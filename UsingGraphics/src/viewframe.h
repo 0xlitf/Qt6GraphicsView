@@ -36,7 +36,8 @@ private slots:
 
 private:
     GraphicsView* m_graphicsView = nullptr;
-    QLabel* m_label = nullptr;
+    QLabel* m_scaleLabel = nullptr;
+    QLabel* m_angleLabel = nullptr;
     QLabel* m_label2 = nullptr;
     QToolButton* m_selectModeButton = nullptr;
     QToolButton* m_dragModeButton = nullptr;

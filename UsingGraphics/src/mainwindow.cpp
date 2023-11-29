@@ -23,17 +23,13 @@ MainWindow::MainWindow(QWidget* parent)
 void MainWindow::populateScene() {
     // Populate scene
     int y = 0;
-    for (int i = -100; i < 100; i += 100) {
+    for (int i = -100; i < 100; i += 100, ++y) {
         int x = 0;
-        for (int j = -70; j < 70; j += 70) {
+        for (int j = -70; j < 70; j += 70, ++x) {
             QColor randomColor = QColor::fromRgb(QRandomGenerator::global()->generate());
             QGraphicsItem* item = new GraphicsItem(randomColor, y, x);
             item->setPos(QPointF(i, j));
             m_scene->addItem(item);
-
-            ++x;
         }
-
-        ++y;
     }
 }

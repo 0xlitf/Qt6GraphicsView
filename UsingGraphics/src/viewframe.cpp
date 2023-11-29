@@ -48,7 +48,6 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     m_zoomSlider->setValue(250);
     m_zoomSlider->setTickPosition(QSlider::TicksRight);
 
-    // Zoom slider layout
     QVBoxLayout* zoomSliderLayout = new QVBoxLayout;
     zoomSliderLayout->addWidget(zoomInIcon);
     zoomSliderLayout->addWidget(m_zoomSlider);
@@ -67,19 +66,18 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     m_rotateSlider->setValue(0);
     m_rotateSlider->setTickPosition(QSlider::TicksBelow);
 
-    // Rotate slider layout
     QHBoxLayout* rotateSliderLayout = new QHBoxLayout;
     rotateSliderLayout->addWidget(rotateLeftIcon);
     rotateSliderLayout->addWidget(m_rotateSlider);
     rotateSliderLayout->addWidget(rotateRightIcon);
 
     m_resetButton = new QToolButton;
-    m_resetButton->setText(tr("0"));
+    m_resetButton->setText(tr("Reset"));
     m_resetButton->setEnabled(false);
 
-    // Label layout
     QHBoxLayout* labelLayout = new QHBoxLayout;
-    m_label = new QLabel(name);
+    m_scaleLabel = new QLabel();
+    m_angleLabel = new QLabel();
     m_label2 = new QLabel(tr("Pointer Mode"));
     m_selectModeButton = new QToolButton;
     m_selectModeButton->setText(tr("Select"));
@@ -94,6 +92,7 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     m_antialiasButton->setCheckable(true);
     m_antialiasButton->setChecked(false);
     m_printButton = new QToolButton;
+    m_printButton->setVisible(false);
     m_printButton->setIcon(QIcon(":/images/printer.svg").pixmap(QSize(100, 100)));
 
     QButtonGroup* pointerModeGroup = new QButtonGroup(this);
@@ -101,7 +100,14 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     pointerModeGroup->addButton(m_selectModeButton);
     pointerModeGroup->addButton(m_dragModeButton);
 
-    labelLayout->addWidget(m_label);
+    labelLayout->addLayout([=] {
+        auto f = new QFormLayout();
+        f->setFormAlignment(Qt::AlignCenter);
+        f->addRow(new QLabel("Scale:"), m_scaleLabel);
+        f->addRow(new QLabel("Angle:"), m_angleLabel);
+        return f;
+    }());
+
     labelLayout->addStretch();
     labelLayout->addWidget(m_label2);
     labelLayout->addWidget(m_selectModeButton);
@@ -154,10 +160,13 @@ void ViewFrame::setResetButtonEnabled() {
 
 void ViewFrame::setupMatrix() {
     qreal scale = qPow(qreal(2), (m_zoomSlider->value() - 250) / qreal(50));
+    qreal angle = m_rotateSlider->value();
+    m_scaleLabel->setText(QString::number(scale));
+    m_angleLabel->setText(QString::number(angle));
 
     QTransform matrix;
     matrix.scale(scale, scale);
-    matrix.rotate(m_rotateSlider->value());
+    matrix.rotate(angle);
 
     m_graphicsView->setTransform(matrix);
     setResetButtonEnabled();

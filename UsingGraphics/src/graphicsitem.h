@@ -20,4 +20,6 @@ private:
     int m_y;
     QColor m_color;
     QList<QPointF> m_stuff;
+
+    qreal scale;
 };
