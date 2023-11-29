@@ -1,20 +1,24 @@
 #pragma once
 
+#include "viewframe.h"
 #include <QGraphicsView>
+#include <QWheelEvent>
 
 class ViewFrame;
 
-class GraphicsView : public QGraphicsView
-{
+class GraphicsView : public QGraphicsView {
     Q_OBJECT
 public:
-    GraphicsView(ViewFrame *v) : QGraphicsView(), view(v) { }
+    GraphicsView(ViewFrame* v)
+        : QGraphicsView()
+        , m_viewFrame(v) {
+    }
 
 protected:
 #if QT_CONFIG(wheelevent)
-    void wheelEvent(QWheelEvent *) override;
+    void wheelEvent(QWheelEvent* e) override;
 #endif
 
 private:
-    ViewFrame *view;
+    ViewFrame* m_viewFrame;
 };

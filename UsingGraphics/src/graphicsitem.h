@@ -2,23 +2,22 @@
 #include <QColor>
 #include <QGraphicsItem>
 
-class GraphicsItem : public QGraphicsItem
-{
+class GraphicsItem : public QGraphicsItem {
 public:
-    GraphicsItem(const QColor &color, int x, int y);
+    GraphicsItem(const QColor& color, int x, int y);
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget) override;
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* item, QWidget* widget) override;
 
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
-    int x;
-    int y;
-    QColor color;
-    QList<QPointF> stuff;
+    int m_x;
+    int m_y;
+    QColor m_color;
+    QList<QPointF> m_stuff;
 };

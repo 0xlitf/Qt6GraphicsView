@@ -16,12 +16,12 @@
 ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     : QFrame(parent) {
     setFrameStyle(Sunken | StyledPanel);
-    graphicsView = new GraphicsView(this);
-    graphicsView->setRenderHint(QPainter::Antialiasing, false);
-    graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
-    graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState);
-    graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
-    graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    m_graphicsView = new GraphicsView(this);
+    m_graphicsView->setRenderHint(QPainter::Antialiasing, false);
+    m_graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
+    m_graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState);
+    m_graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+    m_graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
     int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
     QSize iconSize(size, size);
@@ -42,16 +42,16 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     zoomOutIcon->setIcon(QIcon(":/images/zoom-out.svg").pixmap(QSize(100, 100)));
 
     zoomOutIcon->setIconSize(iconSize);
-    zoomSlider = new QSlider;
-    zoomSlider->setMinimum(0);
-    zoomSlider->setMaximum(500);
-    zoomSlider->setValue(250);
-    zoomSlider->setTickPosition(QSlider::TicksRight);
+    m_zoomSlider = new QSlider;
+    m_zoomSlider->setMinimum(0);
+    m_zoomSlider->setMaximum(500);
+    m_zoomSlider->setValue(250);
+    m_zoomSlider->setTickPosition(QSlider::TicksRight);
 
     // Zoom slider layout
     QVBoxLayout* zoomSliderLayout = new QVBoxLayout;
     zoomSliderLayout->addWidget(zoomInIcon);
-    zoomSliderLayout->addWidget(zoomSlider);
+    zoomSliderLayout->addWidget(m_zoomSlider);
     zoomSliderLayout->addWidget(zoomOutIcon);
 
     QToolButton* rotateLeftIcon = new QToolButton;
@@ -60,116 +60,116 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     QToolButton* rotateRightIcon = new QToolButton;
     rotateRightIcon->setIcon(QIcon(":/images/rotating-forward.svg").pixmap(QSize(100, 100)));
     rotateRightIcon->setIconSize(iconSize);
-    rotateSlider = new QSlider;
-    rotateSlider->setOrientation(Qt::Horizontal);
-    rotateSlider->setMinimum(-360);
-    rotateSlider->setMaximum(360);
-    rotateSlider->setValue(0);
-    rotateSlider->setTickPosition(QSlider::TicksBelow);
+    m_rotateSlider = new QSlider;
+    m_rotateSlider->setOrientation(Qt::Horizontal);
+    m_rotateSlider->setMinimum(-360);
+    m_rotateSlider->setMaximum(360);
+    m_rotateSlider->setValue(0);
+    m_rotateSlider->setTickPosition(QSlider::TicksBelow);
 
     // Rotate slider layout
     QHBoxLayout* rotateSliderLayout = new QHBoxLayout;
     rotateSliderLayout->addWidget(rotateLeftIcon);
-    rotateSliderLayout->addWidget(rotateSlider);
+    rotateSliderLayout->addWidget(m_rotateSlider);
     rotateSliderLayout->addWidget(rotateRightIcon);
 
-    resetButton = new QToolButton;
-    resetButton->setText(tr("0"));
-    resetButton->setEnabled(false);
+    m_resetButton = new QToolButton;
+    m_resetButton->setText(tr("0"));
+    m_resetButton->setEnabled(false);
 
     // Label layout
     QHBoxLayout* labelLayout = new QHBoxLayout;
-    label = new QLabel(name);
-    label2 = new QLabel(tr("Pointer Mode"));
-    selectModeButton = new QToolButton;
-    selectModeButton->setText(tr("Select"));
-    selectModeButton->setCheckable(true);
-    selectModeButton->setChecked(true);
-    dragModeButton = new QToolButton;
-    dragModeButton->setText(tr("Drag"));
-    dragModeButton->setCheckable(true);
-    dragModeButton->setChecked(false);
-    antialiasButton = new QToolButton;
-    antialiasButton->setText(tr("Antialiasing"));
-    antialiasButton->setCheckable(true);
-    antialiasButton->setChecked(false);
-    printButton = new QToolButton;
-    printButton->setIcon(QIcon(":/images/printer.svg").pixmap(QSize(100, 100)));
+    m_label = new QLabel(name);
+    m_label2 = new QLabel(tr("Pointer Mode"));
+    m_selectModeButton = new QToolButton;
+    m_selectModeButton->setText(tr("Select"));
+    m_selectModeButton->setCheckable(true);
+    m_selectModeButton->setChecked(true);
+    m_dragModeButton = new QToolButton;
+    m_dragModeButton->setText(tr("Drag"));
+    m_dragModeButton->setCheckable(true);
+    m_dragModeButton->setChecked(false);
+    m_antialiasButton = new QToolButton;
+    m_antialiasButton->setText(tr("Antialiasing"));
+    m_antialiasButton->setCheckable(true);
+    m_antialiasButton->setChecked(false);
+    m_printButton = new QToolButton;
+    m_printButton->setIcon(QIcon(":/images/printer.svg").pixmap(QSize(100, 100)));
 
     QButtonGroup* pointerModeGroup = new QButtonGroup(this);
     pointerModeGroup->setExclusive(true);
-    pointerModeGroup->addButton(selectModeButton);
-    pointerModeGroup->addButton(dragModeButton);
+    pointerModeGroup->addButton(m_selectModeButton);
+    pointerModeGroup->addButton(m_dragModeButton);
 
-    labelLayout->addWidget(label);
+    labelLayout->addWidget(m_label);
     labelLayout->addStretch();
-    labelLayout->addWidget(label2);
-    labelLayout->addWidget(selectModeButton);
-    labelLayout->addWidget(dragModeButton);
+    labelLayout->addWidget(m_label2);
+    labelLayout->addWidget(m_selectModeButton);
+    labelLayout->addWidget(m_dragModeButton);
     labelLayout->addStretch();
-    labelLayout->addWidget(antialiasButton);
-    labelLayout->addWidget(printButton);
+    labelLayout->addWidget(m_antialiasButton);
+    labelLayout->addWidget(m_printButton);
 
     QGridLayout* topLayout = new QGridLayout;
     topLayout->addLayout(labelLayout, 0, 0);
-    topLayout->addWidget(graphicsView, 1, 0);
+    topLayout->addWidget(m_graphicsView, 1, 0);
     topLayout->addLayout(zoomSliderLayout, 1, 1);
     topLayout->addLayout(rotateSliderLayout, 2, 0);
-    topLayout->addWidget(resetButton, 2, 1);
+    topLayout->addWidget(m_resetButton, 2, 1);
     setLayout(topLayout);
 
-    connect(resetButton, &QAbstractButton::clicked, this, &ViewFrame::resetView);
-    connect(zoomSlider, &QAbstractSlider::valueChanged, this, &ViewFrame::setupMatrix);
-    connect(rotateSlider, &QAbstractSlider::valueChanged, this, &ViewFrame::setupMatrix);
-    connect(graphicsView->verticalScrollBar(), &QAbstractSlider::valueChanged, this, &ViewFrame::setResetButtonEnabled);
-    connect(graphicsView->horizontalScrollBar(), &QAbstractSlider::valueChanged, this, &ViewFrame::setResetButtonEnabled);
-    connect(selectModeButton, &QAbstractButton::toggled, this, &ViewFrame::togglePointerMode);
-    connect(dragModeButton, &QAbstractButton::toggled, this, &ViewFrame::togglePointerMode);
-    connect(antialiasButton, &QAbstractButton::toggled, this, &ViewFrame::toggleAntialiasing);
+    connect(m_resetButton, &QAbstractButton::clicked, this, &ViewFrame::resetView);
+    connect(m_zoomSlider, &QAbstractSlider::valueChanged, this, &ViewFrame::setupMatrix);
+    connect(m_rotateSlider, &QAbstractSlider::valueChanged, this, &ViewFrame::setupMatrix);
+    connect(m_graphicsView->verticalScrollBar(), &QAbstractSlider::valueChanged, this, &ViewFrame::setResetButtonEnabled);
+    connect(m_graphicsView->horizontalScrollBar(), &QAbstractSlider::valueChanged, this, &ViewFrame::setResetButtonEnabled);
+    connect(m_selectModeButton, &QAbstractButton::toggled, this, &ViewFrame::togglePointerMode);
+    connect(m_dragModeButton, &QAbstractButton::toggled, this, &ViewFrame::togglePointerMode);
+    connect(m_antialiasButton, &QAbstractButton::toggled, this, &ViewFrame::toggleAntialiasing);
     connect(rotateLeftIcon, &QAbstractButton::clicked, this, &ViewFrame::rotateLeft);
     connect(rotateRightIcon, &QAbstractButton::clicked, this, &ViewFrame::rotateRight);
     connect(zoomInIcon, &QAbstractButton::clicked, this, &ViewFrame::zoomIn);
     connect(zoomOutIcon, &QAbstractButton::clicked, this, &ViewFrame::zoomOut);
-    connect(printButton, &QAbstractButton::clicked, this, &ViewFrame::print);
+    connect(m_printButton, &QAbstractButton::clicked, this, &ViewFrame::print);
 
     setupMatrix();
 }
 
 QGraphicsView* ViewFrame::view() const {
-    return static_cast<QGraphicsView*>(graphicsView);
+    return static_cast<QGraphicsView*>(m_graphicsView);
 }
 
 void ViewFrame::resetView() {
-    zoomSlider->setValue(250);
-    rotateSlider->setValue(0);
+    m_zoomSlider->setValue(250);
+    m_rotateSlider->setValue(0);
     setupMatrix();
-    graphicsView->ensureVisible(QRectF(0, 0, 0, 0));
+    m_graphicsView->ensureVisible(QRectF(0, 0, 0, 0));
 
-    resetButton->setEnabled(false);
+    m_resetButton->setEnabled(false);
 }
 
 void ViewFrame::setResetButtonEnabled() {
-    resetButton->setEnabled(true);
+    m_resetButton->setEnabled(true);
 }
 
 void ViewFrame::setupMatrix() {
-    qreal scale = qPow(qreal(2), (zoomSlider->value() - 250) / qreal(50));
+    qreal scale = qPow(qreal(2), (m_zoomSlider->value() - 250) / qreal(50));
 
     QTransform matrix;
     matrix.scale(scale, scale);
-    matrix.rotate(rotateSlider->value());
+    matrix.rotate(m_rotateSlider->value());
 
-    graphicsView->setTransform(matrix);
+    m_graphicsView->setTransform(matrix);
     setResetButtonEnabled();
 }
 
 void ViewFrame::togglePointerMode() {
-    graphicsView->setDragMode(selectModeButton->isChecked() ? QGraphicsView::RubberBandDrag : QGraphicsView::ScrollHandDrag);
-    graphicsView->setInteractive(selectModeButton->isChecked());
+    m_graphicsView->setDragMode(m_selectModeButton->isChecked() ? QGraphicsView::RubberBandDrag : QGraphicsView::ScrollHandDrag);
+    m_graphicsView->setInteractive(m_selectModeButton->isChecked());
 }
 
 void ViewFrame::toggleAntialiasing() {
-    graphicsView->setRenderHint(QPainter::Antialiasing, antialiasButton->isChecked());
+    m_graphicsView->setRenderHint(QPainter::Antialiasing, m_antialiasButton->isChecked());
 }
 
 void ViewFrame::print() {
@@ -184,25 +184,25 @@ void ViewFrame::print() {
 }
 
 void ViewFrame::zoomIn() {
-    zoomSlider->setValue(zoomSlider->value() + 1);
+    m_zoomSlider->setValue(m_zoomSlider->value() + 1);
 }
 
 void ViewFrame::zoomOut() {
-    zoomSlider->setValue(zoomSlider->value() - 1);
+    m_zoomSlider->setValue(m_zoomSlider->value() - 1);
 }
 
 void ViewFrame::zoomInBy(int level) {
-    zoomSlider->setValue(zoomSlider->value() + level);
+    m_zoomSlider->setValue(m_zoomSlider->value() + level);
 }
 
 void ViewFrame::zoomOutBy(int level) {
-    zoomSlider->setValue(zoomSlider->value() - level);
+    m_zoomSlider->setValue(m_zoomSlider->value() - level);
 }
 
 void ViewFrame::rotateLeft() {
-    rotateSlider->setValue(rotateSlider->value() - 10);
+    m_rotateSlider->setValue(m_rotateSlider->value() - 10);
 }
 
 void ViewFrame::rotateRight() {
-    rotateSlider->setValue(rotateSlider->value() + 10);
+    m_rotateSlider->setValue(m_rotateSlider->value() + 10);
 }

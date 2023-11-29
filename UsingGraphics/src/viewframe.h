@@ -1,7 +1,7 @@
 #pragma once
+#include "graphicsview.h"
 #include <QFrame>
 #include <QGraphicsView>
-#include "graphicsview.h"
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -9,13 +9,14 @@ class QSlider;
 class QToolButton;
 QT_END_NAMESPACE
 
-class ViewFrame : public QFrame
-{
+class GraphicsView;
+
+class ViewFrame : public QFrame {
     Q_OBJECT
 public:
-    explicit ViewFrame(const QString &name, QWidget *parent = nullptr);
+    explicit ViewFrame(const QString& name, QWidget* parent = nullptr);
 
-    QGraphicsView *view() const;
+    QGraphicsView* view() const;
 
 public slots:
     void zoomIn();
@@ -34,14 +35,14 @@ private slots:
     void rotateRight();
 
 private:
-    GraphicsView *graphicsView;
-    QLabel *label;
-    QLabel *label2;
-    QToolButton *selectModeButton;
-    QToolButton *dragModeButton;
-    QToolButton *antialiasButton;
-    QToolButton *printButton;
-    QToolButton *resetButton;
-    QSlider *zoomSlider;
-    QSlider *rotateSlider;
+    GraphicsView* m_graphicsView = nullptr;
+    QLabel* m_label = nullptr;
+    QLabel* m_label2 = nullptr;
+    QToolButton* m_selectModeButton = nullptr;
+    QToolButton* m_dragModeButton = nullptr;
+    QToolButton* m_antialiasButton = nullptr;
+    QToolButton* m_printButton = nullptr;
+    QToolButton* m_resetButton = nullptr;
+    QSlider* m_zoomSlider = nullptr;
+    QSlider* m_rotateSlider = nullptr;
 };

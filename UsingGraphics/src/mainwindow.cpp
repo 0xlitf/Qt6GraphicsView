@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget* parent)
     populateScene();
 
     ViewFrame* view = new ViewFrame("Top left view");
-    view->view()->setScene(scene);
+    view->view()->setScene(m_scene);
 
     QHBoxLayout* layout = new QHBoxLayout;
     layout->addWidget(view);
@@ -29,7 +29,7 @@ void MainWindow::populateScene() {
             QColor randomColor = QColor::fromRgb(QRandomGenerator::global()->generate());
             QGraphicsItem* item = new GraphicsItem(randomColor, y, x);
             item->setPos(QPointF(i, j));
-            scene->addItem(item);
+            m_scene->addItem(item);
 
             ++x;
         }
