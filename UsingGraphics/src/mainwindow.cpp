@@ -1,9 +1,39 @@
+
 #include "mainwindow.h"
+#include "graphicsitem.h"
+#include "viewframe.h"
+
+#include <QHBoxLayout>
+#include <QRandomGenerator>
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent) {
+    : QWidget(parent) {
+    populateScene();
+
+    ViewFrame* view = new ViewFrame("Top left view");
+    view->view()->setScene(scene);
+
+    QHBoxLayout* layout = new QHBoxLayout;
+    layout->addWidget(view);
+    setLayout(layout);
+
+    setWindowTitle(tr("Chip Example"));
 }
 
-MainWindow::~MainWindow() {
-}
+void MainWindow::populateScene() {
+    // Populate scene
+    int y = 0;
+    for (int i = -100; i < 100; i += 100) {
+        int x = 0;
+        for (int j = -70; j < 70; j += 70) {
+            QColor randomColor = QColor::fromRgb(QRandomGenerator::global()->generate());
+            QGraphicsItem* item = new GraphicsItem(randomColor, y, x);
+            item->setPos(QPointF(i, j));
+            scene->addItem(item);
 
+            ++x;
+        }
+
+        ++y;
+    }
+}

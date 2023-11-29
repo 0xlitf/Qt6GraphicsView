@@ -6,11 +6,12 @@
 
 int main(int argc, char* argv[]) {
     QApplication a(argc, argv);
+    a.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
     for (const QString& locale : uiLanguages) {
-        const QString baseName = "Qt6GraphicsView_" + QLocale(locale).name();
+        const QString baseName = "i18n_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
             a.installTranslator(&translator);
             break;

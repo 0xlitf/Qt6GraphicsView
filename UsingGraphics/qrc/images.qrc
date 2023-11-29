@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/printer.svg</file>
+        <file>images/reverse-rotation.svg</file>
+        <file>images/rotating-forward.svg</file>
+        <file>images/zoom-in.svg</file>
+        <file>images/zoom-out.svg</file>
+    </qresource>
+</RCC>

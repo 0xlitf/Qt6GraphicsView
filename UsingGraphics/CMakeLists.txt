@@ -17,16 +17,16 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Core Quick Widgets Xml Core5Compat OpenGLWidgets Gui)
-find_package(Qt${QT_VERSION_MAJOR} 6.6 REQUIRED COMPONENTS Widgets LinguistTools Core Quick Widgets Xml Core5Compat OpenGLWidgets Gui)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Core Quick Widgets Xml Core5Compat OpenGLWidgets Gui Svg)
+find_package(Qt${QT_VERSION_MAJOR} 6.6 REQUIRED COMPONENTS Widgets LinguistTools Core Quick Widgets Xml Core5Compat OpenGLWidgets Gui Svg)
 
 file(GLOB_RECURSE ${PROJECT_NAME_UPPER}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/*")
 file(GLOB ${PROJECT_NAME_UPPER}_UI "${CMAKE_CURRENT_SOURCE_DIR}/ui/*.ui")
-add_custom_target(ui SOURCES ${${PROJECT_NAME_UPPER}_UI})
+# add_custom_target(ui SOURCES ${${PROJECT_NAME_UPPER}_UI})
 file(GLOB ${PROJECT_NAME_UPPER}_QRC "${CMAKE_CURRENT_SOURCE_DIR}/qrc/*.qrc")
-add_custom_target(qrc SOURCES ${${PROJECT_NAME_UPPER}_QRC})
+# add_custom_target(qrc SOURCES ${${PROJECT_NAME_UPPER}_QRC})
 file(GLOB ${PROJECT_NAME_UPPER}_TS "${CMAKE_CURRENT_SOURCE_DIR}/ts/*.ts")
-add_custom_target(ts SOURCES ${${PROJECT_NAME_UPPER}_TS})
+# add_custom_target(ts SOURCES ${${PROJECT_NAME_UPPER}_TS})
 
 source_group("SRC" FILES ${${PROJECT_NAME_UPPER}_SRC})
 source_group("UI" FILES ${${PROJECT_NAME_UPPER}_UI})
@@ -72,6 +72,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core5Compat
     Qt${QT_VERSION_MAJOR}::OpenGLWidgets
     Qt${QT_VERSION_MAJOR}::Gui
+    Qt6::Svg
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
