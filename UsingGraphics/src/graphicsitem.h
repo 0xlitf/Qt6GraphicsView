@@ -6,6 +6,8 @@
 #include <QMenu>
 #include <QGraphicsSceneContextMenuEvent>
 
+class GraphicsScene;
+
 class GraphicsItem : public QGraphicsObject {
     Q_OBJECT
 public:
@@ -14,6 +16,9 @@ public:
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* item, QWidget* widget) override;
+
+    bool grouped() const;
+    void setGrouped(bool newGrouped);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
@@ -32,4 +37,6 @@ private:
     qreal m_scale;
 
     bool m_grouped = false;
+
+    GraphicsScene* m_scene = nullptr;
 };

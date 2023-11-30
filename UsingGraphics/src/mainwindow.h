@@ -1,4 +1,5 @@
 #pragma once
+#include <graphicsscene.h>
 #include <QGraphicsScene>
 #include <QWidget>
 
@@ -15,5 +16,5 @@ private:
     void setupMatrix();
     void populateScene();
 
-    QGraphicsScene* m_scene = new QGraphicsScene(this);
+    GraphicsScene* m_scene = new GraphicsScene(this);
 };

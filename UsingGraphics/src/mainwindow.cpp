@@ -27,7 +27,7 @@ void MainWindow::populateScene() {
         int x = 0;
         for (int j = -70; j < 70; j += 80, ++x) {
             QColor randomColor = QColor::fromRgb(QRandomGenerator::global()->generate());
-            QGraphicsItem* item = new GraphicsItem(randomColor, y, x);
+            GraphicsItem* item = new GraphicsItem(randomColor, y, x);
             item->setPos(QPointF(i, j));
             m_scene->addItem(item);
         }
