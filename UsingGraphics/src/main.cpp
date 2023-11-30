@@ -91,6 +91,7 @@ int main(int argc, char* argv[]) {
         }
     }
     MainWindow w;
+    w.setMinimumSize(1280, 700);
     w.show();
     return a.exec();
 }

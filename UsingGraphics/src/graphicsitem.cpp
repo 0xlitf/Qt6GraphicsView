@@ -53,32 +53,32 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     painter->drawRect(QRectF(0,0,110,70));
     painter->setPen(p);
 
-    scale = option->levelOfDetailFromTransform(painter->worldTransform());
+    m_scale = option->levelOfDetailFromTransform(painter->worldTransform());
 
     QBrush b = painter->brush();
     painter->setBrush(fillColor);
-    painter->drawText(QPointF(15, 15), QString::number(scale));
+    painter->drawText(QPointF(15, 15), QString::number(m_scale));
     painter->setBrush(b);
 
-    if (scale < 0.2) {
-        if (scale < 0.125) {
+    if (m_scale < 0.2) {
+        if (m_scale < 0.125) {
             painter->fillRect(QRectF(0, 0, 110, 70), fillColor);
             return;
         }
     }
 
-    if (scale >= 1) {
+    if (m_scale >= 1) {
 
     }
 
-    if (scale >= 2) {
+    if (m_scale >= 2) {
 
     }
 
-    if (scale >= 0.5) {
+    if (m_scale >= 0.5) {
 
     }
-    if (scale >= 0.4) {
+    if (m_scale >= 0.4) {
 
     }
 
@@ -117,31 +117,52 @@ void GraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 
 void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
     QMenu menu;
-    QAction *groupAction = menu.addAction("Group Items");
+    QAction *groupAction = menu.addAction(!m_grouped ? "Group Items" : "Ungroup");
     QAction *otherAction = menu.addAction("Other Option");
 
     qDebug() << "event->screenPos(): " << event->screenPos();
     QAction *selectedAction = menu.exec(event->screenPos());
 
     if (selectedAction == groupAction) {
-        groupItems();
+        if (!m_grouped) {
+            groupItems();
+        } else {
+            scene()->destroyItemGroup(m_group);
+        }
     } else if (selectedAction == otherAction) {
 
     }
+
+    auto g = this->group();
+    if (g && g->type() == QGraphicsItemGroup::Type) {
+        if (g) {
+            this->m_grouped = false;
+            g->removeFromGroup(this);
+
+            scene()->addItem(this);
+
+            setPos(mapToScene(0, 0));
+        }
+    }
 }
+
 void GraphicsItem::groupItems() {
     qDebug() << "groupItems";
-    group = new QGraphicsItemGroup();
-    scene()->addItem(group);
+    m_group = new QGraphicsItemGroup();
+    scene()->addItem(m_group);
 
-    group->setFlags(ItemIsSelectable | ItemIsMovable);
-    group->setAcceptHoverEvents(true);
+    m_group->setFlags(ItemIsSelectable | ItemIsMovable);
+    m_group->setAcceptHoverEvents(true);
 
     QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
     qDebug() << "selectedItems: " << selectedItems.count();
 
-    for (QGraphicsItem *item: selectedItems) {
-        item->setSelected(false);
-        group->addToGroup(item);
+    for (QGraphicsItem* item : selectedItems) {
+        GraphicsItem* i = dynamic_cast<GraphicsItem*>(item);
+
+        i->setSelected(false);
+        i->m_grouped = true;
+
+        m_group->addToGroup(i);
     }
 }

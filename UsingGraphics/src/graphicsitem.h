@@ -28,6 +28,8 @@ private:
     int m_y;
     QColor m_color;
     QList<QPointF> m_stuff;
-    QGraphicsItemGroup* group;
-    qreal scale;
+    QGraphicsItemGroup* m_group;
+    qreal m_scale;
+
+    bool m_grouped = false;
 };
