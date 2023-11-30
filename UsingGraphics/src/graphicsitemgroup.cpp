@@ -2,22 +2,26 @@
 #include "graphicsscene.h"
 
 GraphicsItemGroup::GraphicsItemGroup() {
-    setFlags(ItemIsSelectable | ItemIsMovable);
-    setAcceptHoverEvents(true);
+    this->setFlags(ItemIsSelectable | ItemIsMovable);
+    this->setAcceptHoverEvents(true);
 
 }
 
 void GraphicsItemGroup::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
-    QMenu menu;
-    QAction* ungroupAction = menu.addAction("Ungroup");
-    QAction* otherAction = menu.addAction("Other Option");
+    this->setSelected(true);
 
-    qDebug() << "event->screenPos(): " << event->screenPos();
+    m_scene = dynamic_cast<GraphicsScene*>(this->scene());
+    m_scene->clearSelection();
+    this->setSelected(true);
+
+    QMenu menu;
+    QAction* ungroupAction = menu.addAction(QString("Ungroup %1 Items").arg(QString::number(this->childItems().count())));
+
     QAction* selectedAction = menu.exec(event->screenPos());
 
     if (selectedAction == ungroupAction) {
-        ungroupItems();
-    } else if (selectedAction == otherAction) {
+        this->ungroupItems();
+    } else if (selectedAction == nullptr) {
 
     }
 }

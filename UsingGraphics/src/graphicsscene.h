@@ -25,7 +25,6 @@ public:
             GraphicsItem* i = dynamic_cast<GraphicsItem*>(item);
 
             i->setSelected(false);
-            i->setGrouped(true);
 
             group->addToGroup(item);
         }

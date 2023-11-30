@@ -1,10 +1,10 @@
 #pragma once
+#include <QAction>
 #include <QColor>
 #include <QGraphicsItem>
 #include <QGraphicsItemGroup>
-#include <QAction>
-#include <QMenu>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QMenu>
 
 class GraphicsScene;
 
@@ -17,9 +17,6 @@ public:
     QPainterPath shape() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* item, QWidget* widget) override;
 
-    bool grouped() const;
-    void setGrouped(bool newGrouped);
-
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
@@ -31,12 +28,14 @@ protected:
 private:
     int m_x;
     int m_y;
+    int m_radius = 40;
+    int m_height = m_radius * 2;
+    int m_width = m_radius * 2;
+
     QColor m_color;
     QList<QPointF> m_stuff;
     QGraphicsItemGroup* m_group;
     qreal m_scale;
-
-    bool m_grouped = false;
 
     GraphicsScene* m_scene = nullptr;
 };

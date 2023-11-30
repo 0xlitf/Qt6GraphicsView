@@ -24,12 +24,12 @@ GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
 }
 
 QRectF GraphicsItem::boundingRect() const {
-    return QRectF(0, 0, 110, 70);
+    return QRectF(0, 0, m_width, m_height);
 }
 
 QPainterPath GraphicsItem::shape() const {
     QPainterPath path;
-    path.addRect(QRectF(0, 0, 110, 70));
+    path.addEllipse(this->boundingRect());
     return path;
 }
 
@@ -49,25 +49,27 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
         borderColor = Qt::green;
     }
 
-    QPen p = painter->pen();
-    painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    painter->setBrush(fillColor);
-    painter->drawRect(QRectF(0,0,110,70));
-    painter->setPen(p);
+    // QPen p = painter->pen();
+    // painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    // painter->setBrush(fillColor);
+    // painter->drawRect(QRectF(0,0,110,70));
+    // painter->setPen(p);
 
     m_scale = option->levelOfDetailFromTransform(painter->worldTransform());
 
     QBrush b = painter->brush();
     painter->setBrush(fillColor);
-    painter->drawText(QPointF(15, 15), QString::number(m_scale));
+    // painter->drawText(QPointF(15, 15), QString::number(m_scale));
+
+    painter->drawEllipse(0, 0, 2 * m_radius, 2 * m_radius);
     painter->setBrush(b);
 
-    if (m_scale < 0.2) {
-        if (m_scale < 0.125) {
-            painter->fillRect(QRectF(0, 0, 110, 70), fillColor);
-            return;
-        }
-    }
+    // if (m_scale < 0.2) {
+    //     if (m_scale < 0.125) {
+    //         painter->fillRect(QRectF(0, 0, 110, 70), fillColor);
+    //         return;
+    //     }
+    // }
 
     if (m_scale >= 1) {
 
@@ -119,29 +121,39 @@ void GraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
-    QMenu menu;
-    QAction *groupAction = menu.addAction("Group Items");
-    QAction *otherAction = menu.addAction("Other Option");
+    this->setSelected(true);
 
-    qDebug() << "event->screenPos(): " << event->screenPos();
+    m_scene = dynamic_cast<GraphicsScene*>(this->scene());
+    int selectCount = m_scene->selectedItems().count();
+
+    QMenu menu;
+    QAction *groupAction = menu.addAction(QString("Group %1 Items").arg(QString::number(selectCount)));
+    QAction *alignLeftAction = menu.addAction("AlignLeft");
+    QAction *alignRightAction = menu.addAction("AlignRight");
+    QAction *alignTopAction = menu.addAction("AlignTop");
+    QAction *alignBottomAction = menu.addAction("AlignBottom");
+
+    if (selectCount <= 1) {
+        groupAction->setEnabled(false);
+        alignLeftAction->setEnabled(false);
+        alignRightAction->setEnabled(false);
+        alignTopAction->setEnabled(false);
+        alignBottomAction->setEnabled(false);
+    }
+
     QAction *selectedAction = menu.exec(event->screenPos());
 
     if (selectedAction == groupAction) {
-        if (!m_grouped) {
-            m_scene = dynamic_cast<GraphicsScene*>(this->scene());
-            m_scene->groupItems();
-        } else {
-            //scene()->destroyItemGroup(m_group);
-        }
-    } else if (selectedAction == otherAction) {
+        m_scene->groupItems();
+    } else if (selectedAction == alignLeftAction) {
 
+    } else if (selectedAction == alignRightAction) {
+
+    } else if (selectedAction == alignTopAction) {
+
+    } else if (selectedAction == alignBottomAction) {
+
+    } else {
+        qDebug() << "GraphicsItem selectedAction not match";
     }
-}
-
-bool GraphicsItem::grouped() const {
-    return m_grouped;
-}
-
-void GraphicsItem::setGrouped(bool newGrouped) {
-    m_grouped = newGrouped;
 }
