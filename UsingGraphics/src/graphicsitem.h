@@ -5,6 +5,7 @@
 #include <QGraphicsItemGroup>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
+#include <QKeyEvent>
 
 class GraphicsScene;
 
@@ -18,6 +19,14 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* item, QWidget* widget) override;
 
 protected:
+    void keyPressEvent(QKeyEvent *event) override {
+        qDebug() << "GraphicsItem Key Pressed: " << Qt::Key(event->key());
+    }
+
+    void keyReleaseEvent(QKeyEvent *event) override {
+        qDebug() << "GraphicsItem Key Released: " << Qt::Key(event->key());
+    }
+
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;

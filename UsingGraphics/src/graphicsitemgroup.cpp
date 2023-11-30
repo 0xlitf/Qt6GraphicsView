@@ -20,13 +20,13 @@ void GraphicsItemGroup::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) 
     QAction* selectedAction = menu.exec(event->screenPos());
 
     if (selectedAction == ungroupAction) {
-        this->ungroupItems();
+        m_scene->ungroupItems();
     } else if (selectedAction == nullptr) {
 
     }
 }
 
-void GraphicsItemGroup::ungroupItems() {
+void GraphicsItemGroup::ungroup() {
     m_scene = dynamic_cast<GraphicsScene*>(this->scene());
     m_scene->destroyItemGroup(this);
 }
