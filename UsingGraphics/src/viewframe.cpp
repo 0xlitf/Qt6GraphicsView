@@ -28,7 +28,7 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
 
     QToolButton* zoomInIcon = new QToolButton;
     zoomInIcon->setAutoRepeat(true);
-    zoomInIcon->setAutoRepeatInterval(33);
+    zoomInIcon->setAutoRepeatInterval(15);
     zoomInIcon->setAutoRepeatDelay(0);
 
     zoomInIcon->setIcon(QIcon(":/images/zoom-in.svg").pixmap(QSize(100, 100)));
@@ -36,7 +36,7 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     zoomInIcon->setIconSize(iconSize);
     QToolButton* zoomOutIcon = new QToolButton;
     zoomOutIcon->setAutoRepeat(true);
-    zoomOutIcon->setAutoRepeatInterval(33);
+    zoomOutIcon->setAutoRepeatInterval(15);
     zoomOutIcon->setAutoRepeatDelay(0);
 
     zoomOutIcon->setIcon(QIcon(":/images/zoom-out.svg").pixmap(QSize(100, 100)));
@@ -54,11 +54,19 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     zoomSliderLayout->addWidget(zoomOutIcon);
 
     QToolButton* rotateLeftIcon = new QToolButton;
+    rotateLeftIcon->setAutoRepeat(true);
+    rotateLeftIcon->setAutoRepeatInterval(33);
+    rotateLeftIcon->setAutoRepeatDelay(0);
     rotateLeftIcon->setIcon(QIcon(":/images/reverse-rotation.svg").pixmap(QSize(100, 100)));
     rotateLeftIcon->setIconSize(iconSize);
+
     QToolButton* rotateRightIcon = new QToolButton;
+    rotateRightIcon->setAutoRepeat(true);
+    rotateRightIcon->setAutoRepeatInterval(33);
+    rotateRightIcon->setAutoRepeatDelay(0);
     rotateRightIcon->setIcon(QIcon(":/images/rotating-forward.svg").pixmap(QSize(100, 100)));
     rotateRightIcon->setIconSize(iconSize);
+
     m_rotateSlider = new QSlider;
     m_rotateSlider->setOrientation(Qt::Horizontal);
     m_rotateSlider->setMinimum(-360);
@@ -83,10 +91,10 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     m_selectModeButton->setText(tr("Select"));
     m_selectModeButton->setCheckable(true);
     m_selectModeButton->setChecked(true);
-    m_dragModeButton = new QToolButton;
-    m_dragModeButton->setText(tr("Drag"));
-    m_dragModeButton->setCheckable(true);
-    m_dragModeButton->setChecked(false);
+    // m_dragModeButton = new QToolButton;
+    // m_dragModeButton->setText(tr("Drag"));
+    // m_dragModeButton->setCheckable(true);
+    // m_dragModeButton->setChecked(false);
     m_antialiasButton = new QToolButton;
     m_antialiasButton->setText(tr("Antialiasing"));
     m_antialiasButton->setCheckable(true);
@@ -98,7 +106,7 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     QButtonGroup* pointerModeGroup = new QButtonGroup(this);
     pointerModeGroup->setExclusive(true);
     pointerModeGroup->addButton(m_selectModeButton);
-    pointerModeGroup->addButton(m_dragModeButton);
+    // pointerModeGroup->addButton(m_dragModeButton);
 
     labelLayout->addLayout([=] {
         auto f = new QFormLayout();
@@ -111,7 +119,7 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     labelLayout->addStretch();
     labelLayout->addWidget(m_label2);
     labelLayout->addWidget(m_selectModeButton);
-    labelLayout->addWidget(m_dragModeButton);
+    // labelLayout->addWidget(m_dragModeButton);
     labelLayout->addStretch();
     labelLayout->addWidget(m_antialiasButton);
     labelLayout->addWidget(m_printButton);
@@ -130,7 +138,7 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     connect(m_graphicsView->verticalScrollBar(), &QAbstractSlider::valueChanged, this, &ViewFrame::setResetButtonEnabled);
     connect(m_graphicsView->horizontalScrollBar(), &QAbstractSlider::valueChanged, this, &ViewFrame::setResetButtonEnabled);
     connect(m_selectModeButton, &QAbstractButton::toggled, this, &ViewFrame::togglePointerMode);
-    connect(m_dragModeButton, &QAbstractButton::toggled, this, &ViewFrame::togglePointerMode);
+    // connect(m_dragModeButton, &QAbstractButton::toggled, this, &ViewFrame::togglePointerMode);
     connect(m_antialiasButton, &QAbstractButton::toggled, this, &ViewFrame::toggleAntialiasing);
     connect(rotateLeftIcon, &QAbstractButton::clicked, this, &ViewFrame::rotateLeft);
     connect(rotateRightIcon, &QAbstractButton::clicked, this, &ViewFrame::rotateRight);

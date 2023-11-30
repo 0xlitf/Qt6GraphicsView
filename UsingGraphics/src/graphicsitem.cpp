@@ -4,6 +4,12 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
+#include <QGraphicsScene>
+#include <QGraphicsItem>
+#include <QGraphicsItemGroup>
+#include <QMenu>
+#include <QAction>
+#include <QContextMenuEvent>
 
 GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
     this->m_x = x;
@@ -21,23 +27,37 @@ QRectF GraphicsItem::boundingRect() const {
 
 QPainterPath GraphicsItem::shape() const {
     QPainterPath path;
-    path.addRect(14, 14, 82, 42);
+    path.addRect(QRectF(0, 0, 110, 70));
     return path;
 }
 
 void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
     Q_UNUSED(widget);
 
-    QColor fillColor = (option->state & QStyle::State_Selected) ? m_color.darker(150) : m_color;
+    QColor borderColor = m_color;
+    QColor fillColor = m_color;
+
     if (option->state & QStyle::State_MouseOver) {
         fillColor = fillColor.lighter(125);
+        borderColor = Qt::black;
     }
+
+    if (option->state & QStyle::State_Selected) {
+        fillColor = m_color.darker(150);
+        borderColor = Qt::green;
+    }
+
+    QPen p = painter->pen();
+    painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter->setBrush(fillColor);
+    painter->drawRect(QRectF(0,0,110,70));
+    painter->setPen(p);
 
     scale = option->levelOfDetailFromTransform(painter->worldTransform());
 
     QBrush b = painter->brush();
     painter->setBrush(fillColor);
-    painter->drawText(QPointF(13, 13), QString::number(scale));
+    painter->drawText(QPointF(15, 15), QString::number(scale));
     painter->setBrush(b);
 
     if (scale < 0.2) {
@@ -93,4 +113,35 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 void GraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
     QGraphicsItem::mouseReleaseEvent(event);
     update();
+}
+
+void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
+    QMenu menu;
+    QAction *groupAction = menu.addAction("Group Items");
+    QAction *otherAction = menu.addAction("Other Option");
+
+    qDebug() << "event->screenPos(): " << event->screenPos();
+    QAction *selectedAction = menu.exec(event->screenPos());
+
+    if (selectedAction == groupAction) {
+        groupItems();
+    } else if (selectedAction == otherAction) {
+
+    }
+}
+void GraphicsItem::groupItems() {
+    qDebug() << "groupItems";
+    group = new QGraphicsItemGroup();
+    scene()->addItem(group);
+
+    group->setFlags(ItemIsSelectable | ItemIsMovable);
+    group->setAcceptHoverEvents(true);
+
+    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+    qDebug() << "selectedItems: " << selectedItems.count();
+
+    for (QGraphicsItem *item: selectedItems) {
+        item->setSelected(false);
+        group->addToGroup(item);
+    }
 }
