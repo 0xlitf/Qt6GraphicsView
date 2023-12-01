@@ -23,9 +23,9 @@ MainWindow::MainWindow(QWidget* parent)
 void MainWindow::populateScene() {
     // Populate scene
     int y = 0;
-    for (int i = -100; i < 100; i += 120, ++y) {
+    for (int i = -100; i < 150; i += 120, ++y) {
         int x = 0;
-        for (int j = -100; j < 100; j += 120, ++x) {
+        for (int j = -100; j < 150; j += 120, ++x) {
             QColor randomColor = QColor::fromRgb(QRandomGenerator::global()->generate());
             GraphicsItem* item = new GraphicsItem(randomColor, y, x);
             item->setPos(QPointF(i, j));
