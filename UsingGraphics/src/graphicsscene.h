@@ -3,6 +3,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsItemGroup>
 #include <QKeyEvent>
+#include <tuple>
+#include <algorithm>
 #include "graphicsitem.h"
 #include "graphicsitemgroup.h"
 
@@ -42,6 +44,58 @@ public:
         }
     }
 
+    void alignItems(QList<QGraphicsItem*> selectedItems, Qt::AlignmentFlag align) {
+        if (selectedItems.size() < 2) {
+            return;
+        }
+        auto [xList, yList] = [&] {
+            QList<int> xList;
+            QList<int> yList;
+            for (auto item : selectedItems) {
+                xList.append(item->x());
+                yList.append(item->y());
+            }
+            return std::make_tuple(xList, yList);
+        }();
+
+        auto maxValue = [](QList<int>& list) {
+            return *std::max_element(list.begin(), list.end());
+        };
+        auto minValue = [](QList<int>& list) {
+            return *std::min_element(list.begin(), list.end());
+        };
+
+        switch (align) {
+            case Qt::AlignLeft: {
+                int v = minValue(xList);
+                for (auto item : selectedItems) {
+                    item->setX(v);
+                }
+            } break;
+            case Qt::AlignRight: {
+                int v = maxValue(xList);
+                for (auto item : selectedItems) {
+                    item->setX(v);
+                }
+            } break;
+            case Qt::AlignTop: {
+                int v = minValue(yList);
+                for (auto item : selectedItems) {
+                    item->setY(v);
+                }
+            } break;
+            case Qt::AlignBottom: {
+                int v = maxValue(yList);
+                for (auto item : selectedItems) {
+                    item->setY(v);
+                }
+            } break;
+            default: {
+                qDebug() << align << "is not support.";
+            } break;
+        }
+    }
+
 protected:
     void keyPressEvent(QKeyEvent* event) override {
 
@@ -49,27 +103,26 @@ protected:
         qDebug() << "GraphicsScene Key Pressed: " << Qt::Key(event->key());
         switch (Qt::Key(event->key())) {
             case Qt::Key_F1: {
-                groupItems();
-            }
-                break;
+                this->groupItems();
+            } break;
             case Qt::Key_F2: {
-                ungroupItems();
-            }
+                this->ungroupItems();
+            } break;
             case Qt::Key_1: {
-
-            }
+                this->alignItems(this->selectedItems(), Qt::AlignLeft);
+            } break;
             case Qt::Key_2: {
-
-            }
+                this->alignItems(this->selectedItems(), Qt::AlignRight);
+            } break;
             case Qt::Key_3: {
-
-            }
+                this->alignItems(this->selectedItems(), Qt::AlignTop);
+            } break;
             case Qt::Key_4: {
+                this->alignItems(this->selectedItems(), Qt::AlignBottom);
+            } break;
+            default: {
 
-            }
-            break;
-            default:
-                break;
+            } break;
         }
     }
 
