@@ -232,6 +232,7 @@ void GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+    qDebug() << "scene mouseReleaseEvent";
 
     QGraphicsScene::mouseReleaseEvent(event);
 }

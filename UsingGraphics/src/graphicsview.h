@@ -20,6 +20,7 @@ protected:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override {
+        qDebug() << "view mousePressEvent";
         if (event->button() == Qt::RightButton) {
             // 在这里处理鼠标右键按下事件
             // 例如记录下按下时的坐标
@@ -29,7 +30,7 @@ protected:
         }
     }
 
-    void mouseMoveEvent(QMouseEvent *event) override {
+    void mouseMoveEvent(QMouseEvent* event) override {
         if (event->buttons() == Qt::RightButton) {
             // 在这里处理鼠标右键拖动事件
             // 例如根据拖动距离进行视图的平移
@@ -40,6 +41,11 @@ protected:
         } else {
             QGraphicsView::mouseMoveEvent(event);
         }
+    }
+
+    void mouseReleaseEvent(QMouseEvent* event) override {
+        qDebug() << "view mouseReleaseEvent";
+        QGraphicsView::mouseReleaseEvent(event);
     }
 
 private:
