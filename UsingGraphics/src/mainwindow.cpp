@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget* parent)
     QHBoxLayout* layout = new QHBoxLayout;
     layout->addWidget(view);
 
-    m_propertyDock = new QDockWidget(QString::fromStdWString(L"Property"), this);
+    m_propertyDock = new DockWidget(QString::fromStdWString(L"Property"), this);
     m_propertyDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     m_propertyDock->setMaximumWidth(300);
     m_propertyDock->setWidget(m_property);
@@ -29,7 +29,6 @@ MainWindow::MainWindow(QWidget* parent)
 }
 
 void MainWindow::populateScene() {
-    // Populate scene
     int y = 0;
     for (int i = -100; i < 150; i += 120, ++y) {
         int x = 0;
