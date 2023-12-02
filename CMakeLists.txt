@@ -6,13 +6,7 @@ string(REPLACE "-" "_" current_dir "${current_dir}")
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-set(OpenCV_DIR "${CMAKE_CURRENT_LIST_DIR}/../3rdParty/opencv/build")
-set(Eigen_DIR "${CMAKE_CURRENT_LIST_DIR}/../3rdParty/Eigen/eigen3")
-set(fmt_DIR "${CMAKE_CURRENT_LIST_DIR}/../3rdParty/fmt-10.1.1-lib")
-set(QtLottie_DIR "${CMAKE_CURRENT_LIST_DIR}/../3rdParty/QtLottie")
-list(APPEND CMAKE_PREFIX_PATH ${OpenCV_DIR})
-list(APPEND CMAKE_PREFIX_PATH ${Eigen_DIR})
-list(APPEND CMAKE_PREFIX_PATH ${fmt_DIR})
+add_subdirectory("C:/PCL 1.13.1/3rdParty" 3rdParty.out)
 
 message("CMAKE_BUILD_TYPE \n\t : ${CMAKE_BUILD_TYPE}")
 message("CMake start \n\t directory name: ${current_dir}")

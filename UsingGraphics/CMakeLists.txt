@@ -75,8 +75,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::OpenGLWidgets
     Qt${QT_VERSION_MAJOR}::Gui
     Qt6::Svg
-    debug ${CMAKE_CURRENT_SOURCE_DIR}/../QtPropertyBrowser/lib/Windows/qtpropertybrowserd.lib
-    optimized ${CMAKE_CURRENT_SOURCE_DIR}/../QtPropertyBrowser/lib/Windows/qtpropertybrowser.lib
+    debug ${QtPropertyBrowser_DIR}/lib/Windows/qtpropertybrowserd.lib
+    optimized ${QtPropertyBrowser_DIR}/lib/Windows/qtpropertybrowser.lib
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -115,7 +115,7 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../QtPropertyBrowser/include
+    ${QtPropertyBrowser_DIR}/include
     ${Qt6Core_PRIVATE_INCLUDE_DIRS}
 )
 
