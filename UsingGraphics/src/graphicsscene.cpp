@@ -155,11 +155,8 @@ QtTreePropertyBrowser* GraphicsScene::getPropertyEditor() const {
 void GraphicsScene::setPropertyEditor(QtTreePropertyBrowser* newPropertyEditor) {
     m_propertyEditor = newPropertyEditor;
 
-    QtDoubleSpinBoxFactory *doubleSpinBoxFactory = new QtDoubleSpinBoxFactory(this);
-    QtSpinBoxFactory *spinBoxFactory = new QtSpinBoxFactory(this);
-
-    m_propertyEditor->setFactoryForManager(doubleManager, doubleSpinBoxFactory);
-    m_propertyEditor->setFactoryForManager(intManager, spinBoxFactory);
+    m_propertyEditor->setFactoryForManager(doubleManager, new QtDoubleSpinBoxFactory(this));
+    m_propertyEditor->setFactoryForManager(intManager, new QtSpinBoxFactory(this));
 }
 
 void GraphicsScene::keyPressEvent(QKeyEvent* event) {
