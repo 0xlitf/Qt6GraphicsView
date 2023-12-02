@@ -12,6 +12,7 @@ class GraphicsScene;
 class GraphicsItem : public QGraphicsObject {
     Q_OBJECT
 public:
+    GraphicsItem() = default;
     GraphicsItem(const QColor& color, int x, int y);
 
     QRectF boundingRect() const override;
@@ -34,7 +35,7 @@ protected:
 
     void groupItems();
 
-private:
+protected:
     int m_x;
     int m_y;
     int m_radius = 40;

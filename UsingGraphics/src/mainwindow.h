@@ -2,6 +2,8 @@
 #include <graphicsscene.h>
 #include <QGraphicsScene>
 #include <QWidget>
+#include "QtTreePropertyBrowser"
+#include <QDockWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -17,4 +19,6 @@ private:
     void populateScene();
 
     GraphicsScene* m_scene = new GraphicsScene(this);
+    QDockWidget* m_propertyDock;
+    QtTreePropertyBrowser* m_property = new QtTreePropertyBrowser(this);
 };

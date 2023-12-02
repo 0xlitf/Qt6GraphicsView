@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "graphicsitem.h"
 #include "viewframe.h"
+#include "rounditem.h"
 
 #include <QHBoxLayout>
 #include <QRandomGenerator>
@@ -15,9 +16,16 @@ MainWindow::MainWindow(QWidget* parent)
 
     QHBoxLayout* layout = new QHBoxLayout;
     layout->addWidget(view);
+
+    m_propertyDock = new QDockWidget(QString::fromStdWString(L"Property"), this);
+    m_propertyDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    m_propertyDock->setMaximumWidth(300);
+    m_propertyDock->setWidget(m_property);
+    layout->addWidget(m_propertyDock);
+
     setLayout(layout);
 
-    setWindowTitle(tr("Chip Example"));
+    setWindowTitle(tr("Graphics"));
 }
 
 void MainWindow::populateScene() {
@@ -27,7 +35,7 @@ void MainWindow::populateScene() {
         int x = 0;
         for (int j = -100; j < 150; j += 120, ++x) {
             QColor randomColor = QColor::fromRgb(QRandomGenerator::global()->generate());
-            GraphicsItem* item = new GraphicsItem(randomColor, y, x);
+            auto item = new RoundItem(randomColor, y, x);
             item->setPos(QPointF(i, j));
             m_scene->addItem(item);
         }

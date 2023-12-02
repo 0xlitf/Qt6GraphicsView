@@ -16,7 +16,9 @@ public:
         AlignRight = 0x0002,
         AlignTop = 0x0003,
         AlignBottom = 0x0004,
-        AlignCircle = 0x0005
+        AlignCircle = 0x0005,
+        AlignHLine = 0x0006,
+        AlignVLine = 0x0007
     };
     Q_ENUM(AlignmentFlag)
 
@@ -130,6 +132,28 @@ public:
                     item->setY(y);
                 }
             } break;
+            case AlignHLine: {
+                int x = minValue(xList);
+                int y = minValue(yList);
+
+                for (auto item : selectedItems) {
+                    item->setX(x);
+                    item->setY(y);
+
+                    x += item->boundingRect().width() + 10;
+                }
+            } break;
+            case AlignVLine: {
+                int x = minValue(xList);
+                int y = minValue(yList);
+
+                for (auto item : selectedItems) {
+                    item->setX(x);
+                    item->setY(y);
+
+                    y += item->boundingRect().height() + 10;
+                }
+            } break;
             default: {
                 qDebug() << align << "is not support.";
             } break;
@@ -161,6 +185,12 @@ protected:
             } break;
             case Qt::Key_5: {
                 this->alignItems(this->selectedItems(), AlignCircle);
+            } break;
+            case Qt::Key_6: {
+                this->alignItems(this->selectedItems(), AlignHLine);
+            } break;
+            case Qt::Key_7: {
+                this->alignItems(this->selectedItems(), AlignVLine);
             } break;
             default: {
 

@@ -40,10 +40,12 @@ set(PROJECT_SOURCES
     ${${PROJECT_NAME_UPPER}_TS}
 )
 
+set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/qrc/images/qt.rc")
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME}
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        ${app_icon_resource_windows}
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -73,13 +75,23 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::OpenGLWidgets
     Qt${QT_VERSION_MAJOR}::Gui
     Qt6::Svg
+    debug ${CMAKE_CURRENT_SOURCE_DIR}/../QtPropertyBrowser/lib/Windows/qtpropertybrowserd.lib
+    optimized ${CMAKE_CURRENT_SOURCE_DIR}/../QtPropertyBrowser/lib/Windows/qtpropertybrowser.lib
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
+
+set(ICON_FILE "${CMAKE_SOURCE_DIR}/qrc/images/qt.ico")
+if(WIN32)
+    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+    set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ICON:${ICON_FILE}")  # 设置图标文件
+endif()
+
 if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.${PROJECT_NAME})
+    set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.${PROJECT_NAME})
 endif()
 set_target_properties(${PROJECT_NAME} PROPERTIES
     ${BUNDLE_ID_OPTION}
@@ -87,6 +99,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
+    LINK_FLAGS "/ICON:${ICON_FILE}"
 )
 
 include(GNUInstallDirs)
@@ -102,6 +115,7 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../QtPropertyBrowser/include
     ${Qt6Core_PRIVATE_INCLUDE_DIRS}
 )
 
