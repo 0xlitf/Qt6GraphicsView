@@ -119,6 +119,8 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     labelLayout->addStretch();
     labelLayout->addWidget(m_label2);
     labelLayout->addWidget(m_selectModeButton);
+    m_label2->setVisible(false);
+    m_selectModeButton->setVisible(false);
     // labelLayout->addWidget(m_dragModeButton);
     labelLayout->addStretch();
     labelLayout->addWidget(m_antialiasButton);
