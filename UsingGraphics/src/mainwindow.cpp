@@ -20,8 +20,11 @@ MainWindow::MainWindow(QWidget* parent)
     m_propertyDock = new DockWidget(QString::fromStdWString(L"Property"), this);
     m_propertyDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     m_propertyDock->setMaximumWidth(300);
-    m_propertyDock->setWidget(m_property);
+    m_propertyDock->setWidget(m_propertyEditor);
+
     layout->addWidget(m_propertyDock);
+
+    m_scene->setPropertyEditor(m_propertyEditor);
 
     setLayout(layout);
 

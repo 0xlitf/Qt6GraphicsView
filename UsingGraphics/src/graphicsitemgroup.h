@@ -22,6 +22,6 @@ protected:
     void ungroup();
 
 private:
-    GraphicsScene* m_scene = nullptr;
+    class GraphicsScene* m_scene = nullptr;
 };
 

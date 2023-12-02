@@ -2,12 +2,11 @@
 #include <QAction>
 #include <QColor>
 #include <QGraphicsItem>
+#include <QGraphicsScene>
 #include <QGraphicsItemGroup>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
 #include <QKeyEvent>
-
-class GraphicsScene;
 
 class GraphicsItem : public QGraphicsObject {
     Q_OBJECT
@@ -44,8 +43,8 @@ protected:
 
     QColor m_color;
     QList<QPointF> m_stuff;
-    QGraphicsItemGroup* m_group;
+
     qreal m_scale;
 
-    GraphicsScene* m_scene = nullptr;
+    class GraphicsScene* m_scene = nullptr;
 };

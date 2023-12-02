@@ -37,5 +37,5 @@ private:
 
     GraphicsScene* m_scene = new GraphicsScene(this);
     DockWidget* m_propertyDock;
-    QtTreePropertyBrowser* m_property = new QtTreePropertyBrowser(this);
+    QtTreePropertyBrowser* m_propertyEditor = new QtTreePropertyBrowser(this);
 };

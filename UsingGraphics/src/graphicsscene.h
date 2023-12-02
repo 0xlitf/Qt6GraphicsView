@@ -1,12 +1,18 @@
 #pragma once
 
-#include <QGraphicsScene>
-#include <QGraphicsItemGroup>
-#include <QKeyEvent>
-#include <tuple>
-#include <algorithm>
+#include "QtDoublePropertyManager"
+#include "QtProperty"
+#include "QtTreePropertyBrowser"
 #include "graphicsitem.h"
 #include "graphicsitemgroup.h"
+#include <QGraphicsItem>
+#include <QGraphicsItemGroup>
+#include <QGraphicsScene>
+#include <QKeyEvent>
+#include <algorithm>
+#include <tuple>
+#include "qtpropertybrowser.h"
+
 
 class GraphicsScene : public QGraphicsScene {
     Q_OBJECT
@@ -24,200 +30,119 @@ public:
 
     explicit GraphicsScene(QObject* parent = nullptr);
 
-    void groupItems() {
-        qDebug() << "groupItems" << this->selectedItems().count();
-        GraphicsItemGroup* group = new GraphicsItemGroup();
-        this->addItem(group);
+    void deleteAllProperty() {
+        QMap<QtProperty*, QString>::ConstIterator itProp = propertyToId.constBegin();
+        while (itProp != propertyToId.constEnd()) {
+            delete itProp.key();
+            itProp++;
+        }
+        propertyToId.clear();
+        idToProperty.clear();
+    }
 
-        group->setFlags(QGraphicsItemGroup::ItemIsSelectable | QGraphicsItemGroup::ItemIsMovable);
-        group->setAcceptHoverEvents(true);
+    QVariant itemChange(GraphicsItem* item, QGraphicsItem::GraphicsItemChange change, const QVariant& value) {
+        qDebug() << "itemChange:" << change;
+        if (change == QGraphicsItem::ItemPositionChange) {
+            // value is the new position.
+            QPointF newPos = value.toPointF();
+            QRectF rect = this->sceneRect();
+            if (!rect.contains(newPos)) {
+                // Keep the item inside the scene rect.
+                newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
+                newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
 
-        QList<QGraphicsItem *> selectedItems = this->selectedItems();
-        qDebug() << "selectedItems: " << selectedItems.count();
+                if (item != m_currentItem)
+                    return QPointF();
 
-        for (QGraphicsItem* item : selectedItems) {
-            GraphicsItem* i = dynamic_cast<GraphicsItem*>(item);
+                doubleManager->setValue(idToProperty[QLatin1String("xpos")], item->x());
+                doubleManager->setValue(idToProperty[QLatin1String("ypos")], item->y());
+                doubleManager->setValue(idToProperty[QLatin1String("zpos")], item->zValue());
 
-            i->setSelected(false);
+                return newPos;
+            }
+        }
 
-            group->addToGroup(item);
+        return QVariant();
+    }
+
+    void itemClicked(GraphicsItem* item) {
+        qDebug() << "item clicked: " << item;
+        this->updateExpandState();
+        this->deleteAllProperty();
+
+        m_currentItem = item;
+
+        QtProperty* property;
+
+        property = doubleManager->addProperty(tr("Position X"));
+        doubleManager->setValue(property, item->x());
+        addProperty(property, QLatin1String("xpos"));
+
+        property = doubleManager->addProperty(tr("Position Y"));
+        doubleManager->setValue(property, item->y());
+        addProperty(property, QLatin1String("ypos"));
+
+        property = intManager->addProperty(tr("Position Z"));
+        intManager->setValue(property, item->zValue());
+        addProperty(property, QLatin1String("zpos"));
+    }
+
+    void addProperty(QtProperty* property, const QString& id) {
+        propertyToId[property] = id;
+        idToProperty[id] = property;
+        QtBrowserItem* item = m_propertyEditor->addProperty(property);
+        if (idToExpanded.contains(id))
+            m_propertyEditor->setExpanded(item, idToExpanded[id]);
+    }
+
+    void updateExpandState() {
+        QList<QtBrowserItem*> list = m_propertyEditor->topLevelItems();
+        QListIterator<QtBrowserItem*> it(list);
+        while (it.hasNext()) {
+            QtBrowserItem* item = it.next();
+            QtProperty* property = item->property();
+            // qDebug() << "property: " << property->valueText();
+            // qDebug() << "propertyToId[property]: " << propertyToId[property];
+            idToExpanded[propertyToId[property]] = m_propertyEditor->isExpanded(item);
         }
     }
 
-    void ungroupItems() {
-        for (auto item : this->selectedItems()) {
-            if (item->isSelected() && item->type() == QGraphicsItemGroup::Type) {
-                auto i = dynamic_cast<GraphicsItemGroup*>(item);
-                qDebug() << "QGraphicsItemGroup: " << i->type();
+    void groupItems();
 
-                this->destroyItemGroup(i);
-            }
-        }
-    }
+    void ungroupItems();
 
-    void alignItems(QList<QGraphicsItem*> selectedItems, AlignmentFlag align) {
-        if (selectedItems.size() < 2) {
-            return;
-        }
-        auto [xList, yList] = [&] {
-            QList<int> xList;
-            QList<int> yList;
-            for (auto item : selectedItems) {
-                xList.append(item->x());
-                yList.append(item->y());
-            }
-            return std::make_tuple(xList, yList);
-        }();
+    void alignItems(QList<QGraphicsItem*> selectedItems, AlignmentFlag align);
 
-        auto maxValue = [](QList<int>& list) {
-            return *std::max_element(list.begin(), list.end());
-        };
-        auto minValue = [](QList<int>& list) {
-            return *std::min_element(list.begin(), list.end());
-        };
-        auto average = [](const QList<int>& intList) {
-            if (intList.isEmpty()) {
-                qDebug() << "Error: The list is empty.";
-                return 0.0;
-            }
+    QtTreePropertyBrowser* getPropertyEditor() const;
 
-            int sum = 0;
-            for (const int& value : intList) {
-                sum += value;
-            }
+    void setPropertyEditor(QtTreePropertyBrowser* newPropertyEditor);
 
-            return static_cast<double>(sum) / intList.size();
-        };
-
-        switch (align) {
-            case AlignLeft: {
-                int v = minValue(xList);
-                for (auto item : selectedItems) {
-                    item->setX(v);
-                }
-            } break;
-            case AlignRight: {
-                int v = maxValue(xList);
-                for (auto item : selectedItems) {
-                    item->setX(v);
-                }
-            } break;
-            case AlignTop: {
-                int v = minValue(yList);
-                for (auto item : selectedItems) {
-                    item->setY(v);
-                }
-            } break;
-            case AlignBottom: {
-                int v = maxValue(yList);
-                for (auto item : selectedItems) {
-                    item->setY(v);
-                }
-            } break;
-            case AlignCircle: {
-                QPointF center{average(xList), average(yList)};
-                int numPoints = selectedItems.count();
-                const double angleIncrement = 2 * M_PI / numPoints;
-                double radius = 40 / sin(angleIncrement / 2);
-
-                for (int i = 0; i < numPoints; ++i) {
-                    double angle = i * angleIncrement;
-                    double x = center.x() + radius * std::cos(angle);
-                    double y = center.y() + radius * std::sin(angle);
-
-                    qDebug() << "Point " << i << ": (" << x << ", " << y << ")";
-
-                    auto item = selectedItems[i];
-                    item->setX(x);
-                    item->setY(y);
-                }
-            } break;
-            case AlignHLine: {
-                int x = minValue(xList);
-                int y = minValue(yList);
-
-                for (auto item : selectedItems) {
-                    item->setX(x);
-                    item->setY(y);
-
-                    x += item->boundingRect().width() + 10;
-                }
-            } break;
-            case AlignVLine: {
-                int x = minValue(xList);
-                int y = minValue(yList);
-
-                for (auto item : selectedItems) {
-                    item->setX(x);
-                    item->setY(y);
-
-                    y += item->boundingRect().height() + 10;
-                }
-            } break;
-            default: {
-                qDebug() << align << "is not support.";
-            } break;
-        }
-    }
+public slots:
+    void valueChanged(QtProperty* property, double value);
+    void valueChanged(QtProperty* property, int value);
 
 protected:
-    void keyPressEvent(QKeyEvent* event) override {
-        QGraphicsScene::keyPressEvent(event);
-        qDebug() << "GraphicsScene Key Pressed: " << Qt::Key(event->key());
-        switch (Qt::Key(event->key())) {
-            case Qt::Key_F1: {
-                this->groupItems();
-            } break;
-            case Qt::Key_F2: {
-                this->ungroupItems();
-            } break;
-            case Qt::Key_1: {
-                this->alignItems(this->selectedItems(), AlignLeft);
-            } break;
-            case Qt::Key_2: {
-                this->alignItems(this->selectedItems(), AlignRight);
-            } break;
-            case Qt::Key_3: {
-                this->alignItems(this->selectedItems(), AlignTop);
-            } break;
-            case Qt::Key_4: {
-                this->alignItems(this->selectedItems(), AlignBottom);
-            } break;
-            case Qt::Key_5: {
-                this->alignItems(this->selectedItems(), AlignCircle);
-            } break;
-            case Qt::Key_6: {
-                this->alignItems(this->selectedItems(), AlignHLine);
-            } break;
-            case Qt::Key_7: {
-                this->alignItems(this->selectedItems(), AlignVLine);
-            } break;
-            default: {
+    void keyPressEvent(QKeyEvent* event) override;
 
-            } break;
-        }
-    }
+    void keyReleaseEvent(QKeyEvent* event) override;
 
-    void keyReleaseEvent(QKeyEvent *event) override {
-        QGraphicsScene::keyReleaseEvent(event);
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 
-        qDebug() << "GraphicsScene Key Released: " << Qt::Key(event->key());
-    }
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
 
-    void mousePressEvent(QGraphicsSceneMouseEvent* event) override {
-        QGraphicsScene::mousePressEvent(event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
-        this->setFocus(Qt::MouseFocusReason);
-    }
+private:
+    GraphicsItem* m_movingItem = nullptr;
 
-    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override {
+    QMap<QtProperty*, QString> propertyToId;
+    QMap<QString, QtProperty*> idToProperty;
+    QMap<QString, bool> idToExpanded;
+    class QtTreePropertyBrowser* m_propertyEditor;
 
-        QGraphicsScene::mouseMoveEvent(event);
-    }
+    GraphicsItem* m_currentItem;
 
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override {
-
-        QGraphicsScene::mouseReleaseEvent(event);
-    }
+    QtDoublePropertyManager* doubleManager = new QtDoublePropertyManager(this);
+    QtIntPropertyManager* intManager = new QtIntPropertyManager(this);
 };
 
