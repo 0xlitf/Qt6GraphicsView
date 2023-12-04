@@ -40,7 +40,7 @@ set(PROJECT_SOURCES
     ${${PROJECT_NAME_UPPER}_TS}
 )
 
-set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/qrc/images/qt.rc")
+set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/qrc/images/logo.rc")
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME}
         MANUAL_FINALIZATION
@@ -83,13 +83,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 
-set(ICON_FILE "${CMAKE_SOURCE_DIR}/qrc/images/qt.ico")
-if(WIN32)
-    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
-    set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
-    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ICON:${ICON_FILE}")  # 设置图标文件
-endif()
-
 if(${QT_VERSION} VERSION_LESS 6.1.0)
     set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.${PROJECT_NAME})
 endif()
@@ -99,7 +92,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
-    LINK_FLAGS "/ICON:${ICON_FILE}"
 )
 
 include(GNUInstallDirs)

@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
     QApplication a(argc, argv);
     a.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
-    qSetMessagePattern("[%{type}] [%{file}: Line %{line}] [%{function}] \n>> %{message}\n");
+    qSetMessagePattern("[%{time yyyy-MM-dd h:mm:ss.zzz t}][%{type}] [%{file}: Line %{line}] [%{function}] \n>> %{message}\n");
 
     if (!qgetenv("QTDIR").isEmpty()) { // start direct in QtCreator
         qDebug() << "start in QtCreator: " << qgetenv("QTDIR");

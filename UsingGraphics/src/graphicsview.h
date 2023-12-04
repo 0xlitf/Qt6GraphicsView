@@ -20,10 +20,9 @@ protected:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override {
-        qDebug() << "view mousePressEvent";
+        m_pressPoint = event->pos();
+
         if (event->button() == Qt::RightButton) {
-            // 在这里处理鼠标右键按下事件
-            // 例如记录下按下时的坐标
             lastPos = event->pos();
         } else {
             QGraphicsView::mousePressEvent(event);
@@ -31,25 +30,52 @@ protected:
     }
 
     void mouseMoveEvent(QMouseEvent* event) override {
-        if (event->buttons() == Qt::RightButton) {
-            // 在这里处理鼠标右键拖动事件
-            // 例如根据拖动距离进行视图的平移
+        QPointF point = event->pos() - m_pressPoint;
+
+        if (point.manhattanLength() > 1) {
+            if (event->buttons() == Qt::LeftButton) {
+                this->setCursor(Qt::SizeAllCursor);
+            } else if (event->buttons() == Qt::RightButton) {
+                this->setCursor(Qt::ClosedHandCursor);
+            }
+
+        }
+
+        if (event->buttons() == Qt::LeftButton) {
+
+        } else if (event->buttons() == Qt::RightButton) {
             QPoint delta = event->pos() - lastPos;
             horizontalScrollBar()->setValue(horizontalScrollBar()->value() - delta.x());
             verticalScrollBar()->setValue(verticalScrollBar()->value() - delta.y());
             lastPos = event->pos();
+
+            m_sceneMovedByRightButton = true;
+            qDebug() << m_sceneMovedByRightButton;
         } else {
-            QGraphicsView::mouseMoveEvent(event);
+            this->setCursor(Qt::ArrowCursor);
         }
+
+        QGraphicsView::mouseMoveEvent(event);
     }
 
     void mouseReleaseEvent(QMouseEvent* event) override {
-        qDebug() << "view mouseReleaseEvent";
-        QGraphicsView::mouseReleaseEvent(event);
+        this->setCursor(Qt::ArrowCursor);
+
+        if (m_sceneMovedByRightButton) {
+            qDebug() << "event->accept();";
+            event->accept();
+            m_sceneMovedByRightButton = false;
+        } else {
+            QGraphicsView::mouseReleaseEvent(event);
+        }
     }
 
 private:
+    bool m_sceneMovedByRightButton = false;
+
+    QPointF m_pressPoint{};
+
     QPoint lastPos;
-private:
+
     ViewFrame* m_viewFrame;
 };

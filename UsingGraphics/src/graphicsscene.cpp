@@ -1,15 +1,13 @@
-#include <QtTreePropertyBrowser>
 #include "graphicsscene.h"
 #include "QtDoubleSpinBoxFactory"
 #include "QtSpinBoxFactory"
+#include <QtTreePropertyBrowser>
 
 GraphicsScene::GraphicsScene(QObject* parent)
     : QGraphicsScene{parent} {
 
-    connect(doubleManager, SIGNAL(valueChanged(QtProperty *, double)),
-        this, SLOT(valueChanged(QtProperty *, double)));
-    connect(intManager, SIGNAL(valueChanged(QtProperty *, int)),
-        this, SLOT(valueChanged(QtProperty *, int)));
+    connect(doubleManager, SIGNAL(valueChanged(QtProperty*, double)), this, SLOT(valueChanged(QtProperty*, double)));
+    connect(intManager, SIGNAL(valueChanged(QtProperty*, int)), this, SLOT(valueChanged(QtProperty*, int)));
 }
 
 void GraphicsScene::groupItems() {
@@ -204,7 +202,7 @@ void GraphicsScene::keyReleaseEvent(QKeyEvent* event) {
 }
 
 void GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
-    this->setFocus(Qt::MouseFocusReason);
+    // this->setFocus(Qt::MouseFocusReason);
 
     QPointF scenePos = event->scenePos();
     GraphicsItem* item = dynamic_cast<GraphicsItem*>(itemAt(scenePos, QTransform()));
@@ -214,13 +212,14 @@ void GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
         itemClicked(item);
     } else {
         m_movingItem = nullptr;
-        qDebug() << "no item clicked";
+        // qDebug() << "no item clicked";
     }
 
     QGraphicsScene::mousePressEvent(event);
 }
 
 void GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+
     if (m_movingItem != m_currentItem)
         return;
 
@@ -232,13 +231,12 @@ void GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
-    qDebug() << "scene mouseReleaseEvent";
+    qDebug() << "GraphicsScene::mouseReleaseEvent;";
 
     QGraphicsScene::mouseReleaseEvent(event);
 }
 
-void GraphicsScene::valueChanged(QtProperty *property, double value)
-{
+void GraphicsScene::valueChanged(QtProperty* property, double value) {
     if (!propertyToId.contains(property))
         return;
 

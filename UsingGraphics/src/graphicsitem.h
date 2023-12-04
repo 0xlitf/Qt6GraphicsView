@@ -7,6 +7,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
 #include <QKeyEvent>
+#include "graphicsitemfocuspoint.h"
 
 class GraphicsItem : public QGraphicsObject {
     Q_OBJECT
@@ -42,7 +43,9 @@ protected:
     int m_width = m_radius * 2;
 
     QColor m_color;
-    QList<QPointF> m_stuff;
+    QList<QPointF> m_track;
+
+    QList<GraphicsItemFocusPoint> m_focus;
 
     qreal m_scale;
 

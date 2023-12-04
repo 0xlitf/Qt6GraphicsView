@@ -24,7 +24,7 @@ GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
 }
 
 QRectF GraphicsItem::boundingRect() const {
-    return QRectF(0, 0, m_width, m_height);
+    return QRectF(-10, -10, 120, 80);
 }
 
 QPainterPath GraphicsItem::shape() const {
@@ -86,14 +86,14 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     }
 
     // Draw red ink
-    if (m_stuff.size() > 1) {
+    if (m_track.size() > 1) {
         QPen p = painter->pen();
         painter->setPen(QPen(Qt::red, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         painter->setBrush(Qt::NoBrush);
         QPainterPath path;
-        path.moveTo(m_stuff.first());
-        for (int i = 1; i < m_stuff.size(); ++i)
-            path.lineTo(m_stuff.at(i));
+        path.moveTo(m_track.first());
+        for (int i = 1; i < m_track.size(); ++i)
+            path.lineTo(m_track.at(i));
         painter->drawPath(path);
         painter->setPen(p);
     }
@@ -106,7 +106,7 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 
 void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
     if (event->modifiers() & Qt::ShiftModifier) {
-        m_stuff << event->pos();
+        m_track << event->pos();
         update();
         return;
     }
@@ -135,13 +135,19 @@ void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
     QAction *alignTopAction = alignMenu.addAction("AlignTop");
     QAction *alignBottomAction = alignMenu.addAction("AlignBottom");
     QAction *alignCircleAction = alignMenu.addAction("AlignCircle");
+    QAction *alignHLineAction = alignMenu.addAction("AlignHLine");
+    QAction *alignVLineAction = alignMenu.addAction("AlignVLine");
 
     if (selectCount <= 1) {
         groupAction->setEnabled(false);
+        alignMenu.setEnabled(false);
         alignLeftAction->setEnabled(false);
         alignRightAction->setEnabled(false);
         alignTopAction->setEnabled(false);
         alignBottomAction->setEnabled(false);
+        alignCircleAction->setEnabled(false);
+        alignHLineAction->setEnabled(false);
+        alignVLineAction->setEnabled(false);
     }
 
     QAction *selectedAction = menu.exec(event->screenPos());
@@ -158,6 +164,10 @@ void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
         m_scene->alignItems(m_scene->selectedItems(), GraphicsScene::AlignBottom);
     } else if (selectedAction == alignCircleAction) {
         m_scene->alignItems(m_scene->selectedItems(), GraphicsScene::AlignCircle);
+    } else if (selectedAction == alignHLineAction) {
+        m_scene->alignItems(m_scene->selectedItems(), GraphicsScene::AlignHLine);
+    } else if (selectedAction == alignVLineAction) {
+        m_scene->alignItems(m_scene->selectedItems(), GraphicsScene::AlignVLine);
     } else {
         qDebug() << "GraphicsItem selectedAction not match";
     }
