@@ -22,6 +22,9 @@ GraphicsView::GraphicsView(ViewFrame* v)
     setRenderHint(QPainter::Antialiasing, true);
     setDragMode(QGraphicsView::ScrollHandDrag);  // 使用 ScrollHandDrag 模式，使鼠标右键可以拖动
     setRenderHint(QPainter::SmoothPixmapTransform, true);
-    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    // setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing, true);
+
+    setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 }

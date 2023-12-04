@@ -220,18 +220,16 @@ void GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 
 void GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
-    if (m_movingItem != m_currentItem)
-        return;
-
-    doubleManager->setValue(idToProperty[QLatin1String("xpos")], m_movingItem->x());
-    doubleManager->setValue(idToProperty[QLatin1String("ypos")], m_movingItem->y());
-    intManager->setValue(idToProperty[QLatin1String("zpos")], m_movingItem->zValue());
+    if (m_movingItem == m_currentItem) {
+        doubleManager->setValue(idToProperty[QLatin1String("xpos")], m_movingItem->x());
+        doubleManager->setValue(idToProperty[QLatin1String("ypos")], m_movingItem->y());
+        intManager->setValue(idToProperty[QLatin1String("zpos")], m_movingItem->zValue());
+    }
 
     QGraphicsScene::mouseMoveEvent(event);
 }
 
 void GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
-    qDebug() << "GraphicsScene::mouseReleaseEvent;";
 
     QGraphicsScene::mouseReleaseEvent(event);
 }

@@ -7,7 +7,8 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
 #include <QKeyEvent>
-#include "graphicsitemfocuspoint.h"
+#include "focuspoint.h"
+#include "focusitem.h"
 
 class GraphicsItem : public QGraphicsObject {
     Q_OBJECT
@@ -20,6 +21,19 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* item, QWidget* widget) override;
 
 protected:
+
+    void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
+        qDebug() << "GraphicsItem::hoverEnterEvent";
+        setCursor(QCursor(Qt::SizeAllCursor));
+        QGraphicsItem::hoverEnterEvent(event);
+    }
+
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override {
+        qDebug() << "GraphicsItem::hoverLeaveEvent";
+        unsetCursor();
+        QGraphicsItem::hoverLeaveEvent(event);
+    }
+
     void keyPressEvent(QKeyEvent *event) override {
         qDebug() << "GraphicsItem Key Pressed: " << Qt::Key(event->key());
     }
@@ -45,7 +59,8 @@ protected:
     QColor m_color;
     QList<QPointF> m_track;
 
-    QList<GraphicsItemFocusPoint> m_focus;
+    QList<FocusPoint> m_focusPointList;
+    QList<FocusItem*> m_focusItemList;
 
     qreal m_scale;
 

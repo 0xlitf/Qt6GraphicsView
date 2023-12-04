@@ -45,7 +45,7 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     }
 
     if (option->state & QStyle::State_Selected) {
-        fillColor = m_color.darker(150);
+        fillColor = fillColor.darker(150);
         borderColor = Qt::green;
     }
 

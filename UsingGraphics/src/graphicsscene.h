@@ -144,5 +144,7 @@ private:
 
     QtDoublePropertyManager* doubleManager = new QtDoublePropertyManager(this);
     QtIntPropertyManager* intManager = new QtIntPropertyManager(this);
+
+
 };
 
