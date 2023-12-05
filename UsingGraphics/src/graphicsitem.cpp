@@ -23,7 +23,7 @@ GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
 
     setAcceptHoverEvents(true);
 
-    this->resize();
+    this->recalculateFocusPoint();
 }
 
 QRectF GraphicsItem::boundingRect() const {
@@ -171,7 +171,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_leftTop.ry() = qMin(m_rightBottom.y() - 20, m_leftTop.y());
 
             prepareGeometryChange();
-            this->resize();
+            this->recalculateFocusPoint();
             this->update();
         } break;
         case FocusPoint::Position::Top: {
@@ -188,7 +188,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_rightBottom.rx() = qMax(m_leftTop.x() + 20, m_rightBottom.x());
 
             prepareGeometryChange();
-            this->resize();
+            this->recalculateFocusPoint();
             this->update();
         } break;
         case FocusPoint::Position::Right: {
@@ -204,7 +204,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_rightBottom.ry() = qMax(m_leftTop.y() + 20, m_rightBottom.y());
 
             prepareGeometryChange();
-            this->resize();
+            this->recalculateFocusPoint();
             this->update();
         } break;
         case FocusPoint::Position::Bottom: {
@@ -221,7 +221,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_rightBottom.ry() = qMax(m_leftTop.y() + 20, m_rightBottom.y());
 
             prepareGeometryChange();
-            this->resize();
+            this->recalculateFocusPoint();
             this->update();
         } break;
         case FocusPoint::Position::Left: {
@@ -308,11 +308,11 @@ void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
     }
 }
 
-void GraphicsItem::resize() {
-
-    m_focusPointList.clear();
+QList<FocusPoint> GraphicsItem::recalculateFocusPoint() {
+    QList<FocusPoint> m_focusPointList;
     m_focusPointList.append(FocusPoint{m_leftTop.x(), m_leftTop.y(), FocusPoint::Position::LeftTop});
     m_focusPointList.append(FocusPoint{m_rightBottom.x(), m_leftTop.y(), FocusPoint::Position::RightTop});
     m_focusPointList.append(FocusPoint{m_leftTop.x(), m_rightBottom.y(), FocusPoint::Position::LeftBottom});
     m_focusPointList.append(FocusPoint{m_rightBottom.x(), m_rightBottom.y(), FocusPoint::Position::RightBottom});
+    return m_focusPointList;
 }

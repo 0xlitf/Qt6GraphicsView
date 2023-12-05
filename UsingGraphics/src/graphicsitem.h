@@ -31,22 +31,19 @@ public:
 protected:
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
-        if (this->flags() & QGraphicsItem::ItemIsMovable) {
-            this->setCursor(Qt::SizeAllCursor);
-        }
-        qDebug() << "GraphicsItem::hoverEnterEvent";
+        // qDebug() << "GraphicsItem::hoverEnterEvent";
 
         QGraphicsItem::hoverEnterEvent(event);
     }
 
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) {
-        qDebug() << "GraphicsItem::hoverMoveEvent";
+        // qDebug() << "GraphicsItem::hoverMoveEvent";
         // hoverMoveEvent中区分this->isSelected()将导致pressed后无法直接拖动
         // if (!this->isSelected()) {
         //     // m_hoverPoint.setPosition(FocusPoint::Position::Center);
         //     // this->setCursor(Qt::SizeAllCursor);
         // } else {
-
+        //
         // }
         QPointF mousePos = event->pos();
         QMarginsF margin{1, 1, 1, 1};
@@ -81,7 +78,6 @@ protected:
                 m_focusPosition = FocusPoint::Position::Body;
             }
         }
-        qDebug() << "m_focusPosition" << int(m_focusPosition);
         QGraphicsItem::hoverMoveEvent(event);
     }
 
@@ -105,7 +101,7 @@ protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
     void groupItems();
-    void resize();
+    virtual QList<FocusPoint> recalculateFocusPoint();
 
 protected:
     int m_x;
@@ -119,7 +115,6 @@ protected:
     QColor m_color;
     QList<QPointF> m_track;
 
-    QList<FocusPoint> m_focusPointList;
 
     FocusPoint m_hoverPoint;
 
