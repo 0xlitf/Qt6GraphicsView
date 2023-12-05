@@ -138,6 +138,40 @@ QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& val
 void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     // this->setFocus();
     m_itemScenePos = event->pos();
+    QPointF mousePos = event->pos();
+    QMarginsF margin{1, 1, 1, 1};
+
+    switch (m_focusPosition) {
+        case FocusPoint::Position::Undefined: {
+            qDebug() << "m_focusPosition" << "Undefined";
+        } break;
+        case FocusPoint::Position::LeftTop:
+        case FocusPoint::Position::Top:
+        case FocusPoint::Position::RightTop:
+        case FocusPoint::Position::Right:
+        case FocusPoint::Position::RightBottom:
+        case FocusPoint::Position::Bottom:
+        case FocusPoint::Position::LeftBottom:
+        case FocusPoint::Position::Left: {
+            qDebug() << "m_focusPosition" << int(m_focusPosition);
+        } break;
+        case FocusPoint::Position::Body: {
+            qDebug() << "m_focusPosition" << "Body";
+
+        } break;
+        case FocusPoint::Position::Rotate: {
+            qDebug() << "m_focusPosition" << "Rotate";
+
+        } break;
+        case FocusPoint::Position::UserDefined: {
+            qDebug() << "m_focusPosition" << "UserDefined";
+
+        } break;
+        default: {
+
+        } break;
+    }
+
     QGraphicsItem::mousePressEvent(event);
 }
 

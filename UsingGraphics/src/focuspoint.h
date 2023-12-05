@@ -7,7 +7,8 @@
 
 class FocusPoint : public QPoint{
 public:
-    enum class Position {
+    enum struct Position {
+        Undefined,
         LeftTop,
         Top,
         RightTop,
@@ -16,21 +17,23 @@ public:
         Bottom,
         LeftBottom,
         Left,
-        Center,
+        Body,
+        Rotate,
         UserDefined
     };
 
-    QMap<Position, Qt::CursorShape> m_cursorMap{
-        {Position::LeftTop, Qt::SizeFDiagCursor},
-        {Position::RightBottom, Qt::SizeFDiagCursor},
-        {Position::LeftBottom, Qt::SizeBDiagCursor},
-        {Position::RightTop, Qt::SizeBDiagCursor},
-        {Position::Top, Qt::SizeVerCursor},
-        {Position::Bottom, Qt::SizeVerCursor},
-        {Position::Left, Qt::SizeHorCursor},
-        {Position::Right, Qt::SizeHorCursor},
-        {Position::Center, Qt::SizeAllCursor},
-        {Position::UserDefined, Qt::ArrowCursor}
+    QMap<Position, QCursor> m_cursorMap{
+        {Position::LeftTop, QCursor(Qt::SizeFDiagCursor)},
+        {Position::RightBottom, QCursor(Qt::SizeFDiagCursor)},
+        {Position::LeftBottom, QCursor(Qt::SizeBDiagCursor)},
+        {Position::RightTop, QCursor(Qt::SizeBDiagCursor)},
+        {Position::Top, QCursor(Qt::SizeVerCursor)},
+        {Position::Bottom, QCursor(Qt::SizeVerCursor)},
+        {Position::Left, QCursor(Qt::SizeHorCursor)},
+        {Position::Right, QCursor(Qt::SizeHorCursor)},
+        {Position::Body, QCursor(Qt::SizeAllCursor)},
+        {Position::Rotate, QCursor(Qt::CrossCursor)},
+        {Position::UserDefined, QCursor(Qt::ArrowCursor)}
     };
 
     FocusPoint();

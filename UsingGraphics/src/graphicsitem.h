@@ -14,6 +14,7 @@
 class GraphicsItem : public QGraphicsObject {
     Q_OBJECT
 public:
+
     GraphicsItem() = default;
     GraphicsItem(const QColor& color, int x, int y);
 
@@ -45,26 +46,34 @@ protected:
             QMarginsF margin{1, 1, 1, 1};
 
             if (auto atCorner = [=] {
-                for (int i = 0; i < m_focusPointList.count(); ++i) {
-                    QRectF itemRect = QRectF(m_focusPointList[i].x() - 2, m_focusPointList[i].y() - 2, 4, 4) + margin;
-                    if (itemRect.contains(mousePos)) {
-                        qDebug() << "itemRect" << itemRect << m_focusPointList[i].cursor();
-                        this->setCursor(m_focusPointList[i].cursor());
-                        return true;
-                    } else {
+                    for (int i = 0; i < m_focusPointList.count(); ++i) {
+                        QRectF itemRect = QRectF(m_focusPointList[i].x() - 2, m_focusPointList[i].y() - 2, 4, 4) + margin;
+                        if (itemRect.contains(mousePos)) {
+                            this->setCursor(m_focusPointList[i].cursor());
+                            if (m_focusPointList[i].position() == FocusPoint::Position::Rotate) {
+                                this->setToolTip(QString("Drag to rotate"));
+                            } else {
+                                this->setToolTip(QString("Drag to resize"));
+                            }
+                            m_focusPosition = m_focusPointList[i].position();
+                            return true;
+                        }
                     }
-                }
-                return false;
-                }()){
+                    return false;
+                }()) {
 
             } else {
                 auto parentRect = QRectF(m_leftTop, m_rightBottom);
                 if (parentRect.contains(mousePos)) {
                     this->setCursor(Qt::SizeAllCursor);
-                    this->setToolTip(QString("Move"));
+                    this->setToolTip(QString("Move this item"));
+
+                    m_focusPosition = FocusPoint::Position::Body;
                 }
             }
         }
+
+        qDebug() << "m_focusPosition" << int(m_focusPosition);
     }
 
     void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override {
@@ -107,6 +116,8 @@ protected:
     qreal m_scale;
 
     QPointF m_itemScenePos;
+
+    FocusPoint::Position m_focusPosition{FocusPoint::Position::Undefined};
 
     class GraphicsScene* m_scene = nullptr;
 };
