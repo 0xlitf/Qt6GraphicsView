@@ -1,6 +1,7 @@
 #include "focuspoint.h"
 
 FocusPoint::FocusPoint() {
+
 }
 
 FocusPoint::Position FocusPoint::position() const {

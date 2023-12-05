@@ -31,14 +31,30 @@ protected:
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
         qDebug() << "GraphicsItem::hoverEnterEvent";
+
+        QGraphicsItem::hoverEnterEvent(event);
+    }
+
+    void hoverMoveEvent(QGraphicsSceneHoverEvent* event) {
+        qDebug() << "GraphicsItem::hoverMoveEvent";
         if (!this->isSelected()) {
             m_hoverPoint.setPosition(FocusPoint::Position::Center);
             // this->setCursor(Qt::SizeAllCursor);
         } else {
-
-
+            QPointF mousePos = event->pos();
+            for (int i = 0; i < m_focusPointList.count(); ++i) {
+                QRectF itemRect = QRectF(m_focusPointList[i].x() - 2, m_focusPointList[i].y() - 2, 4, 4);
+                if (itemRect.contains(mousePos)) {
+                    this->setCursor(m_focusPointList[i].cursor());
+                } else {
+                    auto parentRect = QRectF(m_leftTop, m_rightBottom);
+                    if (parentRect.contains(mousePos)) {
+                        this->setCursor(Qt::SizeAllCursor);
+                        this->setToolTip(QString("Move"));
+                    }
+                }
+            }
         }
-        QGraphicsItem::hoverEnterEvent(event);
     }
 
     void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override {
@@ -68,11 +84,13 @@ protected:
     int m_height = 80;
     int m_width = 100;
 
+    QPoint m_leftTop{-m_width/2, -m_height/2};
+    QPoint m_rightBottom{m_width/2, m_height/2};
+
     QColor m_color;
     QList<QPointF> m_track;
 
     QList<FocusPoint> m_focusPointList;
-    QList<FocusItem*>  m_focusItemList{};
 
     FocusPoint m_hoverPoint;
 

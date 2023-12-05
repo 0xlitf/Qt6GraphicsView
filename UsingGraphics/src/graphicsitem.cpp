@@ -1,16 +1,16 @@
 
 #include "graphicsitem.h"
 
-#include <QGraphicsSceneMouseEvent>
-#include <QPainter>
-#include <QStyleOptionGraphicsItem>
-#include <QGraphicsScene>
-#include <QGraphicsItem>
-#include <QGraphicsItemGroup>
-#include <QMenu>
+#include "graphicsscene.h"
 #include <QAction>
 #include <QContextMenuEvent>
-#include "graphicsscene.h"
+#include <QGraphicsItem>
+#include <QGraphicsItemGroup>
+#include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
+#include <QMenu>
+#include <QPainter>
+#include <QStyleOptionGraphicsItem>
 
 GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
     m_x = x;
@@ -24,10 +24,10 @@ GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
     // setFlags(ItemIsSelectable | ItemIsMovable);
     setAcceptHoverEvents(true);
 
-    m_focusPointList.append(FocusPoint{boundingRect().x(), boundingRect().y()});
-    m_focusPointList.append(FocusPoint{boundingRect().x() + boundingRect().width(), boundingRect().y()});
-    m_focusPointList.append(FocusPoint{boundingRect().x(), boundingRect().y() + boundingRect().height()});
-    m_focusPointList.append(FocusPoint{boundingRect().x() + boundingRect().width(), boundingRect().y() + boundingRect().height()});
+    m_focusPointList.append(FocusPoint{m_leftTop.x(), m_leftTop.y(), FocusPoint::Position::LeftTop});
+    m_focusPointList.append(FocusPoint{m_rightBottom.x(), m_leftTop.y(), FocusPoint::Position::RightTop});
+    m_focusPointList.append(FocusPoint{m_leftTop.x(), m_rightBottom.y(), FocusPoint::Position::LeftBottom});
+    m_focusPointList.append(FocusPoint{m_rightBottom.x(), m_rightBottom.y(), FocusPoint::Position::RightBottom});
 }
 
 QRectF GraphicsItem::boundingRect() const {
@@ -36,7 +36,7 @@ QRectF GraphicsItem::boundingRect() const {
 
 QPainterPath GraphicsItem::shape() const {
     QPainterPath path;
-    path.addEllipse(QRect(-m_width/2, -m_height/2, m_width, m_height));
+    path.addRect(QRect(-m_width / 2 - 2, -m_height / 2 - 2, m_width + 4, m_height + 4));
     return path;
 }
 
@@ -59,15 +59,15 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     QPen p = painter->pen();
     painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter->setBrush(fillColor);
-    painter->drawRect(QRect(-m_width/2, -m_height/2, m_width, m_height));
+    painter->drawRect(QRect(-m_width / 2, -m_height / 2, m_width, m_height));
     painter->setPen(p);
-
-    m_scale = option->levelOfDetailFromTransform(painter->worldTransform());
 
     QBrush b = painter->brush();
     painter->setBrush(fillColor);
-    painter->drawText(QPointF(-m_width/2 + 15, -m_height/ + 15), QString("GraphicsItem"));
+    painter->drawText(QPointF(-m_width / 2 + 15, -m_height / +15), QString("GraphicsItem"));
     painter->setBrush(b);
+
+    m_scale = option->levelOfDetailFromTransform(painter->worldTransform());
 
     // if (m_scale < 0.2) {
     //     if (m_scale < 0.125) {
@@ -77,19 +77,25 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     // }
 
     if (m_scale >= 1) {
-
     }
 
     if (m_scale >= 2) {
-
     }
 
     if (m_scale >= 0.5) {
-
     }
 
     if (m_scale >= 0.4) {
+    }
 
+    if (this->isSelected()) {
+        for (int i = 0; i < m_focusPointList.count(); ++i) {
+            QPen p = painter->pen();
+            painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            painter->setBrush(Qt::green);
+            painter->drawRect(QRect(m_focusPointList[i].x() - 2, m_focusPointList[i].y() - 2, 4, 4));
+            painter->setPen(p);
+        }
     }
 
     // Draw red ink
@@ -156,18 +162,18 @@ void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
     int selectCount = m_scene->selectedItems().count();
 
     QMenu menu;
-    QAction *groupAction = menu.addAction(QString("Group %1 Items").arg(QString::number(selectCount)));
+    QAction* groupAction = menu.addAction(QString("Group %1 Items").arg(QString::number(selectCount)));
 
     QMenu alignMenu;
     alignMenu.setTitle("Align");
     menu.addMenu(&alignMenu);
-    QAction *alignLeftAction = alignMenu.addAction("AlignLeft");
-    QAction *alignRightAction = alignMenu.addAction("AlignRight");
-    QAction *alignTopAction = alignMenu.addAction("AlignTop");
-    QAction *alignBottomAction = alignMenu.addAction("AlignBottom");
-    QAction *alignCircleAction = alignMenu.addAction("AlignCircle");
-    QAction *alignHLineAction = alignMenu.addAction("AlignHLine");
-    QAction *alignVLineAction = alignMenu.addAction("AlignVLine");
+    QAction* alignLeftAction = alignMenu.addAction("AlignLeft");
+    QAction* alignRightAction = alignMenu.addAction("AlignRight");
+    QAction* alignTopAction = alignMenu.addAction("AlignTop");
+    QAction* alignBottomAction = alignMenu.addAction("AlignBottom");
+    QAction* alignCircleAction = alignMenu.addAction("AlignCircle");
+    QAction* alignHLineAction = alignMenu.addAction("AlignHLine");
+    QAction* alignVLineAction = alignMenu.addAction("AlignVLine");
 
     if (selectCount <= 1) {
         groupAction->setEnabled(false);
@@ -181,7 +187,7 @@ void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
         alignVLineAction->setEnabled(false);
     }
 
-    QAction *selectedAction = menu.exec(event->screenPos());
+    QAction* selectedAction = menu.exec(event->screenPos());
 
     if (selectedAction == groupAction) {
         m_scene->groupItems();
