@@ -12,9 +12,15 @@ GraphicsScene::GraphicsScene(QObject* parent)
     connect(doubleManager, SIGNAL(valueChanged(QtProperty*, double)), this, SLOT(valueChanged(QtProperty*, double)));
     connect(intManager, SIGNAL(valueChanged(QtProperty*, int)), this, SLOT(valueChanged(QtProperty*, int)));
     connect(this, &QGraphicsScene::selectionChanged, this, [=] {
-        qDebug() << "selectionChanged " << this->selectedItems().count();
-
-        // m_focusManager->selectionChanged(this->selectedItems());
+        if (this->selectedItems().count() > 1) {
+            for (int i = 0; i < this->selectedItems().count(); ++i) {
+                this->selectedItems()[i]->setFlag(QGraphicsItem::ItemIsMovable, true);
+            }
+        } else {
+            for (int i = 0; i < this->selectedItems().count(); ++i) {
+                this->selectedItems()[i]->setFlag(QGraphicsItem::ItemIsMovable, false);
+            }
+        }
     });
 }
 
@@ -37,6 +43,17 @@ QVariant GraphicsScene::itemChange(GraphicsItem* item, QGraphicsItem::GraphicsIt
             doubleManager->setValue(idToProperty[QLatin1String("zpos")], item->zValue());
 
             return newPos;
+        }
+    }
+    if (change == QGraphicsItem::ItemSelectedChange) {
+        if (this->selectedItems().count() > 1) {
+            for (int i = 0; i < this->selectedItems().count(); ++i) {
+                this->selectedItems()[i]->setFlag(QGraphicsItem::ItemIsMovable, true);
+            }
+        } else {
+            for (int i = 0; i < this->selectedItems().count(); ++i) {
+                this->selectedItems()[i]->setFlag(QGraphicsItem::ItemIsMovable, false);
+            }
         }
     }
 

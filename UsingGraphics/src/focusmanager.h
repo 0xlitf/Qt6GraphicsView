@@ -53,13 +53,6 @@ public:
     void removeItem(QGraphicsItem* item) {
 
     }
-//     FocusItem* addElement(GraphicsItem* item, QColor clr);
-//     FocusItem* resetFocus(GraphicsItem* item, int index = -1);
-//     void resetAllFocus();
-//     void removeElement(GraphicsItem* item);
-//     void clearAll();
-//     QVector<FocusItem*> getFocusElement();
-//     FocusPoint getElementFocusPointInfo(GraphicsItem* item, const FocusPoint& pt);
 
 private:
     QList<QGraphicsItem*>  m_focusItemList{};

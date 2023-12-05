@@ -20,8 +20,7 @@ GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
 
     this->setFlag(QGraphicsItem::ItemIsFocusable);
     this->setFlag(QGraphicsItem::ItemIsSelectable);
-    // this->setFlag(QGraphicsItem::ItemIsMovable);
-    // setFlags(ItemIsSelectable | ItemIsMovable);
+
     setAcceptHoverEvents(true);
 
     this->resize();
@@ -110,35 +109,22 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 }
 
 QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value) {
-    if (change == QGraphicsItem::ItemSelectedChange) {
-        prepareGeometryChange();
-    }
-
     // if (change == ItemSelectedChange && scene()) {
-    //     if (value.toBool()) {
-    //         QList<FocusPoint> pointList = this->focusPoint();
-    //         for (int i = 0; i < pointList.count(); ++i) {
-    //             auto item = new FocusItem(pointList[i], this);
-    //             m_focusItemList.append(item);
-    //             dynamic_cast<GraphicsScene*>(scene())->addItem(item);
-    //         }
+    //     if (scene()->selectedItems().count() > 1) {
+    //         this->setFlag(QGraphicsItem::ItemIsMovable, true);
     //     } else {
-    //         for (int i = 0; i < m_focusItemList.count(); ++i) {
-    //             dynamic_cast<GraphicsScene*>(scene())->removeItem(m_focusItemList[i]);
-    //         }
-    //         m_focusItemList.clear();
+    //         this->setFlag(QGraphicsItem::ItemIsMovable, false);
     //     }
     // }
     return QGraphicsItem::itemChange(change, value);
 }
 
 void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
-    // this->setFocus();
-    m_itemScenePos = event->pos();
-    QPointF mousePos = event->pos();
-    QMarginsF margin{1, 1, 1, 1};
+    qDebug() << this->flags();
 
     m_operationPoint = m_focusPosition;
+
+    m_pressedPos = event->pos();
 
     switch (m_focusPosition) {
         case FocusPoint::Position::Undefined: {
@@ -152,10 +138,11 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
         case FocusPoint::Position::Bottom:
         case FocusPoint::Position::LeftBottom:
         case FocusPoint::Position::Left: {
-            m_pressedPos = event->pos();
+
         } break;
         case FocusPoint::Position::Body: {
-
+            this->setCursor(Qt::SizeAllCursor);
+            this->update();
         } break;
         case FocusPoint::Position::Rotate: {
 
@@ -169,10 +156,6 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-    // if (m_leftTop.x() + 10 > m_rightBottom.x() || m_leftTop.y() + 10 > m_rightBottom.y()) {
-    //     QGraphicsItem::mouseMoveEvent(event);
-    //     return;
-    // }
 
     switch (m_operationPoint) {
         case FocusPoint::Position::Undefined: {
@@ -245,11 +228,13 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
         } break;
         case FocusPoint::Position::Body: {
+            this->setCursor(Qt::SizeAllCursor);
+
             if (bool singleMovable = !(this->flags() & QGraphicsItem::ItemIsMovable)) {
-                this->setPos(event->scenePos() - m_itemScenePos);
-                this->update();
+                qDebug() << "singleMovable";
+                this->setPos(event->scenePos() - m_pressedPos);
             }
-            qDebug() << "OperationWhenPressed::Move";
+            this->update();
         } break;
         case FocusPoint::Position::Rotate: {
 
