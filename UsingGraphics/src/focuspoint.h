@@ -28,6 +28,12 @@ public:
         m_cursorMap.insert(Position::RightBottom, Qt::SizeFDiagCursor);
         m_cursorMap.insert(Position::LeftBottom, Qt::SizeBDiagCursor);
         m_cursorMap.insert(Position::RightTop, Qt::SizeBDiagCursor);
+        m_cursorMap.insert(Position::Top, Qt::SizeVerCursor);
+        m_cursorMap.insert(Position::Bottom, Qt::SizeVerCursor);
+        m_cursorMap.insert(Position::Left, Qt::SizeHorCursor);
+        m_cursorMap.insert(Position::Right, Qt::SizeHorCursor);
+        m_cursorMap.insert(Position::Center, Qt::SizeAllCursor);
+        m_cursorMap.insert(Position::UserDefined, Qt::ArrowCursor);
     }
 
     Position position() const;
