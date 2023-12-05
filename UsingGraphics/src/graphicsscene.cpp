@@ -12,13 +12,38 @@ GraphicsScene::GraphicsScene(QObject* parent)
     connect(doubleManager, SIGNAL(valueChanged(QtProperty*, double)), this, SLOT(valueChanged(QtProperty*, double)));
     connect(intManager, SIGNAL(valueChanged(QtProperty*, int)), this, SLOT(valueChanged(QtProperty*, int)));
     connect(this, &QGraphicsScene::selectionChanged, this, [=] {
-        if (this->selectedItems().count() > 1) {
-            for (int i = 0; i < this->selectedItems().count(); ++i) {
-                this->selectedItems()[i]->setFlag(QGraphicsItem::ItemIsMovable, true);
+        for (int i = m_focusItemList.count() - 1; i >= 0 ; --i) {
+            if (this->selectedItems().contains(m_focusItemList[i])) {
+                continue;
+            } else {
+                m_focusItemList[i]->setFlag(QGraphicsItem::ItemIsMovable, true);
+                m_focusItemList.remove(i);
             }
-        } else {
+        }
+        for (int i = 0; i < this->selectedItems().count(); ++i) {
+            if (m_focusItemList.contains(this->selectedItems()[i])) {
+                continue;
+            } else {
+                m_focusItemList[i]->setFlag(QGraphicsItem::ItemIsMovable, false);
+                m_focusItemList.append(this->selectedItems()[i]);
+            }
+        }
+        qDebug() << "m_focusItemList.count()" << m_focusItemList.count();
+        if (m_focusItemList.count() != this->selectedItems().count()) {
+            qFatal() << "m_focusItemList.count() != list";
+            for (int i = 0; i < m_focusItemList.count(); ++i) {
+                if (this->selectedItems().contains(m_focusItemList[i])) {
+                    continue;
+                } else {
+                    qFatal() << "m_focusItemList.count() != list";
+                }
+            }
             for (int i = 0; i < this->selectedItems().count(); ++i) {
-                this->selectedItems()[i]->setFlag(QGraphicsItem::ItemIsMovable, false);
+                if (m_focusItemList.contains(this->selectedItems()[i])) {
+                    continue;
+                } else {
+                    qFatal() << "m_focusItemList.count() != list";
+                }
             }
         }
     });

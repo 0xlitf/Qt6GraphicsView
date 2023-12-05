@@ -111,5 +111,7 @@ private:
     QtIntPropertyManager* intManager = new QtIntPropertyManager(this);
 
     FocusManager* m_focusManager = nullptr;
+
+    QList<QGraphicsItem*>  m_focusItemList{};
 };
 

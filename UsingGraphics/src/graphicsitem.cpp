@@ -85,11 +85,12 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     }
 
     if (this->isSelected()) {
-        for (int i = 0; i < m_focusPointList.count(); ++i) {
+        auto focusPointList = this->focusPoint();
+        for (int i = 0; i < focusPointList.count(); ++i) {
             QPen p = painter->pen();
             painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
             painter->setBrush(Qt::green);
-            painter->drawRect(QRect(m_focusPointList[i].x() - 2, m_focusPointList[i].y() - 2, 4, 4));
+            painter->drawRect(QRect(focusPointList[i].x() - 2, focusPointList[i].y() - 2, 4, 4));
             painter->setPen(p);
         }
     }
@@ -121,8 +122,6 @@ QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& val
 
 void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     qDebug() << this->flags();
-
-    m_operationPoint = m_focusPosition;
 
     m_pressedPos = event->pos();
 
@@ -156,8 +155,13 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+    if (event->modifiers() & Qt::ShiftModifier) {
+        m_track << event->pos();
+        update();
+        return;
+    }
 
-    switch (m_operationPoint) {
+    switch (m_focusPosition) {
         case FocusPoint::Position::Undefined: {
 
         } break;
@@ -230,8 +234,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         case FocusPoint::Position::Body: {
             this->setCursor(Qt::SizeAllCursor);
 
-            if (bool singleMovable = !(this->flags() & QGraphicsItem::ItemIsMovable)) {
-                qDebug() << "singleMovable";
+            if (bool singleMove = !(this->flags() & QGraphicsItem::ItemIsMovable)) {
                 this->setPos(event->scenePos() - m_pressedPos);
             }
             this->update();
@@ -309,10 +312,10 @@ void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
 }
 
 QList<FocusPoint> GraphicsItem::recalculateFocusPoint() {
-    QList<FocusPoint> m_focusPointList;
-    m_focusPointList.append(FocusPoint{m_leftTop.x(), m_leftTop.y(), FocusPoint::Position::LeftTop});
-    m_focusPointList.append(FocusPoint{m_rightBottom.x(), m_leftTop.y(), FocusPoint::Position::RightTop});
-    m_focusPointList.append(FocusPoint{m_leftTop.x(), m_rightBottom.y(), FocusPoint::Position::LeftBottom});
-    m_focusPointList.append(FocusPoint{m_rightBottom.x(), m_rightBottom.y(), FocusPoint::Position::RightBottom});
-    return m_focusPointList;
+    QList<FocusPoint> focusPointList;
+    focusPointList.append(FocusPoint{m_leftTop.x(), m_leftTop.y(), FocusPoint::Position::LeftTop});
+    focusPointList.append(FocusPoint{m_rightBottom.x(), m_leftTop.y(), FocusPoint::Position::RightTop});
+    focusPointList.append(FocusPoint{m_leftTop.x(), m_rightBottom.y(), FocusPoint::Position::LeftBottom});
+    focusPointList.append(FocusPoint{m_rightBottom.x(), m_rightBottom.y(), FocusPoint::Position::RightBottom});
+    return focusPointList;
 }
