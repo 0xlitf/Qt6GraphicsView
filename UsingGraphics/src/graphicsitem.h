@@ -9,6 +9,7 @@
 #include <QKeyEvent>
 #include "focuspoint.h"
 #include "focusitem.h"
+#include "focuspoint.h"
 
 class GraphicsItem : public QGraphicsObject {
     Q_OBJECT
@@ -20,11 +21,23 @@ public:
     QPainterPath shape() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* item, QWidget* widget) override;
 
+    virtual QList<FocusPoint> focusPoint() {
+        return m_focusPointList;
+    }
+
+    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value) override;
+
 protected:
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
         qDebug() << "GraphicsItem::hoverEnterEvent";
-        setCursor(QCursor(Qt::SizeAllCursor));
+        if (!this->isSelected()) {
+            m_hoverPoint.setPosition(FocusPoint::Position::Center);
+            // this->setCursor(Qt::SizeAllCursor);
+        } else {
+
+
+        }
         QGraphicsItem::hoverEnterEvent(event);
     }
 
@@ -52,17 +65,20 @@ protected:
 protected:
     int m_x;
     int m_y;
-    int m_radius = 40;
-    int m_height = m_radius * 2;
-    int m_width = m_radius * 2;
+    int m_height = 80;
+    int m_width = 100;
 
     QColor m_color;
     QList<QPointF> m_track;
 
     QList<FocusPoint> m_focusPointList;
-    QList<FocusItem*> m_focusItemList;
+    QList<FocusItem*>  m_focusItemList{};
+
+    FocusPoint m_hoverPoint;
 
     qreal m_scale;
+
+    QPointF m_itemScenePos;
 
     class GraphicsScene* m_scene = nullptr;
 };

@@ -13,10 +13,12 @@ public:
         RightBottom,
         Bottom,
         LeftBottom,
-        Left
+        Left,
+        Center,
+        UserDefined
     };
     FocusPoint();
-    FocusPoint(int xpos, int ypos) noexcept: QPoint(xpos, ypos) {
+    FocusPoint(qreal xpos, qreal ypos) noexcept: QPoint(xpos, ypos) {
 
     }
 

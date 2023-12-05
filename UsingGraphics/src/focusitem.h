@@ -21,16 +21,19 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 protected:
-    void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
-        qDebug() << "GraphicsItemFocusItem::hoverEnterEvent";
-        setCursor(QCursor(Qt::SizeAllCursor));
-        QGraphicsItem::hoverEnterEvent(event);
-    }
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+    // void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
+    //     qDebug() << "GraphicsItemFocusItem::hoverEnterEvent";
+    //     setCursor(QCursor(Qt::SizeAllCursor));
+    //     QGraphicsItem::hoverEnterEvent(event);
+    // }
 
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override {
-        unsetCursor();
-        QGraphicsItem::hoverLeaveEvent(event);
-    }
+    // void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override {
+    //     unsetCursor();
+    //     QGraphicsItem::hoverLeaveEvent(event);
+    // }
 
 private:
     FocusPoint m_point;

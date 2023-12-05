@@ -3,7 +3,7 @@
 #include "graphicsitem.h"
 #include "viewframe.h"
 #include "rounditem.h"
-
+#include "anchoritem.h"
 #include <QHBoxLayout>
 #include <QRandomGenerator>
 
@@ -38,6 +38,7 @@ void MainWindow::populateScene() {
         for (int j = -100; j < 150; j += 120, ++x) {
             QColor randomColor = QColor::fromRgb(QRandomGenerator::global()->generate());
             auto item = new GraphicsItem(randomColor, y, x);
+            // auto item = new AnchorItem();
             item->setPos(QPointF(i, j));
             m_scene->addItem(item);
         }

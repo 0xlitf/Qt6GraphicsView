@@ -13,23 +13,30 @@
 #include "graphicsscene.h"
 
 GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
-    this->m_x = x;
-    this->m_y = y;
-    this->m_color = color;
+    m_x = x;
+    m_y = y;
+    m_color = color;
     setZValue((x + y) % 2);
 
-    setFlags(ItemIsSelectable | ItemIsMovable);
+    this->setFlag(QGraphicsItem::ItemIsFocusable);
+    this->setFlag(QGraphicsItem::ItemIsSelectable);
+    // this->setFlag(QGraphicsItem::ItemIsMovable);
+    // setFlags(ItemIsSelectable | ItemIsMovable);
     setAcceptHoverEvents(true);
 
+    m_focusPointList.append(FocusPoint{boundingRect().x(), boundingRect().y()});
+    m_focusPointList.append(FocusPoint{boundingRect().x() + boundingRect().width(), boundingRect().y()});
+    m_focusPointList.append(FocusPoint{boundingRect().x(), boundingRect().y() + boundingRect().height()});
+    m_focusPointList.append(FocusPoint{boundingRect().x() + boundingRect().width(), boundingRect().y() + boundingRect().height()});
 }
 
 QRectF GraphicsItem::boundingRect() const {
-    return QRectF(-10, -10, 120, 80);
+    return QRectF(-60, -50, 120, 100);
 }
 
 QPainterPath GraphicsItem::shape() const {
     QPainterPath path;
-    path.addEllipse(this->boundingRect());
+    path.addEllipse(QRect(-m_width/2, -m_height/2, m_width, m_height));
     return path;
 }
 
@@ -52,14 +59,14 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     QPen p = painter->pen();
     painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter->setBrush(fillColor);
-    painter->drawRect(QRectF(0,0,110,70));
+    painter->drawRect(QRect(-m_width/2, -m_height/2, m_width, m_height));
     painter->setPen(p);
 
     m_scale = option->levelOfDetailFromTransform(painter->worldTransform());
 
     QBrush b = painter->brush();
     painter->setBrush(fillColor);
-    painter->drawText(QPointF(15, 15), QString("GraphicsItem"));
+    painter->drawText(QPointF(-m_width/2 + 15, -m_height/ + 15), QString("GraphicsItem"));
     painter->setBrush(b);
 
     // if (m_scale < 0.2) {
@@ -99,17 +106,41 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     }
 }
 
+QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value) {
+    if (change == QGraphicsItem::ItemSelectedChange) {
+        prepareGeometryChange();
+    }
+
+    // if (change == ItemSelectedChange && scene()) {
+    //     if (value.toBool()) {
+    //         QList<FocusPoint> pointList = this->focusPoint();
+    //         for (int i = 0; i < pointList.count(); ++i) {
+    //             auto item = new FocusItem(pointList[i], this);
+    //             m_focusItemList.append(item);
+    //             dynamic_cast<GraphicsScene*>(scene())->addItem(item);
+    //         }
+    //     } else {
+    //         for (int i = 0; i < m_focusItemList.count(); ++i) {
+    //             dynamic_cast<GraphicsScene*>(scene())->removeItem(m_focusItemList[i]);
+    //         }
+    //         m_focusItemList.clear();
+    //     }
+    // }
+    return QGraphicsItem::itemChange(change, value);
+}
+
 void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+    // this->setFocus();
+    m_itemScenePos = event->pos();
     QGraphicsItem::mousePressEvent(event);
-    update();
 }
 
 void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-    if (event->modifiers() & Qt::ShiftModifier) {
-        m_track << event->pos();
-        update();
-        return;
+    if (bool singleMovable = !(this->flags() & QGraphicsItem::ItemIsMovable)) {
+        this->setPos(event->scenePos() - m_itemScenePos);
+        this->update();
     }
+
     QGraphicsItem::mouseMoveEvent(event);
 }
 

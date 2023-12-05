@@ -2,12 +2,67 @@
 #include "QtDoubleSpinBoxFactory"
 #include "QtSpinBoxFactory"
 #include <QtTreePropertyBrowser>
+#include "graphicsitem.h"
+#include "focusitem.h"
 
 GraphicsScene::GraphicsScene(QObject* parent)
     : QGraphicsScene{parent} {
+    m_focusManager = new FocusManager(this);
 
     connect(doubleManager, SIGNAL(valueChanged(QtProperty*, double)), this, SLOT(valueChanged(QtProperty*, double)));
     connect(intManager, SIGNAL(valueChanged(QtProperty*, int)), this, SLOT(valueChanged(QtProperty*, int)));
+    connect(this, &QGraphicsScene::selectionChanged, this, [=] {
+        qDebug() << "selectionChanged " << this->selectedItems().count();
+
+        // m_focusManager->selectionChanged(this->selectedItems());
+    });
+}
+
+QVariant GraphicsScene::itemChange(GraphicsItem* item, QGraphicsItem::GraphicsItemChange change, const QVariant& value) {
+    qDebug() << "itemChange:" << change;
+    if (change == QGraphicsItem::ItemPositionChange) {
+        // value is the new position.
+        QPointF newPos = value.toPointF();
+        QRectF rect = this->sceneRect();
+        if (!rect.contains(newPos)) {
+            // Keep the item inside the scene rect.
+            newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
+            newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
+
+            if (item != m_currentItem)
+                return QPointF();
+
+            doubleManager->setValue(idToProperty[QLatin1String("xpos")], item->x());
+            doubleManager->setValue(idToProperty[QLatin1String("ypos")], item->y());
+            doubleManager->setValue(idToProperty[QLatin1String("zpos")], item->zValue());
+
+            return newPos;
+        }
+    }
+
+    return QVariant();
+}
+
+void GraphicsScene::itemClicked(GraphicsItem* item) {
+    qDebug() << "item clicked: " << item;
+    this->updateExpandState();
+    this->deleteAllProperty();
+
+    m_currentItem = item;
+
+    QtProperty* property;
+
+    property = doubleManager->addProperty(tr("Position X"));
+    doubleManager->setValue(property, item->x());
+    addProperty(property, QLatin1String("xpos"));
+
+    property = doubleManager->addProperty(tr("Position Y"));
+    doubleManager->setValue(property, item->y());
+    addProperty(property, QLatin1String("ypos"));
+
+    property = intManager->addProperty(tr("Position Z"));
+    intManager->setValue(property, item->zValue());
+    addProperty(property, QLatin1String("zpos"));
 }
 
 void GraphicsScene::groupItems() {
@@ -262,4 +317,18 @@ void GraphicsScene::valueChanged(QtProperty* property, int value) {
         m_currentItem->setZValue(value);
     }
     this->update();
+}
+
+void GraphicsScene::dragEnterEvent(QGraphicsSceneDragDropEvent* event) {
+    event->accept();
+    QGraphicsScene::dragEnterEvent(event);
+}
+
+void GraphicsScene::dragMoveEvent(QGraphicsSceneDragDropEvent* event) {
+    event->accept();
+}
+
+void GraphicsScene::dropEvent(QGraphicsSceneDragDropEvent* event) {
+    event->acceptProposedAction();
+    QGraphicsScene::dropEvent(event);
 }

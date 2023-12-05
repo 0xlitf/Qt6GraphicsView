@@ -1,10 +1,5 @@
 #pragma once
 
-#include "QtDoublePropertyManager"
-#include "QtProperty"
-#include "QtTreePropertyBrowser"
-#include "graphicsitem.h"
-#include "graphicsitemgroup.h"
 #include <QGraphicsItem>
 #include <QGraphicsItemGroup>
 #include <QGraphicsScene>
@@ -12,7 +7,14 @@
 #include <algorithm>
 #include <tuple>
 #include "qtpropertybrowser.h"
+#include "focusmanager.h"
+#include "QtDoublePropertyManager"
+#include "QtProperty"
+#include "QtTreePropertyBrowser"
+#include "graphicsitemgroup.h"
 
+class GraphicsItem;
+class FocusManager;
 
 class GraphicsScene : public QGraphicsScene {
     Q_OBJECT
@@ -40,52 +42,9 @@ public:
         idToProperty.clear();
     }
 
-    QVariant itemChange(GraphicsItem* item, QGraphicsItem::GraphicsItemChange change, const QVariant& value) {
-        qDebug() << "itemChange:" << change;
-        if (change == QGraphicsItem::ItemPositionChange) {
-            // value is the new position.
-            QPointF newPos = value.toPointF();
-            QRectF rect = this->sceneRect();
-            if (!rect.contains(newPos)) {
-                // Keep the item inside the scene rect.
-                newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
-                newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
+    QVariant itemChange(GraphicsItem* item, QGraphicsItem::GraphicsItemChange change, const QVariant& value);
 
-                if (item != m_currentItem)
-                    return QPointF();
-
-                doubleManager->setValue(idToProperty[QLatin1String("xpos")], item->x());
-                doubleManager->setValue(idToProperty[QLatin1String("ypos")], item->y());
-                doubleManager->setValue(idToProperty[QLatin1String("zpos")], item->zValue());
-
-                return newPos;
-            }
-        }
-
-        return QVariant();
-    }
-
-    void itemClicked(GraphicsItem* item) {
-        qDebug() << "item clicked: " << item;
-        this->updateExpandState();
-        this->deleteAllProperty();
-
-        m_currentItem = item;
-
-        QtProperty* property;
-
-        property = doubleManager->addProperty(tr("Position X"));
-        doubleManager->setValue(property, item->x());
-        addProperty(property, QLatin1String("xpos"));
-
-        property = doubleManager->addProperty(tr("Position Y"));
-        doubleManager->setValue(property, item->y());
-        addProperty(property, QLatin1String("ypos"));
-
-        property = intManager->addProperty(tr("Position Z"));
-        intManager->setValue(property, item->zValue());
-        addProperty(property, QLatin1String("zpos"));
-    }
+    void itemClicked(GraphicsItem* item);
 
     void addProperty(QtProperty* property, const QString& id) {
         propertyToId[property] = id;
@@ -132,6 +91,12 @@ protected:
 
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
+    void dragEnterEvent(QGraphicsSceneDragDropEvent* event);
+
+    void dragMoveEvent(QGraphicsSceneDragDropEvent* event);
+
+    void dropEvent(QGraphicsSceneDragDropEvent* event);
+
 private:
     GraphicsItem* m_movingItem = nullptr;
 
@@ -145,6 +110,6 @@ private:
     QtDoublePropertyManager* doubleManager = new QtDoublePropertyManager(this);
     QtIntPropertyManager* intManager = new QtIntPropertyManager(this);
 
-
+    FocusManager* m_focusManager = nullptr;
 };
 
