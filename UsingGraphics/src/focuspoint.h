@@ -3,8 +3,9 @@
 #include <QPoint>
 #include <QCursor>
 #include <QMap>
+#include <QObject>
 
-class FocusPoint : public QPoint {
+class FocusPoint : public QPoint{
 public:
     enum class Position {
         LeftTop,
@@ -18,6 +19,7 @@ public:
         Center,
         UserDefined
     };
+
     QMap<Position, Qt::CursorShape> m_cursorMap{
         {Position::LeftTop, Qt::SizeFDiagCursor},
         {Position::RightBottom, Qt::SizeFDiagCursor},

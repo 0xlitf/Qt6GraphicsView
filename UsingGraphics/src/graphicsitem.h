@@ -32,6 +32,25 @@ protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
         qDebug() << "GraphicsItem::hoverEnterEvent";
 
+        if (!this->isSelected()) {
+            m_hoverPoint.setPosition(FocusPoint::Position::Center);
+            // this->setCursor(Qt::SizeAllCursor);
+        } else {
+            QPointF mousePos = event->pos();
+            QMarginsF margin{1, 1, 1, 1};
+            for (int i = 0; i < m_focusPointList.count(); ++i) {
+                QRectF itemRect = QRectF(m_focusPointList[i].x() - 2, m_focusPointList[i].y() - 2, 4, 4) + margin;
+                if (itemRect.contains(mousePos)) {
+                    this->setCursor(m_focusPointList[i].cursor());
+                } else {
+                    auto parentRect = QRectF(m_leftTop, m_rightBottom);
+                    if (parentRect.contains(mousePos)) {
+                        this->setCursor(Qt::SizeAllCursor);
+                        this->setToolTip(QString("Move"));
+                    }
+                }
+            }
+        }
         QGraphicsItem::hoverEnterEvent(event);
     }
 
@@ -42,16 +61,26 @@ protected:
             // this->setCursor(Qt::SizeAllCursor);
         } else {
             QPointF mousePos = event->pos();
-            for (int i = 0; i < m_focusPointList.count(); ++i) {
-                QRectF itemRect = QRectF(m_focusPointList[i].x() - 2, m_focusPointList[i].y() - 2, 4, 4);
-                if (itemRect.contains(mousePos)) {
-                    this->setCursor(m_focusPointList[i].cursor());
-                } else {
-                    auto parentRect = QRectF(m_leftTop, m_rightBottom);
-                    if (parentRect.contains(mousePos)) {
-                        this->setCursor(Qt::SizeAllCursor);
-                        this->setToolTip(QString("Move"));
+            QMarginsF margin{1, 1, 1, 1};
+
+            if (auto atCorner = [=] {
+                for (int i = 0; i < m_focusPointList.count(); ++i) {
+                    QRectF itemRect = QRectF(m_focusPointList[i].x() - 2, m_focusPointList[i].y() - 2, 4, 4) + margin;
+                    if (itemRect.contains(mousePos)) {
+                        qDebug() << "itemRect" << itemRect << m_focusPointList[i].cursor();
+                        this->setCursor(m_focusPointList[i].cursor());
+                        return true;
+                    } else {
                     }
+                }
+                return false;
+                }()){
+
+            } else {
+                auto parentRect = QRectF(m_leftTop, m_rightBottom);
+                if (parentRect.contains(mousePos)) {
+                    this->setCursor(Qt::SizeAllCursor);
+                    this->setToolTip(QString("Move"));
                 }
             }
         }
