@@ -24,19 +24,16 @@ GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
     // setFlags(ItemIsSelectable | ItemIsMovable);
     setAcceptHoverEvents(true);
 
-    m_focusPointList.append(FocusPoint{m_leftTop.x(), m_leftTop.y(), FocusPoint::Position::LeftTop});
-    m_focusPointList.append(FocusPoint{m_rightBottom.x(), m_leftTop.y(), FocusPoint::Position::RightTop});
-    m_focusPointList.append(FocusPoint{m_leftTop.x(), m_rightBottom.y(), FocusPoint::Position::LeftBottom});
-    m_focusPointList.append(FocusPoint{m_rightBottom.x(), m_rightBottom.y(), FocusPoint::Position::RightBottom});
+    this->resize();
 }
 
 QRectF GraphicsItem::boundingRect() const {
-    return QRectF(-60, -50, 120, 100);
+    return QRectF(-10 + m_leftTop.x(), -10 + m_leftTop.y(), 20 + QPoint(m_rightBottom - m_leftTop).x(), 20 + QPoint(m_rightBottom - m_leftTop).y());
 }
 
 QPainterPath GraphicsItem::shape() const {
     QPainterPath path;
-    path.addRect(QRect(-m_width / 2 - 2, -m_height / 2 - 2, m_width + 4, m_height + 4));
+    path.addRect(QRect(m_leftTop.x() - 2, m_leftTop.y() - 2, QPoint(m_rightBottom - m_leftTop).x() + 4, QPoint(m_rightBottom - m_leftTop).y() + 4));
     return path;
 }
 
@@ -59,12 +56,12 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     QPen p = painter->pen();
     painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter->setBrush(fillColor);
-    painter->drawRect(QRect(-m_width / 2, -m_height / 2, m_width, m_height));
+    painter->drawRect(QRect(m_leftTop.x() - 2, m_leftTop.y() - 2, QPoint(m_rightBottom - m_leftTop).x() + 4, QPoint(m_rightBottom - m_leftTop).y() + 4));
     painter->setPen(p);
 
     QBrush b = painter->brush();
     painter->setBrush(fillColor);
-    painter->drawText(QPointF(-m_width / 2 + 15, -m_height / +15), QString("GraphicsItem"));
+    painter->drawText(QPointF(m_leftTop.x() + 15, m_leftTop.y() + 15), QString("GraphicsItem"));
     painter->setBrush(b);
 
     m_scale = option->levelOfDetailFromTransform(painter->worldTransform());
@@ -141,9 +138,11 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     QPointF mousePos = event->pos();
     QMarginsF margin{1, 1, 1, 1};
 
+    m_operationPoint = m_focusPosition;
+
     switch (m_focusPosition) {
         case FocusPoint::Position::Undefined: {
-            qDebug() << "m_focusPosition" << "Undefined";
+
         } break;
         case FocusPoint::Position::LeftTop:
         case FocusPoint::Position::Top:
@@ -153,18 +152,12 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
         case FocusPoint::Position::Bottom:
         case FocusPoint::Position::LeftBottom:
         case FocusPoint::Position::Left: {
-            qDebug() << "m_focusPosition" << int(m_focusPosition);
+            m_pressedPos = event->pos();
         } break;
         case FocusPoint::Position::Body: {
-            qDebug() << "m_focusPosition" << "Body";
 
         } break;
         case FocusPoint::Position::Rotate: {
-            qDebug() << "m_focusPosition" << "Rotate";
-
-        } break;
-        case FocusPoint::Position::UserDefined: {
-            qDebug() << "m_focusPosition" << "UserDefined";
 
         } break;
         default: {
@@ -176,9 +169,95 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-    if (bool singleMovable = !(this->flags() & QGraphicsItem::ItemIsMovable)) {
-        this->setPos(event->scenePos() - m_itemScenePos);
-        this->update();
+    // if (m_leftTop.x() + 10 > m_rightBottom.x() || m_leftTop.y() + 10 > m_rightBottom.y()) {
+    //     QGraphicsItem::mouseMoveEvent(event);
+    //     return;
+    // }
+
+    switch (m_operationPoint) {
+        case FocusPoint::Position::Undefined: {
+
+        } break;
+        case FocusPoint::Position::LeftTop: {
+            QPointF offset = event->pos() - m_pressedPos;
+            m_pressedPos = event->pos();
+
+            m_leftTop += offset.toPoint();
+
+            m_leftTop.rx() = qMin(m_rightBottom.x() - 20, m_leftTop.x());
+            m_leftTop.ry() = qMin(m_rightBottom.y() - 20, m_leftTop.y());
+
+            prepareGeometryChange();
+            this->resize();
+            this->update();
+        } break;
+        case FocusPoint::Position::Top: {
+
+        } break;
+        case FocusPoint::Position::RightTop: {
+            QPointF offset = event->pos() - m_pressedPos;
+            m_pressedPos = event->pos();
+
+            m_rightBottom.rx() += offset.toPoint().x();
+            m_leftTop.ry() += offset.toPoint().y();
+
+            m_leftTop.ry() = qMin(m_rightBottom.y() - 20, m_leftTop.y());
+            m_rightBottom.rx() = qMax(m_leftTop.x() + 20, m_rightBottom.x());
+
+            prepareGeometryChange();
+            this->resize();
+            this->update();
+        } break;
+        case FocusPoint::Position::Right: {
+
+        } break;
+        case FocusPoint::Position::RightBottom: {
+            QPointF offset = event->pos() - m_pressedPos;
+            m_pressedPos = event->pos();
+
+            m_rightBottom += offset.toPoint();
+
+            m_rightBottom.rx() = qMax(m_leftTop.x() + 20, m_rightBottom.x());
+            m_rightBottom.ry() = qMax(m_leftTop.y() + 20, m_rightBottom.y());
+
+            prepareGeometryChange();
+            this->resize();
+            this->update();
+        } break;
+        case FocusPoint::Position::Bottom: {
+
+        } break;
+        case FocusPoint::Position::LeftBottom: {
+            QPointF offset = event->pos() - m_pressedPos;
+            m_pressedPos = event->pos();
+
+            m_leftTop.rx() += offset.toPoint().x();
+            m_rightBottom.ry() += offset.toPoint().y();
+
+            m_leftTop.rx() = qMin(m_rightBottom.x() - 20, m_leftTop.x());
+            m_rightBottom.ry() = qMax(m_leftTop.y() + 20, m_rightBottom.y());
+
+            prepareGeometryChange();
+            this->resize();
+            this->update();
+        } break;
+        case FocusPoint::Position::Left: {
+
+        } break;
+        case FocusPoint::Position::Body: {
+            if (bool singleMovable = !(this->flags() & QGraphicsItem::ItemIsMovable)) {
+                this->setPos(event->scenePos() - m_itemScenePos);
+                this->update();
+            }
+            qDebug() << "OperationWhenPressed::Move";
+        } break;
+        case FocusPoint::Position::Rotate: {
+
+
+        } break;
+        default: {
+
+        } break;
     }
 
     QGraphicsItem::mouseMoveEvent(event);
@@ -242,4 +321,13 @@ void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
     } else {
         qDebug() << "GraphicsItem selectedAction not match";
     }
+}
+
+void GraphicsItem::resize() {
+
+    m_focusPointList.clear();
+    m_focusPointList.append(FocusPoint{m_leftTop.x(), m_leftTop.y(), FocusPoint::Position::LeftTop});
+    m_focusPointList.append(FocusPoint{m_rightBottom.x(), m_leftTop.y(), FocusPoint::Position::RightTop});
+    m_focusPointList.append(FocusPoint{m_leftTop.x(), m_rightBottom.y(), FocusPoint::Position::LeftBottom});
+    m_focusPointList.append(FocusPoint{m_rightBottom.x(), m_rightBottom.y(), FocusPoint::Position::RightBottom});
 }

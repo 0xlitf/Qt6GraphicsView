@@ -18,8 +18,7 @@ public:
         LeftBottom,
         Left,
         Body,
-        Rotate,
-        UserDefined
+        Rotate
     };
 
     QMap<Position, QCursor> m_cursorMap{
@@ -32,8 +31,7 @@ public:
         {Position::Left, QCursor(Qt::SizeHorCursor)},
         {Position::Right, QCursor(Qt::SizeHorCursor)},
         {Position::Body, QCursor(Qt::SizeAllCursor)},
-        {Position::Rotate, QCursor(Qt::CrossCursor)},
-        {Position::UserDefined, QCursor(Qt::ArrowCursor)}
+        {Position::Rotate, QCursor(Qt::CrossCursor)}
     };
 
     FocusPoint();

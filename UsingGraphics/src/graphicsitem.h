@@ -96,15 +96,16 @@ protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
     void groupItems();
+    void resize();
 
 protected:
     int m_x;
     int m_y;
-    int m_height = 80;
-    int m_width = 100;
+    int m_initialHeight = 80;
+    int m_initialWidth = 100;
 
-    QPoint m_leftTop{-m_width/2, -m_height/2};
-    QPoint m_rightBottom{m_width/2, m_height/2};
+    QPoint m_leftTop{-m_initialWidth/2, -m_initialHeight/2};
+    QPoint m_rightBottom{m_initialWidth/2, m_initialHeight/2};
 
     QColor m_color;
     QList<QPointF> m_track;
@@ -118,6 +119,9 @@ protected:
     QPointF m_itemScenePos;
 
     FocusPoint::Position m_focusPosition{FocusPoint::Position::Undefined};
+
+    FocusPoint::Position m_operationPoint;
+    QPointF m_pressedPos{};
 
     class GraphicsScene* m_scene = nullptr;
 };
