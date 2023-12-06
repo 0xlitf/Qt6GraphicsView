@@ -22,29 +22,43 @@ GraphicsScene::GraphicsScene(QObject* parent)
             }
         }
         for (int i = 0; i < list.count(); ++i) {
-            list[i]->setFlag(QGraphicsItem::ItemIsMovable, true);
             if (m_focusItemList.contains(list[i])) {
                 continue;
             } else {
                 m_focusItemList.append(list[i]);
             }
         }
+        if (m_focusItemList.count() > 1) {
+            for (auto item : m_focusItemList) {
+                item->setFlag(QGraphicsItem::ItemIsMovable, true);
+            }
+        }
+        qDebug() << "list.count()" << list.count();
         qDebug() << "m_focusItemList.count()" << m_focusItemList.count();
-        if (m_focusItemList.count() != list.count()) {
-            qFatal() << "m_focusItemList.count() != list";
-            for (int i = 0; i < m_focusItemList.count(); ++i) {
-                if (list.contains(m_focusItemList[i])) {
-                    continue;
-                } else {
-                    qFatal() << "m_focusItemList.count() != list";
+
+        return;
+        if (list.count() > 1) {
+            qDebug() << "m_focusItemList.count()" << m_focusItemList.count();
+            if (m_focusItemList.count() != list.count()) {
+                qFatal() << "m_focusItemList.count() != list";
+                for (int i = 0; i < m_focusItemList.count(); ++i) {
+                    if (list.contains(m_focusItemList[i])) {
+                        continue;
+                    } else {
+                        qFatal() << "m_focusItemList.count() != list";
+                    }
+                }
+                for (int i = 0; i < list.count(); ++i) {
+                    if (m_focusItemList.contains(list[i])) {
+                        continue;
+                    } else {
+                        qFatal() << "m_focusItemList.count() != list";
+                    }
                 }
             }
+        } else {
             for (int i = 0; i < list.count(); ++i) {
-                if (m_focusItemList.contains(list[i])) {
-                    continue;
-                } else {
-                    qFatal() << "m_focusItemList.count() != list";
-                }
+                list[i]->setFlag(QGraphicsItem::ItemIsMovable, false);
             }
         }
     });
