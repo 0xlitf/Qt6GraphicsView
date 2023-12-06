@@ -22,10 +22,10 @@ GraphicsScene::GraphicsScene(QObject* parent)
             }
         }
         for (int i = 0; i < list.count(); ++i) {
+            list[i]->setFlag(QGraphicsItem::ItemIsMovable, true);
             if (m_focusItemList.contains(list[i])) {
                 continue;
             } else {
-                list[i]->setFlag(QGraphicsItem::ItemIsMovable, true);
                 m_focusItemList.append(list[i]);
             }
         }

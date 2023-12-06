@@ -2,7 +2,7 @@
 #include "graphicsscene.h"
 
 GraphicsItemGroup::GraphicsItemGroup() {
-    this->setFlags(ItemIsSelectable | ItemIsMovable);
+    this->setFlags(ItemIsSelectable);
     this->setAcceptHoverEvents(true);
 
 }
@@ -26,7 +26,23 @@ void GraphicsItemGroup::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) 
     }
 }
 
-void GraphicsItemGroup::ungroup() {
-    m_scene = dynamic_cast<GraphicsScene*>(this->scene());
-    m_scene->destroyItemGroup(this);
+void GraphicsItemGroup::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+    qDebug() << this->flags();
+
+    m_pressedPos = event->pos();
+
+    QGraphicsItemGroup::mousePressEvent(event);
+}
+
+void GraphicsItemGroup::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+    if (bool singleMove = !(this->flags() & QGraphicsItem::ItemIsMovable)) {
+        this->setPos(event->scenePos() - m_pressedPos);
+    }
+    this->update();
+
+    QGraphicsItemGroup::mouseMoveEvent(event);
+}
+
+void GraphicsItemGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+    QGraphicsItemGroup::mouseReleaseEvent(event);
 }

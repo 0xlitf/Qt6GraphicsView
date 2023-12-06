@@ -17,11 +17,14 @@ protected:
         qDebug() << "GraphicsItemGroup Key Released: " << Qt::Key(event->key());
     }
 
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
-
-    void ungroup();
 
 private:
     class GraphicsScene* m_scene = nullptr;
+    QPointF m_pressedPos{};
+
 };
 
