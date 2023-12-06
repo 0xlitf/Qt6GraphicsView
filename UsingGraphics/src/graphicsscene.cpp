@@ -12,34 +12,35 @@ GraphicsScene::GraphicsScene(QObject* parent)
     connect(doubleManager, SIGNAL(valueChanged(QtProperty*, double)), this, SLOT(valueChanged(QtProperty*, double)));
     connect(intManager, SIGNAL(valueChanged(QtProperty*, int)), this, SLOT(valueChanged(QtProperty*, int)));
     connect(this, &QGraphicsScene::selectionChanged, this, [=] {
-        for (int i = m_focusItemList.count() - 1; i >= 0 ; --i) {
-            if (this->selectedItems().contains(m_focusItemList[i])) {
-                continue;
-            } else {
-                m_focusItemList[i]->setFlag(QGraphicsItem::ItemIsMovable, true);
-                m_focusItemList.remove(i);
-            }
-        }
-        for (int i = 0; i < this->selectedItems().count(); ++i) {
-            if (m_focusItemList.contains(this->selectedItems()[i])) {
+        auto list = this->selectedItems();
+        for (int i = m_focusItemList.count() - 1; i >= 0; --i) {
+            if (list.contains(m_focusItemList[i])) {
                 continue;
             } else {
                 m_focusItemList[i]->setFlag(QGraphicsItem::ItemIsMovable, false);
-                m_focusItemList.append(this->selectedItems()[i]);
+                m_focusItemList.remove(i);
+            }
+        }
+        for (int i = 0; i < list.count(); ++i) {
+            if (m_focusItemList.contains(list[i])) {
+                continue;
+            } else {
+                list[i]->setFlag(QGraphicsItem::ItemIsMovable, true);
+                m_focusItemList.append(list[i]);
             }
         }
         qDebug() << "m_focusItemList.count()" << m_focusItemList.count();
-        if (m_focusItemList.count() != this->selectedItems().count()) {
+        if (m_focusItemList.count() != list.count()) {
             qFatal() << "m_focusItemList.count() != list";
             for (int i = 0; i < m_focusItemList.count(); ++i) {
-                if (this->selectedItems().contains(m_focusItemList[i])) {
+                if (list.contains(m_focusItemList[i])) {
                     continue;
                 } else {
                     qFatal() << "m_focusItemList.count() != list";
                 }
             }
-            for (int i = 0; i < this->selectedItems().count(); ++i) {
-                if (m_focusItemList.contains(this->selectedItems()[i])) {
+            for (int i = 0; i < list.count(); ++i) {
+                if (m_focusItemList.contains(list[i])) {
                     continue;
                 } else {
                     qFatal() << "m_focusItemList.count() != list";
