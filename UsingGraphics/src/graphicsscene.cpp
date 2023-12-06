@@ -13,11 +13,17 @@ GraphicsScene::GraphicsScene(QObject* parent)
     connect(intManager, SIGNAL(valueChanged(QtProperty*, int)), this, SLOT(valueChanged(QtProperty*, int)));
     connect(this, &QGraphicsScene::selectionChanged, this, [=] {
         auto list = this->selectedItems();
+        qDebug() << "selectedItems: " << list.count();
+        if (list.count() == 0) {
+            for (auto item : this->items()) {
+                item->setFlag(QGraphicsItem::ItemIsMovable, false);
+            }
+        }
+
         for (int i = m_focusItemList.count() - 1; i >= 0; --i) {
             if (list.contains(m_focusItemList[i])) {
                 continue;
             } else {
-                m_focusItemList[i]->setFlag(QGraphicsItem::ItemIsMovable, false);
                 m_focusItemList.remove(i);
             }
         }
@@ -25,47 +31,18 @@ GraphicsScene::GraphicsScene(QObject* parent)
             if (m_focusItemList.contains(list[i])) {
                 continue;
             } else {
+                qDebug() << "selectsetFlagedItems ItemIsMovable" << list.count();
                 m_focusItemList.append(list[i]);
             }
         }
-        if (m_focusItemList.count() > 1) {
-            for (auto item : m_focusItemList) {
-                item->setFlag(QGraphicsItem::ItemIsMovable, true);
-            }
-        }
-        qDebug() << "list.count()" << list.count();
-        qDebug() << "m_focusItemList.count()" << m_focusItemList.count();
-
-        return;
-        if (list.count() > 1) {
-            qDebug() << "m_focusItemList.count()" << m_focusItemList.count();
-            if (m_focusItemList.count() != list.count()) {
-                qFatal() << "m_focusItemList.count() != list";
-                for (int i = 0; i < m_focusItemList.count(); ++i) {
-                    if (list.contains(m_focusItemList[i])) {
-                        continue;
-                    } else {
-                        qFatal() << "m_focusItemList.count() != list";
-                    }
-                }
-                for (int i = 0; i < list.count(); ++i) {
-                    if (m_focusItemList.contains(list[i])) {
-                        continue;
-                    } else {
-                        qFatal() << "m_focusItemList.count() != list";
-                    }
-                }
-            }
-        } else {
-            for (int i = 0; i < list.count(); ++i) {
-                list[i]->setFlag(QGraphicsItem::ItemIsMovable, false);
-            }
+        for (auto item : m_focusItemList) {
+            item->setFlag(QGraphicsItem::ItemIsMovable, m_focusItemList.count() > 1);
         }
     });
 }
 
 QVariant GraphicsScene::itemChange(GraphicsItem* item, QGraphicsItem::GraphicsItemChange change, const QVariant& value) {
-    qDebug() << "itemChange:" << change;
+    qDebug() << "GraphicsScene::itemChange:" << change;
     if (change == QGraphicsItem::ItemPositionChange) {
         // value is the new position.
         QPointF newPos = value.toPointF();
@@ -86,22 +63,19 @@ QVariant GraphicsScene::itemChange(GraphicsItem* item, QGraphicsItem::GraphicsIt
         }
     }
     if (change == QGraphicsItem::ItemSelectedChange) {
-        if (this->selectedItems().count() > 1) {
-            for (int i = 0; i < this->selectedItems().count(); ++i) {
-                this->selectedItems()[i]->setFlag(QGraphicsItem::ItemIsMovable, true);
-            }
-        } else {
-            for (int i = 0; i < this->selectedItems().count(); ++i) {
-                this->selectedItems()[i]->setFlag(QGraphicsItem::ItemIsMovable, false);
-            }
-        }
+
     }
 
     return QVariant();
 }
 
-void GraphicsScene::itemClicked(GraphicsItem* item) {
-    qDebug() << "item clicked: " << item;
+void GraphicsScene::itemClicked(QGraphicsItem* item) {
+    if (item->type() == QGraphicsItemGroup::Type) {
+        qDebug() << "itemClicked: group" << item;
+    } else {
+        qDebug() << "itemClicked: item" << item;
+    }
+    
     this->updateExpandState();
     this->deleteAllProperty();
 
@@ -124,33 +98,43 @@ void GraphicsScene::itemClicked(GraphicsItem* item) {
 
 void GraphicsScene::groupItems() {
     qDebug() << "groupItems" << this->selectedItems().count();
+    if (this->selectedItems().count() <= 1) {
+        return;
+    }
+
     GraphicsItemGroup* group = new GraphicsItemGroup();
+    group->setFlag(QGraphicsItem::ItemIsMovable);
     this->addItem(group);
 
-    group->setFlags(QGraphicsItemGroup::ItemIsSelectable | QGraphicsItemGroup::ItemIsMovable);
+    group->setFlag(QGraphicsItemGroup::ItemIsSelectable/* | QGraphicsItemGroup::ItemIsMovable*/);
+    group->setHandlesChildEvents(true);
     group->setAcceptHoverEvents(true);
 
     QList<QGraphicsItem*> selectedItems = this->selectedItems();
-    qDebug() << "selectedItems: " << selectedItems.count();
 
     for (QGraphicsItem* item : selectedItems) {
-        GraphicsItem* i = dynamic_cast<GraphicsItem*>(item);
-
-        i->setSelected(false);
-
-        group->addToGroup(item);
-    }
-}
-
-void GraphicsScene::ungroupItems() {
-    for (auto item : this->selectedItems()) {
-        if (item->isSelected() && item->type() == QGraphicsItemGroup::Type) {
-            auto i = dynamic_cast<GraphicsItemGroup*>(item);
-            qDebug() << "QGraphicsItemGroup: " << i->type();
-
-            this->destroyItemGroup(i);
+        if (GraphicsItem* i = dynamic_cast<GraphicsItem*>(item)) {
+            i->setSelected(false);
+            i->setFlag(QGraphicsItem::ItemIsSelectable, false);
+            group->addToGroup(item);
         }
     }
+    this->clearSelection();
+}
+
+void GraphicsScene::ungroupItems(QGraphicsItemGroup* group) {
+    this->clearSelection();
+
+    for (auto j : group->childItems()) {
+        if (j) {
+            j->setFlag(QGraphicsItem::ItemIsSelectable, true);
+        } else {
+            qFatal() << "j nullptr";
+        }
+    }
+    this->destroyItemGroup(group);
+    m_movingItem = nullptr;
+    group = nullptr;
 }
 
 void GraphicsScene::alignItems(QList<QGraphicsItem*> selectedItems, AlignmentFlag align) {
@@ -271,13 +255,17 @@ void GraphicsScene::setPropertyEditor(QtTreePropertyBrowser* newPropertyEditor) 
 
 void GraphicsScene::keyPressEvent(QKeyEvent* event) {
     QGraphicsScene::keyPressEvent(event);
-    qDebug() << "GraphicsScene Key Pressed: " << Qt::Key(event->key());
     switch (Qt::Key(event->key())) {
         case Qt::Key_F1: {
             this->groupItems();
         } break;
         case Qt::Key_F2: {
-            this->ungroupItems();
+            for (auto item : this->selectedItems()) {
+                if (item->type() == QGraphicsItemGroup::Type) {
+                    auto i = dynamic_cast<QGraphicsItemGroup*>(item);
+                    this->ungroupItems(i);
+                }
+            }
         } break;
         case Qt::Key_1: {
             this->alignItems(this->selectedItems(), AlignLeft);
@@ -314,14 +302,23 @@ void GraphicsScene::keyReleaseEvent(QKeyEvent* event) {
 }
 
 void GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
-    // this->setFocus(Qt::MouseFocusReason);
-
     QPointF scenePos = event->scenePos();
-    GraphicsItem* item = dynamic_cast<GraphicsItem*>(itemAt(scenePos, QTransform()));
+    QGraphicsItem* item = this->itemAt(scenePos, QTransform());
 
     if (item) {
         m_movingItem = item;
-        itemClicked(item);
+        if (item->parentItem()) {
+            this->itemClicked(item->parentItem());
+        } else {
+            this->itemClicked(item);
+        }
+
+        if (GraphicsItemGroup* g = qgraphicsitem_cast<GraphicsItemGroup*>(item)) {
+
+        } else if (GraphicsItem* g = qgraphicsitem_cast<GraphicsItem*>(item)) {
+
+        }
+
     } else {
         m_movingItem = nullptr;
         // qDebug() << "no item clicked";
@@ -331,8 +328,10 @@ void GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-
-    if (m_movingItem == m_currentItem) {
+    if (m_movingItem && m_movingItem == m_currentItem) {
+        auto x = m_movingItem->x();
+        auto y = m_movingItem->y();
+        auto z = m_movingItem->zValue();
         doubleManager->setValue(idToProperty[QLatin1String("xpos")], m_movingItem->x());
         doubleManager->setValue(idToProperty[QLatin1String("ypos")], m_movingItem->y());
         intManager->setValue(idToProperty[QLatin1String("zpos")], m_movingItem->zValue());

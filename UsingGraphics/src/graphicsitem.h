@@ -14,6 +14,12 @@
 class GraphicsItem : public QGraphicsObject {
     Q_OBJECT
 public:
+    enum {
+        Type = UserType + 1
+    };
+    int type() const override {
+        return Type;
+    }
 
     GraphicsItem() = default;
     GraphicsItem(const QColor& color, int x, int y);
@@ -105,7 +111,6 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
-    void groupItems();
     virtual QList<FocusPoint> recalculateFocusPoint();
 
 protected:

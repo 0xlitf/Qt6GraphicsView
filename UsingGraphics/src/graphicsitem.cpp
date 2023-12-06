@@ -21,7 +21,7 @@ GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
     this->setFlag(QGraphicsItem::ItemIsFocusable);
     this->setFlag(QGraphicsItem::ItemIsSelectable);
 
-    setAcceptHoverEvents(true);
+    this->setAcceptHoverEvents(true);
 
     this->recalculateFocusPoint();
 }
@@ -121,6 +121,9 @@ QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& val
 }
 
 void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+    if (this->group()) {
+        return;
+    }
     qDebug() << this->flags();
 
     m_pressedPos = event->pos();
@@ -166,6 +169,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
         } break;
         case FocusPoint::Position::LeftTop: {
+            qDebug() << "LeftTop";
             QPointF offset = event->pos() - m_pressedPos;
             m_pressedPos = event->pos();
 
@@ -182,6 +186,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
         } break;
         case FocusPoint::Position::RightTop: {
+            qDebug() << "RightTop";
             QPointF offset = event->pos() - m_pressedPos;
             m_pressedPos = event->pos();
 
@@ -199,6 +204,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
         } break;
         case FocusPoint::Position::RightBottom: {
+            qDebug() << "RightBottom";
             QPointF offset = event->pos() - m_pressedPos;
             m_pressedPos = event->pos();
 
@@ -215,6 +221,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
         } break;
         case FocusPoint::Position::LeftBottom: {
+            qDebug() << "LeftBottom";
             QPointF offset = event->pos() - m_pressedPos;
             m_pressedPos = event->pos();
 
@@ -234,7 +241,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         case FocusPoint::Position::Body: {
             this->setCursor(Qt::SizeAllCursor);
 
-            if (bool singleMove = !(this->flags() & QGraphicsItem::ItemIsMovable)) {
+            if (bool singleMove = !(this->flags() & QGraphicsItem::ItemIsMovable) && !m_pressedPos.isNull()) {
                 this->setPos(event->scenePos() - m_pressedPos);
             }
             this->update();
@@ -252,6 +259,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+    m_pressedPos = QPointF{};
     QGraphicsItem::mouseReleaseEvent(event);
     update();
 }

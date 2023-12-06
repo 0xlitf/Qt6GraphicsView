@@ -4,7 +4,6 @@
 GraphicsItemGroup::GraphicsItemGroup() {
     this->setFlags(ItemIsSelectable);
     this->setAcceptHoverEvents(true);
-
 }
 
 void GraphicsItemGroup::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
@@ -18,15 +17,15 @@ void GraphicsItemGroup::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) 
     QAction* ungroupAction = menu.addAction(QString("Ungroup %1 Items").arg(QString::number(this->childItems().count())));
 
     QAction* selectedAction = menu.exec(event->screenPos());
-
     if (selectedAction == ungroupAction) {
-        m_scene->ungroupItems();
+        m_scene->ungroupItems(this);
     } else if (selectedAction == nullptr) {
 
     }
 }
 
 void GraphicsItemGroup::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+
     qDebug() << this->flags();
 
     m_pressedPos = event->pos();
@@ -35,6 +34,7 @@ void GraphicsItemGroup::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsItemGroup::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+
     if (bool singleMove = !(this->flags() & QGraphicsItem::ItemIsMovable)) {
         this->setPos(event->scenePos() - m_pressedPos);
     }
@@ -44,5 +44,6 @@ void GraphicsItemGroup::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsItemGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+
     QGraphicsItemGroup::mouseReleaseEvent(event);
 }

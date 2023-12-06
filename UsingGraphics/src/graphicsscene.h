@@ -44,7 +44,7 @@ public:
 
     QVariant itemChange(GraphicsItem* item, QGraphicsItem::GraphicsItemChange change, const QVariant& value);
 
-    void itemClicked(GraphicsItem* item);
+    void itemClicked(QGraphicsItem* item);
 
     void addProperty(QtProperty* property, const QString& id) {
         propertyToId[property] = id;
@@ -68,7 +68,7 @@ public:
 
     void groupItems();
 
-    void ungroupItems();
+    void ungroupItems(QGraphicsItemGroup* group);
 
     void alignItems(QList<QGraphicsItem*> selectedItems, AlignmentFlag align);
 
@@ -98,14 +98,14 @@ protected:
     void dropEvent(QGraphicsSceneDragDropEvent* event);
 
 private:
-    GraphicsItem* m_movingItem = nullptr;
+    QGraphicsItem* m_movingItem = nullptr;
 
     QMap<QtProperty*, QString> propertyToId;
     QMap<QString, QtProperty*> idToProperty;
     QMap<QString, bool> idToExpanded;
     class QtTreePropertyBrowser* m_propertyEditor;
 
-    GraphicsItem* m_currentItem;
+    QGraphicsItem* m_currentItem;
 
     QtDoublePropertyManager* doubleManager = new QtDoublePropertyManager(this);
     QtIntPropertyManager* intManager = new QtIntPropertyManager(this);
