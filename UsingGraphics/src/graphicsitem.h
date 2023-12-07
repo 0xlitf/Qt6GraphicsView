@@ -87,7 +87,7 @@ protected:
                 }
                 return false;
             }()) {
-            qDebug() << "GraphicsItem::hoverMoveEvent atCorner";
+            // qDebug() << "GraphicsItem::hoverMoveEvent atCorner";
         } else {
             auto parentRect = QRectF(m_topLeft, m_bottomRight);
             if (parentRect.contains(mousePos)) {
@@ -128,9 +128,8 @@ protected:
     int m_x;
     int m_y;
     int m_initialHeight = 80;
-    int m_initialWidth = 80;
+    int m_initialWidth = 120;
     bool m_proportional = true;
-
 
     QString m_centerText;
 

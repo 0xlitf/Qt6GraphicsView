@@ -65,7 +65,7 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 
     painter->setPen(QPen(Qt::white, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     QFont f = painter->font();
-    f.setPixelSize(20);
+    f.setPixelSize(qMin(this->boundingRect().width(), this->boundingRect().height()) / 4);
     painter->setFont(f);
 
     QBrush b = painter->brush();
@@ -136,20 +136,20 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+    auto proportionalScale = this->proportionalScale();
     switch (m_focusPosition) {
         case FocusPoint::Position::Undefined: {
 
         } break;
         case FocusPoint::Position::TopLeft: {
-            qDebug() << "TopLeft";
             if (m_proportional) {
                 auto now = event->pos();
 
                 double x = (now - m_bottomRight).x();
                 double y = (now - m_bottomRight).y();
 
-                double width = qMin(x, y * this->proportionalScale());
-                double height = qMin(y, x / this->proportionalScale());
+                double width = qMin(x, y / proportionalScale);
+                double height = qMin(y, x * proportionalScale);
 
                 m_topLeft.rx() = m_bottomRight.x() + width;
                 m_topLeft.ry() = m_bottomRight.y() + height;
@@ -170,7 +170,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
         } break;
         case FocusPoint::Position::TopRight: {
-            qDebug() << "TopRight";
             if (m_proportional) {
                 auto now = event->pos();
 
@@ -181,8 +180,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                     return;
                 }
 
-                double width = qMin(abs(x), abs(-y * this->proportionalScale()));
-                double height = qMin(abs(y), abs(x / this->proportionalScale()));
+                double width = qMin(abs(x), abs(-y / proportionalScale));
+                double height = qMin(abs(y), abs(x * proportionalScale));
 
                 m_bottomRight.rx() = m_topLeft.x() + width;
                 m_topLeft.ry() = m_bottomRight.y() - abs(height) ;
@@ -204,15 +203,14 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
         } break;
         case FocusPoint::Position::BottomRight: {
-            qDebug() << "BottomRight";
             if (m_proportional) {
                 auto now = event->pos();
 
                 double x = (now - m_topLeft).x();
                 double y = (now - m_topLeft).y();
 
-                double width = qMin(x, y * this->proportionalScale());
-                double height = qMin(y, x / this->proportionalScale());
+                double width = qMin(x, y / proportionalScale);
+                double height = qMin(y, x * proportionalScale);
 
                 m_bottomRight.rx() = m_topLeft.x() + width;
                 m_bottomRight.ry() = m_topLeft.y() + height;
@@ -234,7 +232,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
         } break;
         case FocusPoint::Position::BottomLeft: {
-            qDebug() << "BottomLeft";
             if (m_proportional) {
                 auto now = event->pos();
 
@@ -244,9 +241,11 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 if (x > 0 || y < 0) {
                     return;
                 }
+                if (x / y > ) {
 
-                double width = qMin(abs(x), abs(-y * this->proportionalScale()));
-                double height = qMin(abs(y), abs(x / this->proportionalScale()));
+                }
+                double width = qMin(abs(x), abs(-y / proportionalScale));
+                double height = qMin(abs(y), abs(x * proportionalScale));
 
                 m_topLeft.rx() = m_bottomRight.x() - width;
                 m_bottomRight.ry() = m_topLeft.y() + abs(height) ;
