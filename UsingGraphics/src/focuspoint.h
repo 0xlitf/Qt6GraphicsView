@@ -11,7 +11,7 @@ public:
         Undefined,
         TopLeft,
         Top,
-        RightTop,
+        TopRight,
         Right,
         BottomRight,
         Bottom,
@@ -25,7 +25,7 @@ public:
         {Position::TopLeft, QCursor(Qt::SizeFDiagCursor)},
         {Position::BottomRight, QCursor(Qt::SizeFDiagCursor)},
         {Position::BottomLeft, QCursor(Qt::SizeBDiagCursor)},
-        {Position::RightTop, QCursor(Qt::SizeBDiagCursor)},
+        {Position::TopRight, QCursor(Qt::SizeBDiagCursor)},
         {Position::Top, QCursor(Qt::SizeVerCursor)},
         {Position::Bottom, QCursor(Qt::SizeVerCursor)},
         {Position::Left, QCursor(Qt::SizeHorCursor)},
@@ -38,16 +38,7 @@ public:
     FocusPoint(int xpos, int ypos, Position position) noexcept
         : QPoint(xpos, ypos)
         , m_position{position} {
-        // m_cursorMap.insert(Position::TopLeft, Qt::SizeFDiagCursor);
-        // m_cursorMap.insert(Position::BottomRight, Qt::SizeFDiagCursor);
-        // m_cursorMap.insert(Position::BottomLeft, Qt::SizeBDiagCursor);
-        // m_cursorMap.insert(Position::RightTop, Qt::SizeBDiagCursor);
-        // m_cursorMap.insert(Position::Top, Qt::SizeVerCursor);
-        // m_cursorMap.insert(Position::Bottom, Qt::SizeVerCursor);
-        // m_cursorMap.insert(Position::Left, Qt::SizeHorCursor);
-        // m_cursorMap.insert(Position::Right, Qt::SizeHorCursor);
-        // m_cursorMap.insert(Position::Center, Qt::SizeAllCursor);
-        // m_cursorMap.insert(Position::UserDefined, Qt::ArrowCursor);
+
     }
 
     Position position() const;

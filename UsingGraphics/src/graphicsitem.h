@@ -33,7 +33,7 @@ public:
     virtual QList<FocusPoint> focusPoint() {
         QList<FocusPoint> focusPointList;
         focusPointList.append(FocusPoint{m_topLeft.x(), m_topLeft.y(), FocusPoint::Position::TopLeft});
-        focusPointList.append(FocusPoint{m_bottomRight.x(), m_topLeft.y(), FocusPoint::Position::RightTop});
+        focusPointList.append(FocusPoint{m_bottomRight.x(), m_topLeft.y(), FocusPoint::Position::TopRight});
         focusPointList.append(FocusPoint{m_topLeft.x(), m_bottomRight.y(), FocusPoint::Position::BottomLeft});
         focusPointList.append(FocusPoint{m_bottomRight.x(), m_bottomRight.y(), FocusPoint::Position::BottomRight});
         return focusPointList;
@@ -43,6 +43,9 @@ public:
 
     QString centerText() const;
     void setCenterText(const QString& newCenterText);
+
+    bool proportional() const;
+    void setProportional(bool newProportional);
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
@@ -117,11 +120,17 @@ protected:
 
     virtual QList<FocusPoint> recalculateFocusPoint();
 
+    double proportionalScale() {
+        return m_initialHeight / m_initialWidth;
+    }
+
 protected:
     int m_x;
     int m_y;
     int m_initialHeight = 80;
-    int m_initialWidth = 100;
+    int m_initialWidth = 80;
+    bool m_proportional = true;
+
 
     QString m_centerText;
 
