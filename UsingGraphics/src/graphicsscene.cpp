@@ -71,7 +71,9 @@ QVariant GraphicsScene::itemChange(GraphicsItem* item, QGraphicsItem::GraphicsIt
 
 void GraphicsScene::itemClicked(QGraphicsItem* item) {
     if (item->type() == QGraphicsItemGroup::Type) {
-        qDebug() << "itemClicked: group" << item;
+        QPointF groupTopLeftInScene = item->mapToScene(0, 0);
+        qDebug() << "itemClicked: group pos" << groupTopLeftInScene;
+        qDebug() << "itemClicked: item->pos" << item->pos();
     } else {
         qDebug() << "itemClicked: item" << item;
     }
@@ -104,13 +106,46 @@ void GraphicsScene::groupItems() {
 
     GraphicsItemGroup* group = new GraphicsItemGroup();
     group->setFlag(QGraphicsItem::ItemIsMovable);
+
+    QList<QGraphicsItem*> selectedItems = this->selectedItems();
+
+    auto minX = this->sceneRect().bottomRight().x();
+    auto minY = this->sceneRect().bottomRight().y();
+    auto maxX = this->sceneRect().topLeft().x();
+    auto maxY = this->sceneRect().topLeft().y();
+
+    QRectF rect;
+    qDebug() << "diag" << QPointF(minX, minY) << QPointF(maxX, maxY);
+    for (QGraphicsItem* item : selectedItems) {
+        if (item/*GraphicsItem* i = dynamic_cast<GraphicsItem*>(item)*/) {
+            auto toScene = item->mapRectToScene(item->boundingRect());
+            if (toScene.topLeft().x() < minX) {
+                minX = toScene.topLeft().x();
+            }
+            if (toScene.topLeft().y() < minY) {
+                minY = toScene.topLeft().y();
+            }
+            if (toScene.bottomRight().x() > maxX) {
+                maxX = toScene.bottomRight().x();
+            }
+            if (toScene.bottomRight().y() > maxY) {
+                maxY = toScene.bottomRight().y();
+            }
+            rect = QRectF{QPointF(minX, minY), QPointF(maxX, maxY)};
+        }
+    }
+
+    group->setPos(rect.topLeft());
+    group->setDiagonalPoint(QPointF(0, 0), rect.bottomRight() - rect.topLeft());
+    qDebug() << "group->pos()" << group->pos();
+    qDebug() << "group topleft" << QPointF(minX, minY);
+    qDebug() << "group bottomRight" << QPointF(maxX, maxY);
     this->addItem(group);
 
     group->setFlag(QGraphicsItemGroup::ItemIsSelectable/* | QGraphicsItemGroup::ItemIsMovable*/);
     group->setHandlesChildEvents(true);
     group->setAcceptHoverEvents(true);
 
-    QList<QGraphicsItem*> selectedItems = this->selectedItems();
 
     for (QGraphicsItem* item : selectedItems) {
         if (GraphicsItem* i = dynamic_cast<GraphicsItem*>(item)) {

@@ -12,6 +12,15 @@ public:
         QGraphicsItemGroup::setZValue(z);
     }
 
+    void setDiagonalPoint(const QPointF& topLeft, const QPointF& bottomRight) {
+        m_topLeft = topLeft;
+        m_bottomRight = bottomRight;
+    }
+
+    QRectF boundingRect() const override;
+    QPainterPath shape() const override;
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* item, QWidget* widget) override;
+
 protected:
     void keyPressEvent(QKeyEvent *event) override {
         qDebug() << "GraphicsItemGroup Key Pressed: " << Qt::Key(event->key());
@@ -37,9 +46,10 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
-private:
+protected:
     class GraphicsScene* m_scene = nullptr;
     QPointF m_pressedPos{};
-
+    QPointF m_topLeft;
+    QPointF m_bottomRight;
 };
 

@@ -30,10 +30,10 @@ public:
 
     virtual QList<FocusPoint> focusPoint() {
         QList<FocusPoint> focusPointList;
-        focusPointList.append(FocusPoint{m_leftTop.x(), m_leftTop.y(), FocusPoint::Position::LeftTop});
-        focusPointList.append(FocusPoint{m_rightBottom.x(), m_leftTop.y(), FocusPoint::Position::RightTop});
-        focusPointList.append(FocusPoint{m_leftTop.x(), m_rightBottom.y(), FocusPoint::Position::LeftBottom});
-        focusPointList.append(FocusPoint{m_rightBottom.x(), m_rightBottom.y(), FocusPoint::Position::RightBottom});
+        focusPointList.append(FocusPoint{m_topLeft.x(), m_topLeft.y(), FocusPoint::Position::TopLeft});
+        focusPointList.append(FocusPoint{m_bottomRight.x(), m_topLeft.y(), FocusPoint::Position::RightTop});
+        focusPointList.append(FocusPoint{m_topLeft.x(), m_bottomRight.y(), FocusPoint::Position::BottomLeft});
+        focusPointList.append(FocusPoint{m_bottomRight.x(), m_bottomRight.y(), FocusPoint::Position::BottomRight});
         return focusPointList;
     }
 
@@ -82,7 +82,7 @@ protected:
             }()) {
             qDebug() << "GraphicsItem::hoverMoveEvent atCorner";
         } else {
-            auto parentRect = QRectF(m_leftTop, m_rightBottom);
+            auto parentRect = QRectF(m_topLeft, m_bottomRight);
             if (parentRect.contains(mousePos)) {
                 this->setCursor(Qt::SizeAllCursor);
                 this->setToolTip(QString("Move this item"));
@@ -119,11 +119,10 @@ protected:
     int m_initialHeight = 80;
     int m_initialWidth = 100;
 
-    QPoint m_leftTop{-m_initialWidth/2, -m_initialHeight/2};
-    QPoint m_rightBottom{m_initialWidth/2, m_initialHeight/2};
+    QPoint m_topLeft{-m_initialWidth/2, -m_initialHeight/2};
+    QPoint m_bottomRight{m_initialWidth/2, m_initialHeight/2};
 
     QColor m_color;
-    QList<QPointF> m_track;
 
     qreal m_scale;
 

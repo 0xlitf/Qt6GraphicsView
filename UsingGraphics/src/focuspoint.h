@@ -9,22 +9,22 @@ class FocusPoint : public QPoint{
 public:
     enum struct Position {
         Undefined,
-        LeftTop,
+        TopLeft,
         Top,
         RightTop,
         Right,
-        RightBottom,
+        BottomRight,
         Bottom,
-        LeftBottom,
+        BottomLeft,
         Left,
         Body,
         Rotate
     };
 
     QMap<Position, QCursor> m_cursorMap{
-        {Position::LeftTop, QCursor(Qt::SizeFDiagCursor)},
-        {Position::RightBottom, QCursor(Qt::SizeFDiagCursor)},
-        {Position::LeftBottom, QCursor(Qt::SizeBDiagCursor)},
+        {Position::TopLeft, QCursor(Qt::SizeFDiagCursor)},
+        {Position::BottomRight, QCursor(Qt::SizeFDiagCursor)},
+        {Position::BottomLeft, QCursor(Qt::SizeBDiagCursor)},
         {Position::RightTop, QCursor(Qt::SizeBDiagCursor)},
         {Position::Top, QCursor(Qt::SizeVerCursor)},
         {Position::Bottom, QCursor(Qt::SizeVerCursor)},
@@ -38,9 +38,9 @@ public:
     FocusPoint(int xpos, int ypos, Position position) noexcept
         : QPoint(xpos, ypos)
         , m_position{position} {
-        // m_cursorMap.insert(Position::LeftTop, Qt::SizeFDiagCursor);
-        // m_cursorMap.insert(Position::RightBottom, Qt::SizeFDiagCursor);
-        // m_cursorMap.insert(Position::LeftBottom, Qt::SizeBDiagCursor);
+        // m_cursorMap.insert(Position::TopLeft, Qt::SizeFDiagCursor);
+        // m_cursorMap.insert(Position::BottomRight, Qt::SizeFDiagCursor);
+        // m_cursorMap.insert(Position::BottomLeft, Qt::SizeBDiagCursor);
         // m_cursorMap.insert(Position::RightTop, Qt::SizeBDiagCursor);
         // m_cursorMap.insert(Position::Top, Qt::SizeVerCursor);
         // m_cursorMap.insert(Position::Bottom, Qt::SizeVerCursor);
