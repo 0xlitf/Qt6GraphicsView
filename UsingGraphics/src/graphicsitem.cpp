@@ -60,7 +60,7 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     QPen p = painter->pen();
     painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter->setBrush(fillColor);
-    painter->drawEllipse(QRect(m_topLeft.x(), m_topLeft.y(), QPoint(m_bottomRight - m_topLeft).x(), QPoint(m_bottomRight - m_topLeft).y()));
+    painter->drawEllipse(QRectF(m_topLeft.x(), m_topLeft.y(), QPointF(m_bottomRight - m_topLeft).x(), QPointF(m_bottomRight - m_topLeft).y()));
     painter->setPen(p);
 
     painter->setPen(QPen(Qt::white, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
@@ -148,11 +148,21 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 double x = (now - m_bottomRight).x();
                 double y = (now - m_bottomRight).y();
 
-                double width = qMin(x, y / proportionalScale);
-                double height = qMin(y, x * proportionalScale);
+                if (x > 0 || y > 0) {
+                    return;
+                }
 
-                m_topLeft.rx() = m_bottomRight.x() + width;
-                m_topLeft.ry() = m_bottomRight.y() + height;
+                double width, height;
+                if (y / x < proportionalScale) {
+                    width = abs(x);
+                    height = abs(x * proportionalScale);
+                } else {
+                    width = abs(y / proportionalScale);
+                    height = abs(y);
+                }
+
+                m_topLeft.rx() = m_bottomRight.x() - width;
+                m_topLeft.ry() = m_bottomRight.y() - height;
             } else {
                 QPointF offset = event->pos() - m_pressedPos;
                 m_pressedPos = event->pos();
@@ -180,8 +190,14 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                     return;
                 }
 
-                double width = qMin(abs(x), abs(-y / proportionalScale));
-                double height = qMin(abs(y), abs(x * proportionalScale));
+                double width, height;
+                if (y / x < proportionalScale) {
+                    width = abs(x);
+                    height = abs(x * proportionalScale);
+                } else {
+                    width = abs(y / proportionalScale);
+                    height = abs(y);
+                }
 
                 m_bottomRight.rx() = m_topLeft.x() + width;
                 m_topLeft.ry() = m_bottomRight.y() - abs(height) ;
@@ -209,8 +225,18 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 double x = (now - m_topLeft).x();
                 double y = (now - m_topLeft).y();
 
-                double width = qMin(x, y / proportionalScale);
-                double height = qMin(y, x * proportionalScale);
+                if (x < 0 || y < 0) {
+                    return;
+                }
+
+                double width, height;
+                if (y / x < proportionalScale) {
+                    width = abs(x);
+                    height = abs(x * proportionalScale);
+                } else {
+                    width = abs(y / proportionalScale);
+                    height = abs(y);
+                }
 
                 m_bottomRight.rx() = m_topLeft.x() + width;
                 m_bottomRight.ry() = m_topLeft.y() + height;
@@ -241,11 +267,15 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 if (x > 0 || y < 0) {
                     return;
                 }
-                if (x / y > ) {
 
+                double width, height;
+                if (y / x < proportionalScale) {
+                    width = abs(x);
+                    height = abs(x * proportionalScale);
+                } else {
+                    width = abs(y / proportionalScale);
+                    height = abs(y);
                 }
-                double width = qMin(abs(x), abs(-y / proportionalScale));
-                double height = qMin(abs(y), abs(x * proportionalScale));
 
                 m_topLeft.rx() = m_bottomRight.x() - width;
                 m_bottomRight.ry() = m_topLeft.y() + abs(height) ;

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <QPoint>
+#include <QPointF>
 #include <QCursor>
 #include <QMap>
 #include <QObject>
 
-class FocusPoint : public QPoint{
+class FocusPoint : public QPointF{
 public:
     enum struct Position {
         Undefined,
@@ -35,8 +35,8 @@ public:
     };
 
     FocusPoint();
-    FocusPoint(int xpos, int ypos, Position position) noexcept
-        : QPoint(xpos, ypos)
+    FocusPoint(qreal xpos, qreal ypos, Position position) noexcept
+        : QPointF(xpos, ypos)
         , m_position{position} {
 
     }

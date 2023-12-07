@@ -44,7 +44,7 @@ protected:
         if (event->buttons() == Qt::LeftButton) {
 
         } else if (event->buttons() == Qt::RightButton) {
-            QPoint delta = event->pos() - lastPos;
+            QPointF delta = event->pos() - lastPos;
             horizontalScrollBar()->setValue(horizontalScrollBar()->value() - delta.x());
             verticalScrollBar()->setValue(verticalScrollBar()->value() - delta.y());
             lastPos = event->pos();
@@ -74,7 +74,7 @@ private:
 
     QPointF m_pressPoint{};
 
-    QPoint lastPos;
+    QPointF lastPos;
 
     ViewFrame* m_viewFrame;
 };

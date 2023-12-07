@@ -127,14 +127,14 @@ protected:
 protected:
     int m_x;
     int m_y;
-    int m_initialHeight = 80;
-    int m_initialWidth = 120;
+    double m_initialHeight = 80;
+    double m_initialWidth = 120;
     bool m_proportional = true;
 
     QString m_centerText;
 
-    QPoint m_topLeft{-m_initialWidth/2, -m_initialHeight/2};
-    QPoint m_bottomRight{m_initialWidth/2, m_initialHeight/2};
+    QPointF m_topLeft{-m_initialWidth/2, -m_initialHeight/2};
+    QPointF m_bottomRight{m_initialWidth/2, m_initialHeight/2};
 
     QColor m_color;
 
