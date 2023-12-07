@@ -27,12 +27,12 @@ GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
 }
 
 QRectF GraphicsItem::boundingRect() const {
-    return QRectF(-10 + m_topLeft.x(), -10 + m_topLeft.y(), 20 + QPoint(m_bottomRight - m_topLeft).x(), 20 + QPoint(m_bottomRight - m_topLeft).y());
+    return QRectF(m_topLeft, m_bottomRight) + QMargins(10, 10, 10, 10);
 }
 
 QPainterPath GraphicsItem::shape() const {
     QPainterPath path;
-    path.addRect(QRect(m_topLeft.x() - 2, m_topLeft.y() - 2, QPoint(m_bottomRight - m_topLeft).x() + 4, QPoint(m_bottomRight - m_topLeft).y() + 4));
+    path.addRect(QRectF(m_topLeft, m_bottomRight) + QMargins(2, 2, 2, 2));
     return path;
 }
 

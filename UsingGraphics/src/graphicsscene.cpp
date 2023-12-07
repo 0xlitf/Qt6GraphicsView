@@ -99,7 +99,6 @@ void GraphicsScene::itemClicked(QGraphicsItem* item) {
 }
 
 void GraphicsScene::groupItems() {
-    qDebug() << "groupItems" << this->selectedItems().count();
     if (this->selectedItems().count() <= 1) {
         return;
     }
@@ -114,8 +113,6 @@ void GraphicsScene::groupItems() {
     auto maxX = this->sceneRect().topLeft().x();
     auto maxY = this->sceneRect().topLeft().y();
 
-    QRectF rect;
-    qDebug() << "diag" << QPointF(minX, minY) << QPointF(maxX, maxY);
     for (QGraphicsItem* item : selectedItems) {
         if (item/*GraphicsItem* i = dynamic_cast<GraphicsItem*>(item)*/) {
             auto toScene = item->mapRectToScene(item->boundingRect());
@@ -131,34 +128,33 @@ void GraphicsScene::groupItems() {
             if (toScene.bottomRight().y() > maxY) {
                 maxY = toScene.bottomRight().y();
             }
-            rect = QRectF{QPointF(minX, minY), QPointF(maxX, maxY)};
         }
     }
+    QRectF rect = QRectF{QPointF(minX, minY), QPointF(maxX, maxY)};
 
     group->setPos(rect.topLeft());
     group->setDiagonalPoint(QPointF(0, 0), rect.bottomRight() - rect.topLeft());
-    qDebug() << "group->pos()" << group->pos();
-    qDebug() << "group topleft" << QPointF(minX, minY);
-    qDebug() << "group bottomRight" << QPointF(maxX, maxY);
+
     this->addItem(group);
+    group->update();
 
     group->setFlag(QGraphicsItemGroup::ItemIsSelectable/* | QGraphicsItemGroup::ItemIsMovable*/);
     group->setHandlesChildEvents(true);
     group->setAcceptHoverEvents(true);
 
-
     for (QGraphicsItem* item : selectedItems) {
-        if (GraphicsItem* i = dynamic_cast<GraphicsItem*>(item)) {
-            i->setSelected(false);
-            i->setFlag(QGraphicsItem::ItemIsSelectable, false);
-            group->addToGroup(item);
-        }
+        item->setSelected(false);
+        item->setFlag(QGraphicsItem::ItemIsSelectable, false);
+        group->addToGroup(item);
     }
     this->clearSelection();
 }
 
 void GraphicsScene::ungroupItems(QGraphicsItemGroup* group) {
     this->clearSelection();
+
+    auto boundingRect = group->mapRectToScene(group->boundingRect()) + QMargins{1,1,1,1};
+    qDebug() << boundingRect;
 
     for (auto j : group->childItems()) {
         if (j) {
@@ -167,7 +163,10 @@ void GraphicsScene::ungroupItems(QGraphicsItemGroup* group) {
             qFatal() << "j nullptr";
         }
     }
+
     this->destroyItemGroup(group);
+    this->update(boundingRect);
+
     m_movingItem = nullptr;
     group = nullptr;
 }

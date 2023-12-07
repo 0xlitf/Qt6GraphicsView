@@ -7,12 +7,12 @@ GraphicsItemGroup::GraphicsItemGroup() {
 }
 
 QRectF GraphicsItemGroup::boundingRect() const {
-    return QRectF(-10 + m_topLeft.x(), -10 + m_topLeft.y(), 20 + (m_bottomRight - m_topLeft).x(), 20 + (m_bottomRight - m_topLeft).y());
+    return QRectF(m_topLeft, m_bottomRight) + QMargins(10, 10, 10, 10);
 }
 
 QPainterPath GraphicsItemGroup::shape() const {
     QPainterPath path;
-    path.addRect(QRect(m_topLeft.x() - 2, m_topLeft.y() - 2, (m_bottomRight - m_topLeft).x() + 4, (m_bottomRight - m_topLeft).y() + 4));
+    path.addRect(QRectF(m_topLeft, m_bottomRight) + QMargins(2, 2, 2, 2));
     return path;
 }
 
@@ -29,7 +29,7 @@ void GraphicsItemGroup::paint(QPainter* painter, const QStyleOptionGraphicsItem*
 
     if (option->state & QStyle::State_Selected) {
         fillColor = fillColor.darker(150);
-        borderColor = borderColor.lighter(125);;
+        borderColor = borderColor.darker(150);;
     }
 
     QPen p = painter->pen();
@@ -41,14 +41,17 @@ void GraphicsItemGroup::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     }
 
     painter->setBrush(fillColor);
-    auto topLeft = this->boundingRect().topLeft();
-    auto bottomRight = this->boundingRect().bottomRight();
+    auto topLeft = m_topLeft;
+    auto bottomRight = m_bottomRight;
     painter->drawRect(QRect(topLeft.x() - 2, topLeft.y() - 2, (bottomRight - topLeft).x() + 4, (bottomRight - topLeft).y() + 4));
     painter->setPen(p);
 
     QBrush b = painter->brush();
     painter->setBrush(fillColor);
-    painter->drawText(QPointF(topLeft.x() + 15, topLeft.y() + 15), QString("Group"));
+    if (option->state & QStyle::State_Selected) {
+        // painter->drawText(QPointF(topLeft.x() + 10, topLeft.y()), QString("Group"));
+    } else {
+    }
     painter->setBrush(b);
 
     auto scale = option->levelOfDetailFromTransform(painter->worldTransform());
