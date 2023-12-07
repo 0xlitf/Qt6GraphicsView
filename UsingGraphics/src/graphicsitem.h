@@ -24,6 +24,8 @@ public:
     GraphicsItem() = default;
     GraphicsItem(const QColor& color, int x, int y);
 
+
+
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* item, QWidget* widget) override;
@@ -39,8 +41,10 @@ public:
 
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value) override;
 
-protected:
+    QString centerText() const;
+    void setCenterText(const QString& newCenterText);
 
+protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
         // qDebug() << "GraphicsItem::hoverEnterEvent";
 
@@ -118,6 +122,8 @@ protected:
     int m_y;
     int m_initialHeight = 80;
     int m_initialWidth = 100;
+
+    QString m_centerText;
 
     QPoint m_topLeft{-m_initialWidth/2, -m_initialHeight/2};
     QPoint m_bottomRight{m_initialWidth/2, m_initialHeight/2};

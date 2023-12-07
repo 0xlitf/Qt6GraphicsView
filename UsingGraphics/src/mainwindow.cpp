@@ -32,15 +32,19 @@ MainWindow::MainWindow(QWidget* parent)
 }
 
 void MainWindow::populateScene() {
+    int index = 1;
     int y = 0;
     for (int i = -100; i < 150; i += 120, ++y) {
         int x = 0;
         for (int j = -100; j < 150; j += 120, ++x) {
             QColor randomColor = QColor::fromRgb(QRandomGenerator::global()->generate());
             auto item = new GraphicsItem(randomColor, y, x);
+            item->setCenterText(QString::number(index));
             // auto item = new AnchorItem();
             item->setPos(QPointF(i, j));
             m_scene->addItem(item);
+
+            ++index;
         }
     }
 }

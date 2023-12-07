@@ -55,12 +55,17 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     QPen p = painter->pen();
     painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter->setBrush(fillColor);
-    painter->drawRect(QRect(m_topLeft.x() - 2, m_topLeft.y() - 2, QPoint(m_bottomRight - m_topLeft).x() + 4, QPoint(m_bottomRight - m_topLeft).y() + 4));
+    painter->drawEllipse(QRect(m_topLeft.x(), m_topLeft.y(), QPoint(m_bottomRight - m_topLeft).x(), QPoint(m_bottomRight - m_topLeft).y()));
     painter->setPen(p);
+
+    painter->setPen(QPen(Qt::white, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    QFont f = painter->font();
+    f.setPixelSize(20);
+    painter->setFont(f);
 
     QBrush b = painter->brush();
     painter->setBrush(fillColor);
-    painter->drawText(QPointF(m_topLeft.x() + 15, m_topLeft.y() + 15), QString("GraphicsItem"));
+    painter->drawText(this->boundingRect(), Qt::AlignCenter, m_centerText);
     painter->setBrush(b);
 
     m_scale = option->levelOfDetailFromTransform(painter->worldTransform());
@@ -288,4 +293,12 @@ QList<FocusPoint> GraphicsItem::recalculateFocusPoint() {
     focusPointList.append(FocusPoint{m_topLeft.x(), m_bottomRight.y(), FocusPoint::Position::BottomLeft});
     focusPointList.append(FocusPoint{m_bottomRight.x(), m_bottomRight.y(), FocusPoint::Position::BottomRight});
     return focusPointList;
+}
+
+QString GraphicsItem::centerText() const {
+    return m_centerText;
+}
+
+void GraphicsItem::setCenterText(const QString& newCenterText) {
+    m_centerText = newCenterText;
 }

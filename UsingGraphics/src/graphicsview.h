@@ -62,7 +62,6 @@ protected:
         this->setCursor(Qt::ArrowCursor);
 
         if (m_sceneMovedByRightButton) {
-            qDebug() << "event->accept();";
             event->accept();
             m_sceneMovedByRightButton = false;
         } else {
