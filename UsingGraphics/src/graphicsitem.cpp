@@ -77,7 +77,7 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 
     if (this->isSelected()) {
         auto focusPointList = this->recalculateFocusPoint();
-        qDebug() << "focusPointList.count()" << focusPointList.count();
+        // qDebug() << "focusPointList.count()" << focusPointList.count();
 
         for (int i = 0; i < focusPointList.count(); ++i) {
             QPen p = painter->pen();
@@ -173,7 +173,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_topLeft.ry() = m_bottomRight.y() - height;
             } else {
                 QPointF offset = event->pos() - m_pressedPos;
-                m_pressedPos = event->pos();
+                m_pressedPos.rx() = offset.x() < 0 ? event->pos().x() : m_topLeft.x();
+                m_pressedPos.ry() = offset.y() < 0 ? event->pos().y() : m_topLeft.y();
 
                 m_topLeft += offset.toPoint();
             }
@@ -226,7 +227,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_topLeft.ry() = m_bottomRight.y() - abs(height) ;
             } else {
                 QPointF offset = event->pos() - m_pressedPos;
-                m_pressedPos = event->pos();
+                m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
+                m_pressedPos.ry() = offset.y() > 0 ? event->pos().y() : m_topLeft.y();
 
                 m_bottomRight.rx() += offset.toPoint().x();
                 m_topLeft.ry() += offset.toPoint().y();
@@ -271,7 +273,9 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_bottomRight.ry() = m_topLeft.y() + height;
             } else {
                 QPointF offset = event->pos() - m_pressedPos;
-                m_pressedPos = event->pos();
+
+                m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
+                m_pressedPos.ry() = offset.y() > 0 ? event->pos().y() : m_bottomRight.y();
 
                 m_bottomRight += offset.toPoint();
             }
@@ -316,7 +320,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_bottomRight.ry() = m_topLeft.y() + abs(height);
             } else {
                 QPointF offset = event->pos() - m_pressedPos;
-                m_pressedPos = event->pos();
+                m_pressedPos.rx() = offset.x() < 0 ? event->pos().x() : m_topLeft.x();
+                m_pressedPos.ry() = offset.y() < 0 ? event->pos().y() : m_bottomRight.y();
 
                 m_topLeft.rx() += offset.toPoint().x();
                 m_bottomRight.ry() += offset.toPoint().y();
