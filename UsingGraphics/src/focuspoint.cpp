@@ -1,13 +1,13 @@
 #include "focuspoint.h"
 
-FocusPoint::FocusPoint() {
+FocusPointF::FocusPointF() {
 
 }
 
-FocusPoint::Position FocusPoint::position() const {
+FocusPointF::Position FocusPointF::position() const {
     return m_position;
 }
 
-void FocusPoint::setPosition(Position newPosition) {
+void FocusPointF::setPosition(Position newPosition) {
     m_position = newPosition;
 }

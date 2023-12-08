@@ -10,10 +10,10 @@
 class FocusItem : public QGraphicsItem {
 public:
     FocusItem();
-    FocusItem(FocusPoint point, QGraphicsItem* parent = nullptr);
+    FocusItem(FocusPointF point, QGraphicsItem* parent = nullptr);
 
-    FocusPoint point() const;
-    void setPoint(FocusPoint newPoint);
+    FocusPointF point() const;
+    void setPoint(FocusPointF newPoint);
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
@@ -36,6 +36,6 @@ protected:
     // }
 
 private:
-    FocusPoint m_point;
+    FocusPointF m_point;
 };
 

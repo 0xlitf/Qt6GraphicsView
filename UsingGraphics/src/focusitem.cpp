@@ -4,7 +4,7 @@ FocusItem::FocusItem() {
     setAcceptHoverEvents(true);
 }
 
-FocusItem::FocusItem(FocusPoint point, QGraphicsItem* parent)
+FocusItem::FocusItem(FocusPointF point, QGraphicsItem* parent)
     : m_point{point} {
 
     setFlags(ItemIsMovable);
@@ -25,11 +25,11 @@ QPainterPath FocusItem::shape() const {
     return path;
 }
 
-FocusPoint FocusItem::point() const {
+FocusPointF FocusItem::point() const {
     return m_point;
 }
 
-void FocusItem::setPoint(FocusPoint newPoint) {
+void FocusItem::setPoint(FocusPointF newPoint) {
     m_point = newPoint;
 }
 

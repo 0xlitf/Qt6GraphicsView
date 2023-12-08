@@ -25,19 +25,12 @@ public:
     GraphicsItem(const QColor& color, int x, int y);
 
 
+    virtual QList<FocusPointF> recalculateFocusPoint();
+
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* item, QWidget* widget) override;
-
-    virtual QList<FocusPoint> focusPoint() {
-        QList<FocusPoint> focusPointList;
-        focusPointList.append(FocusPoint{m_topLeft.x(), m_topLeft.y(), FocusPoint::Position::TopLeft});
-        focusPointList.append(FocusPoint{m_bottomRight.x(), m_topLeft.y(), FocusPoint::Position::TopRight});
-        focusPointList.append(FocusPoint{m_topLeft.x(), m_bottomRight.y(), FocusPoint::Position::BottomLeft});
-        focusPointList.append(FocusPoint{m_bottomRight.x(), m_bottomRight.y(), FocusPoint::Position::BottomRight});
-        return focusPointList;
-    }
 
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value) override;
 
@@ -71,12 +64,12 @@ protected:
                     this->setCursor(Qt::SizeAllCursor);
                     return false;
                 }
-                auto focusPointList = this->focusPoint();
+                auto focusPointList = this->recalculateFocusPoint();
                 for (int i = 0; i < focusPointList.count(); ++i) {
                     QRectF itemRect = QRectF(focusPointList[i].x() - 2, focusPointList[i].y() - 2, 4, 4) + margin;
                     if (itemRect.contains(mousePos)) {
                         this->setCursor(focusPointList[i].cursor());
-                        if (focusPointList[i].position() == FocusPoint::Position::Rotate) {
+                        if (focusPointList[i].position() == FocusPointF::Position::Rotate) {
                             this->setToolTip(QString("Drag to rotate"));
                         } else {
                             this->setToolTip(QString("Drag to resize"));
@@ -94,7 +87,7 @@ protected:
                 this->setCursor(Qt::SizeAllCursor);
                 this->setToolTip(QString("Move this item"));
 
-                m_focusPosition = FocusPoint::Position::Body;
+                m_focusPosition = FocusPointF::Position::Body;
             }
         }
         QGraphicsItem::hoverMoveEvent(event);
@@ -118,8 +111,6 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
-    virtual QList<FocusPoint> recalculateFocusPoint();
-
     double proportionalScale() {
         return m_initialHeight / m_initialWidth;
     }
@@ -140,7 +131,7 @@ protected:
 
     qreal m_scale;
 
-    FocusPoint::Position m_focusPosition{FocusPoint::Position::Undefined};
+    FocusPointF::Position m_focusPosition{FocusPointF::Position::Undefined};
 
     QPointF m_pressedPos{};
 

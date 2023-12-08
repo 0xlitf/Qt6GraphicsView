@@ -76,7 +76,8 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     m_scale = option->levelOfDetailFromTransform(painter->worldTransform());
 
     if (this->isSelected()) {
-        auto focusPointList = this->focusPoint();
+        auto focusPointList = this->recalculateFocusPoint();
+        qDebug() << "focusPointList.count()" << focusPointList.count();
         for (int i = 0; i < focusPointList.count(); ++i) {
             QPen p = painter->pen();
             painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
@@ -107,24 +108,24 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     m_pressedPos = event->pos();
 
     switch (m_focusPosition) {
-        case FocusPoint::Position::Undefined: {
+        case FocusPointF::Position::Undefined: {
 
         } break;
-        case FocusPoint::Position::TopLeft:
-        case FocusPoint::Position::Top:
-        case FocusPoint::Position::TopRight:
-        case FocusPoint::Position::Right:
-        case FocusPoint::Position::BottomRight:
-        case FocusPoint::Position::Bottom:
-        case FocusPoint::Position::BottomLeft:
-        case FocusPoint::Position::Left: {
+        case FocusPointF::Position::TopLeft:
+        case FocusPointF::Position::Top:
+        case FocusPointF::Position::TopRight:
+        case FocusPointF::Position::Right:
+        case FocusPointF::Position::BottomRight:
+        case FocusPointF::Position::Bottom:
+        case FocusPointF::Position::BottomLeft:
+        case FocusPointF::Position::Left: {
 
         } break;
-        case FocusPoint::Position::Body: {
+        case FocusPointF::Position::Body: {
             this->setCursor(Qt::SizeAllCursor);
             this->update();
         } break;
-        case FocusPoint::Position::Rotate: {
+        case FocusPointF::Position::Rotate: {
 
         } break;
         default: {
@@ -138,27 +139,27 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
     auto proportionalScale = this->proportionalScale();
     switch (m_focusPosition) {
-        case FocusPoint::Position::Undefined: {
+        case FocusPointF::Position::Undefined: {
 
         } break;
-        case FocusPoint::Position::TopLeft: {
+        case FocusPointF::Position::TopLeft: {
             if (m_proportional) {
                 auto now = event->pos();
 
                 double x = (now - m_bottomRight).x();
                 double y = (now - m_bottomRight).y();
 
-                if (x > 0 || y > 0) {
-                    return;
-                }
+                double width{0.}, height{0.};
+                if (x > 0 && y > 0) {
 
-                double width, height;
-                if (y / x < proportionalScale) {
-                    width = abs(x);
-                    height = abs(x * proportionalScale);
                 } else {
-                    width = abs(y / proportionalScale);
-                    height = abs(y);
+                    if (y / x < proportionalScale) {
+                        width = abs(x);
+                        height = abs(x * proportionalScale);
+                    } else {
+                        width = abs(y / proportionalScale);
+                        height = abs(y);
+                    }
                 }
 
                 m_topLeft.rx() = m_bottomRight.x() - width;
@@ -176,27 +177,27 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             this->recalculateFocusPoint();
             this->update();
         } break;
-        case FocusPoint::Position::Top: {
+        case FocusPointF::Position::Top: {
 
         } break;
-        case FocusPoint::Position::TopRight: {
+        case FocusPointF::Position::TopRight: {
             if (m_proportional) {
                 auto now = event->pos();
 
                 double x = (now - m_topLeft).x();
                 double y = (now - m_bottomRight).y();
 
-                if (x < 0 || y > 0) {
-                    return;
-                }
+                double width{0.}, height{0.};
+                if (x < 0 && y > 0) {
 
-                double width, height;
-                if (y / x < proportionalScale) {
-                    width = abs(x);
-                    height = abs(x * proportionalScale);
                 } else {
-                    width = abs(y / proportionalScale);
-                    height = abs(y);
+                    if (y / x < proportionalScale) {
+                        width = abs(x);
+                        height = abs(x * proportionalScale);
+                    } else {
+                        width = abs(y / proportionalScale);
+                        height = abs(y);
+                    }
                 }
 
                 m_bottomRight.rx() = m_topLeft.x() + width;
@@ -215,27 +216,28 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             this->recalculateFocusPoint();
             this->update();
         } break;
-        case FocusPoint::Position::Right: {
+        case FocusPointF::Position::Right: {
 
         } break;
-        case FocusPoint::Position::BottomRight: {
+        case FocusPointF::Position::BottomRight: {
             if (m_proportional) {
                 auto now = event->pos();
 
                 double x = (now - m_topLeft).x();
                 double y = (now - m_topLeft).y();
 
-                if (x < 0 || y < 0) {
-                    return;
-                }
+                double width{0.}, height{0.};
 
-                double width, height;
-                if (y / x < proportionalScale) {
-                    width = abs(x);
-                    height = abs(x * proportionalScale);
+                if (x < 0 && y < 0) {
+
                 } else {
-                    width = abs(y / proportionalScale);
-                    height = abs(y);
+                    if (abs(y / x) < proportionalScale) {
+                        width = abs(x);
+                        height = abs(x * proportionalScale);
+                    } else {
+                        width = abs(y / proportionalScale);
+                        height = abs(y);
+                    }
                 }
 
                 m_bottomRight.rx() = m_topLeft.x() + width;
@@ -248,33 +250,33 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             }
 
             m_bottomRight.rx() = qMax(m_topLeft.x() + 20, m_bottomRight.x());
-            m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
+            m_bottomRight.ry() = qMax(m_topLeft.y() + 20 * this->proportionalScale(), m_bottomRight.y());
 
             prepareGeometryChange();
             this->recalculateFocusPoint();
             this->update();
         } break;
-        case FocusPoint::Position::Bottom: {
+        case FocusPointF::Position::Bottom: {
 
         } break;
-        case FocusPoint::Position::BottomLeft: {
+        case FocusPointF::Position::BottomLeft: {
             if (m_proportional) {
                 auto now = event->pos();
 
                 double x = (now - m_bottomRight).x();
                 double y = (now - m_topLeft).y();
 
-                if (x > 0 || y < 0) {
-                    return;
-                }
+                double width{0.}, height{0.};
+                if (x > 0 && y < 0) {
 
-                double width, height;
-                if (y / x < proportionalScale) {
-                    width = abs(x);
-                    height = abs(x * proportionalScale);
                 } else {
-                    width = abs(y / proportionalScale);
-                    height = abs(y);
+                    if (y / x < proportionalScale) {
+                        width = abs(x);
+                        height = abs(x * proportionalScale);
+                    } else {
+                        width = abs(y / proportionalScale);
+                        height = abs(y);
+                    }
                 }
 
                 m_topLeft.rx() = m_bottomRight.x() - width;
@@ -287,16 +289,16 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_bottomRight.ry() += offset.toPoint().y();
             }
             m_topLeft.rx() = qMin(m_bottomRight.x() - 20, m_topLeft.x());
-            m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
+            m_bottomRight.ry() = qMax(m_topLeft.y() + 20 / this->proportionalScale(), m_bottomRight.y());
 
             prepareGeometryChange();
             this->recalculateFocusPoint();
             this->update();
         } break;
-        case FocusPoint::Position::Left: {
+        case FocusPointF::Position::Left: {
 
         } break;
-        case FocusPoint::Position::Body: {
+        case FocusPointF::Position::Body: {
             this->setCursor(Qt::SizeAllCursor);
 
             if (bool singleMove = !(this->flags() & QGraphicsItem::ItemIsMovable) && !m_pressedPos.isNull()) {
@@ -304,7 +306,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             }
             this->update();
         } break;
-        case FocusPoint::Position::Rotate: {
+        case FocusPointF::Position::Rotate: {
 
 
         } break;
@@ -377,12 +379,20 @@ void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
     }
 }
 
-QList<FocusPoint> GraphicsItem::recalculateFocusPoint() {
-    QList<FocusPoint> focusPointList;
-    focusPointList.append(FocusPoint{m_topLeft.x(), m_topLeft.y(), FocusPoint::Position::TopLeft});
-    focusPointList.append(FocusPoint{m_bottomRight.x(), m_topLeft.y(), FocusPoint::Position::TopRight});
-    focusPointList.append(FocusPoint{m_topLeft.x(), m_bottomRight.y(), FocusPoint::Position::BottomLeft});
-    focusPointList.append(FocusPoint{m_bottomRight.x(), m_bottomRight.y(), FocusPoint::Position::BottomRight});
+QList<FocusPointF> GraphicsItem::recalculateFocusPoint() {
+    QPointF center{(m_topLeft + m_bottomRight) / 2};
+
+    QList<FocusPointF> focusPointList;
+    focusPointList.append(FocusPointF{m_topLeft.x(), m_topLeft.y(), FocusPointF::Position::TopLeft});
+    focusPointList.append(FocusPointF{m_bottomRight.x(), m_topLeft.y(), FocusPointF::Position::TopRight});
+    focusPointList.append(FocusPointF{m_topLeft.x(), m_bottomRight.y(), FocusPointF::Position::BottomLeft});
+    focusPointList.append(FocusPointF{m_bottomRight.x(), m_bottomRight.y(), FocusPointF::Position::BottomRight});
+
+    focusPointList.append(FocusPointF{m_topLeft.x(), center.y(), FocusPointF::Position::Left});
+    focusPointList.append(FocusPointF{m_bottomRight.x(), center.y(), FocusPointF::Position::Right});
+    focusPointList.append(FocusPointF{center.x(), m_topLeft.y(), FocusPointF::Position::Top});
+    focusPointList.append(FocusPointF{center.x(), m_bottomRight.y(), FocusPointF::Position::Bottom});
+
     return focusPointList;
 }
 

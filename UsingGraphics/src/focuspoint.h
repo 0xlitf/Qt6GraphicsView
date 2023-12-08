@@ -5,7 +5,7 @@
 #include <QMap>
 #include <QObject>
 
-class FocusPoint : public QPointF{
+class FocusPointF : public QPointF{
 public:
     enum struct Position {
         Undefined,
@@ -34,13 +34,18 @@ public:
         {Position::Rotate, QCursor(Qt::CrossCursor)}
     };
 
-    FocusPoint();
-    FocusPoint(qreal xpos, qreal ypos, Position position) noexcept
+    FocusPointF();
+    FocusPointF(qreal xpos, qreal ypos, Position position = Position::Undefined) noexcept
         : QPointF(xpos, ypos)
         , m_position{position} {
 
     }
 
+    FocusPointF(QPointF p, Position position = Position::Undefined) noexcept
+        : QPointF(p)
+        , m_position{position} {
+
+    }
     Position position() const;
     void setPosition(Position newPosition);
 

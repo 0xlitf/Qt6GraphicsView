@@ -11,7 +11,7 @@ FocusManager::~FocusManager() {
 void FocusManager::addItem(QGraphicsItem* item) {
     return;
     auto i = dynamic_cast<GraphicsItem*>(item);
-    QList<FocusPoint> pointList = i->focusPoint();
+    QList<FocusPointF> pointList = i->recalculateFocusPoint();
     for (int i = 0; i < pointList.count(); ++i) {
         m_scene->addItem(new FocusItem(pointList[i]));
     }
