@@ -150,16 +150,22 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 double y = (now - m_bottomRight).y();
 
                 double width{0.}, height{0.};
-                if (x > 0 && y > 0) {
-
-                } else {
-                    if (y / x < proportionalScale) {
+                if (x < 0 && y < 0) {
+                    if (abs(y / x) < proportionalScale) {
                         width = abs(x);
                         height = abs(x * proportionalScale);
                     } else {
                         width = abs(y / proportionalScale);
                         height = abs(y);
                     }
+                } else if (x < 0 && y >= 0) {
+                    width = abs(x);
+                    height = abs(x * proportionalScale);
+                } else if (x >= 0 && y < 0) {
+                    width = abs(y / proportionalScale);
+                    height = abs(y);
+                } else if (x >= 0 && y >= 0) {
+
                 }
 
                 m_topLeft.rx() = m_bottomRight.x() - width;
@@ -170,7 +176,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
                 m_topLeft += offset.toPoint();
             }
-            m_topLeft.rx() = qMin(m_bottomRight.x() - 20, m_topLeft.x());
+            m_topLeft.rx() = qMin(m_bottomRight.x() - 20 / this->proportionalScale(), m_topLeft.x());
             m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
 
             prepareGeometryChange();
@@ -188,16 +194,22 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 double y = (now - m_bottomRight).y();
 
                 double width{0.}, height{0.};
-                if (x < 0 && y > 0) {
+                if (x < 0 && y < 0) {
+                    width = abs(y / proportionalScale);
+                    height = abs(y);
+                } else if (x < 0 && y >= 0) {
 
-                } else {
-                    if (y / x < proportionalScale) {
+                } else if (x >= 0 && y < 0) {
+                    if (abs(y / x) < proportionalScale) {
                         width = abs(x);
                         height = abs(x * proportionalScale);
                     } else {
                         width = abs(y / proportionalScale);
                         height = abs(y);
                     }
+                } else if (x >= 0 && y >= 0) {
+                    width = abs(x);
+                    height = abs(x * proportionalScale);
                 }
 
                 m_bottomRight.rx() = m_topLeft.x() + width;
@@ -209,8 +221,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_bottomRight.rx() += offset.toPoint().x();
                 m_topLeft.ry() += offset.toPoint().y();
             }
+            m_bottomRight.rx() = qMax(m_topLeft.x() + 20 / this->proportionalScale(), m_bottomRight.x());
             m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
-            m_bottomRight.rx() = qMax(m_topLeft.x() + 20, m_bottomRight.x());
 
             prepareGeometryChange();
             this->recalculateFocusPoint();
@@ -227,10 +239,15 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 double y = (now - m_topLeft).y();
 
                 double width{0.}, height{0.};
-
                 if (x < 0 && y < 0) {
 
-                } else {
+                } else if (x < 0 && y >= 0) {
+                    width = abs(y / proportionalScale);
+                    height = abs(y);
+                } else if (x >= 0 && y < 0) {
+                    width = abs(x);
+                    height = abs(x * proportionalScale);
+                } else if (x >= 0 && y >= 0) {
                     if (abs(y / x) < proportionalScale) {
                         width = abs(x);
                         height = abs(x * proportionalScale);
@@ -249,8 +266,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_bottomRight += offset.toPoint();
             }
 
-            m_bottomRight.rx() = qMax(m_topLeft.x() + 20, m_bottomRight.x());
-            m_bottomRight.ry() = qMax(m_topLeft.y() + 20 * this->proportionalScale(), m_bottomRight.y());
+            m_bottomRight.rx() = qMax(m_topLeft.x() + 20 / this->proportionalScale(), m_bottomRight.x());
+            m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
 
             prepareGeometryChange();
             this->recalculateFocusPoint();
@@ -267,20 +284,26 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 double y = (now - m_topLeft).y();
 
                 double width{0.}, height{0.};
-                if (x > 0 && y < 0) {
-
-                } else {
-                    if (y / x < proportionalScale) {
+                if (x < 0 && y < 0) {
+                    width = abs(x);
+                    height = abs(x * proportionalScale);
+                } else if (x < 0 && y >= 0) {
+                    if (abs(y / x) < proportionalScale) {
                         width = abs(x);
                         height = abs(x * proportionalScale);
                     } else {
                         width = abs(y / proportionalScale);
                         height = abs(y);
                     }
+                } else if (x >= 0 && y < 0) {
+
+                } else if (x >= 0 && y >= 0) {
+                    width = abs(y / proportionalScale);
+                    height = abs(y);
                 }
 
                 m_topLeft.rx() = m_bottomRight.x() - width;
-                m_bottomRight.ry() = m_topLeft.y() + abs(height) ;
+                m_bottomRight.ry() = m_topLeft.y() + abs(height);
             } else {
                 QPointF offset = event->pos() - m_pressedPos;
                 m_pressedPos = event->pos();
@@ -288,8 +311,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_topLeft.rx() += offset.toPoint().x();
                 m_bottomRight.ry() += offset.toPoint().y();
             }
-            m_topLeft.rx() = qMin(m_bottomRight.x() - 20, m_topLeft.x());
-            m_bottomRight.ry() = qMax(m_topLeft.y() + 20 / this->proportionalScale(), m_bottomRight.y());
+            m_topLeft.rx() = qMin(m_bottomRight.x() - 20 / this->proportionalScale(), m_topLeft.x());
+            m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
 
             prepareGeometryChange();
             this->recalculateFocusPoint();
