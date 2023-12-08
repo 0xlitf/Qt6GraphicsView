@@ -78,6 +78,7 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     if (this->isSelected()) {
         auto focusPointList = this->recalculateFocusPoint();
         qDebug() << "focusPointList.count()" << focusPointList.count();
+
         for (int i = 0; i < focusPointList.count(); ++i) {
             QPen p = painter->pen();
             painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
@@ -143,7 +144,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
         } break;
         case FocusPointF::Position::TopLeft: {
-            if (m_proportional) {
+            if (m_isProportional) {
                 auto now = event->pos();
 
                 double x = (now - m_bottomRight).x();
@@ -184,10 +185,19 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             this->update();
         } break;
         case FocusPointF::Position::Top: {
+            QPointF offset = event->pos() - m_pressedPos;
+            m_pressedPos = event->pos();
 
+            m_topLeft.ry() += offset.y();
+
+            m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
+
+            prepareGeometryChange();
+            this->recalculateFocusPoint();
+            this->update();
         } break;
         case FocusPointF::Position::TopRight: {
-            if (m_proportional) {
+            if (m_isProportional) {
                 auto now = event->pos();
 
                 double x = (now - m_topLeft).x();
@@ -232,7 +242,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
         } break;
         case FocusPointF::Position::BottomRight: {
-            if (m_proportional) {
+            if (m_isProportional) {
                 auto now = event->pos();
 
                 double x = (now - m_topLeft).x();
@@ -277,7 +287,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
         } break;
         case FocusPointF::Position::BottomLeft: {
-            if (m_proportional) {
+            if (m_isProportional) {
                 auto now = event->pos();
 
                 double x = (now - m_bottomRight).x();
@@ -411,20 +421,24 @@ QList<FocusPointF> GraphicsItem::recalculateFocusPoint() {
     focusPointList.append(FocusPointF{m_topLeft.x(), m_bottomRight.y(), FocusPointF::Position::BottomLeft});
     focusPointList.append(FocusPointF{m_bottomRight.x(), m_bottomRight.y(), FocusPointF::Position::BottomRight});
 
-    focusPointList.append(FocusPointF{m_topLeft.x(), center.y(), FocusPointF::Position::Left});
-    focusPointList.append(FocusPointF{m_bottomRight.x(), center.y(), FocusPointF::Position::Right});
-    focusPointList.append(FocusPointF{center.x(), m_topLeft.y(), FocusPointF::Position::Top});
-    focusPointList.append(FocusPointF{center.x(), m_bottomRight.y(), FocusPointF::Position::Bottom});
+    if (m_isProportional) {
+
+    } else {
+        focusPointList.append(FocusPointF{m_topLeft.x(), center.y(), FocusPointF::Position::Left});
+        focusPointList.append(FocusPointF{m_bottomRight.x(), center.y(), FocusPointF::Position::Right});
+        focusPointList.append(FocusPointF{center.x(), m_topLeft.y(), FocusPointF::Position::Top});
+        focusPointList.append(FocusPointF{center.x(), m_bottomRight.y(), FocusPointF::Position::Bottom});
+    }
 
     return focusPointList;
 }
 
 bool GraphicsItem::proportional() const {
-    return m_proportional;
+    return m_isProportional;
 }
 
 void GraphicsItem::setProportional(bool newProportional) {
-    m_proportional = newProportional;
+    m_isProportional = newProportional;
 }
 
 QString GraphicsItem::centerText() const {

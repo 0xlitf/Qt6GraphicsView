@@ -120,7 +120,7 @@ protected:
     int m_y;
     double m_initialHeight = 80;
     double m_initialWidth = 120;
-    bool m_proportional = true;
+    bool m_isProportional = false;
 
     QString m_centerText;
 
