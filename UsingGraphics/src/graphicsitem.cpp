@@ -187,7 +187,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         } break;
         case FocusPointF::Position::Top: {
             QPointF offset = event->pos() - m_pressedPos;
-            m_pressedPos = event->pos();
+            m_pressedPos.ry() = offset.y() < 0 ? event->pos().y() : m_topLeft.y();
 
             m_topLeft.ry() += offset.y();
 
@@ -241,7 +241,16 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             this->update();
         } break;
         case FocusPointF::Position::Right: {
+            QPointF offset = event->pos() - m_pressedPos;
+            m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
 
+            m_bottomRight.rx() += offset.x();
+
+            m_bottomRight.rx() = qMax(m_topLeft.x() + 20, m_bottomRight.x());
+
+            prepareGeometryChange();
+            this->recalculateFocusPoint();
+            this->update();
         } break;
         case FocusPointF::Position::BottomRight: {
             if (m_isProportional) {
@@ -288,7 +297,16 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             this->update();
         } break;
         case FocusPointF::Position::Bottom: {
+            QPointF offset = event->pos() - m_pressedPos;
+            m_pressedPos.ry() = offset.y() > 0 ? event->pos().y() : m_bottomRight.y();
 
+            m_bottomRight.ry() += offset.y();
+
+            m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
+
+            prepareGeometryChange();
+            this->recalculateFocusPoint();
+            this->update();
         } break;
         case FocusPointF::Position::BottomLeft: {
             if (m_isProportional) {
@@ -334,7 +352,16 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             this->update();
         } break;
         case FocusPointF::Position::Left: {
+            QPointF offset = event->pos() - m_pressedPos;
+            m_pressedPos.rx() = offset.x() < 0 ? event->pos().x() : m_topLeft.x();
 
+            m_topLeft.rx() += offset.x();
+
+            m_topLeft.rx() = qMin(m_bottomRight.x() - 20, m_topLeft.x());
+
+            prepareGeometryChange();
+            this->recalculateFocusPoint();
+            this->update();
         } break;
         case FocusPointF::Position::Body: {
             this->setCursor(Qt::SizeAllCursor);

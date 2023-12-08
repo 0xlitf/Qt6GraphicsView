@@ -31,7 +31,6 @@ GraphicsScene::GraphicsScene(QObject* parent)
             if (m_focusItemList.contains(list[i])) {
                 continue;
             } else {
-                qDebug() << "selectsetFlagedItems ItemIsMovable" << list.count();
                 m_focusItemList.append(list[i]);
             }
         }
@@ -288,7 +287,8 @@ void GraphicsScene::setPropertyEditor(QtTreePropertyBrowser* newPropertyEditor) 
 }
 
 void GraphicsScene::keyPressEvent(QKeyEvent* event) {
-    QGraphicsScene::keyPressEvent(event);
+    qDebug() << "GraphicsScene keyPressEvent: " << Qt::Key(event->key());
+
     switch (Qt::Key(event->key())) {
         case Qt::Key_F1: {
             this->groupItems();
@@ -326,13 +326,14 @@ void GraphicsScene::keyPressEvent(QKeyEvent* event) {
 
         } break;
     }
+    QGraphicsScene::keyPressEvent(event);
 }
 
 
 void GraphicsScene::keyReleaseEvent(QKeyEvent* event) {
-    QGraphicsScene::keyReleaseEvent(event);
 
-    qDebug() << "GraphicsScene Key Released: " << Qt::Key(event->key());
+    qDebug() << "GraphicsScene keyReleaseEvent: " << Qt::Key(event->key());
+    QGraphicsScene::keyReleaseEvent(event);
 }
 
 void GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {

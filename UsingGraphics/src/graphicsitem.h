@@ -99,11 +99,19 @@ protected:
     }
 
     void keyPressEvent(QKeyEvent *event) override {
-        qDebug() << "GraphicsItem Key Pressed: " << Qt::Key(event->key());
+        qDebug() << "GraphicsItem keyPressEvent: " << Qt::Key(event->key());
+
+        event->accept();
+
+        // QGraphicsItem::keyPressEvent(event);
     }
 
     void keyReleaseEvent(QKeyEvent *event) override {
-        qDebug() << "GraphicsItem Key Released: " << Qt::Key(event->key());
+        qDebug() << "GraphicsItem keyReleaseEvent: " << Qt::Key(event->key());
+
+        event->accept();
+
+        // QGraphicsItem::keyReleaseEvent(event);
     }
 
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
