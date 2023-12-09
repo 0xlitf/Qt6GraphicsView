@@ -188,10 +188,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             }
             m_topLeft.rx() = qMin(m_bottomRight.x() - 20 / this->proportionalScale(), m_topLeft.x());
             m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
-
-            prepareGeometryChange();
-            this->recalculateFocusPoint();
-            this->update();
         } break;
         case FocusPointF::Position::Top: {
             QPointF offset = event->pos() - m_pressedPos;
@@ -200,10 +196,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_topLeft.ry() += offset.y();
 
             m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
-
-            prepareGeometryChange();
-            this->recalculateFocusPoint();
-            this->update();
         } break;
         case FocusPointF::Position::TopRight: {
             if (m_isProportional) {
@@ -243,10 +235,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             }
             m_bottomRight.rx() = qMax(m_topLeft.x() + 20 / this->proportionalScale(), m_bottomRight.x());
             m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
-
-            prepareGeometryChange();
-            this->recalculateFocusPoint();
-            this->update();
         } break;
         case FocusPointF::Position::Right: {
             QPointF offset = event->pos() - m_pressedPos;
@@ -255,10 +243,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_bottomRight.rx() += offset.x();
 
             m_bottomRight.rx() = qMax(m_topLeft.x() + 20, m_bottomRight.x());
-
-            prepareGeometryChange();
-            this->recalculateFocusPoint();
-            this->update();
         } break;
         case FocusPointF::Position::BottomRight: {
             if (m_isProportional) {
@@ -299,10 +283,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
             m_bottomRight.rx() = qMax(m_topLeft.x() + 20 / this->proportionalScale(), m_bottomRight.x());
             m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
-
-            prepareGeometryChange();
-            this->recalculateFocusPoint();
-            this->update();
         } break;
         case FocusPointF::Position::Bottom: {
             QPointF offset = event->pos() - m_pressedPos;
@@ -311,10 +291,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_bottomRight.ry() += offset.y();
 
             m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
-
-            prepareGeometryChange();
-            this->recalculateFocusPoint();
-            this->update();
         } break;
         case FocusPointF::Position::BottomLeft: {
             if (m_isProportional) {
@@ -354,10 +330,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             }
             m_topLeft.rx() = qMin(m_bottomRight.x() - 20 / this->proportionalScale(), m_topLeft.x());
             m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
-
-            prepareGeometryChange();
-            this->recalculateFocusPoint();
-            this->update();
         } break;
         case FocusPointF::Position::Left: {
             QPointF offset = event->pos() - m_pressedPos;
@@ -367,9 +339,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
             m_topLeft.rx() = qMin(m_bottomRight.x() - 20, m_topLeft.x());
 
-            prepareGeometryChange();
-            this->recalculateFocusPoint();
-            this->update();
         } break;
         case FocusPointF::Position::Body: {
             this->setCursor(Qt::SizeAllCursor);
@@ -399,17 +368,15 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
             this->setTransformOriginPoint(this->center());
             this->setRotation(this->rotation() + angle);
-
-            this->update();
-
-            prepareGeometryChange();
-            this->recalculateFocusPoint();
-            this->update();
         } break;
         default: {
 
         } break;
     }
+
+    prepareGeometryChange();
+    this->recalculateFocusPoint();
+    this->update();
 
     QGraphicsItem::mouseMoveEvent(event);
 }
