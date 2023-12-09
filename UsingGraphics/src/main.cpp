@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "mainwindow.h"
 
 #include <QApplication>
@@ -9,8 +11,13 @@
 #include <QTime>
 #include <QDir>
 #include <QMutex>
+#include <QtGui>
 
-void outputMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+#define STRINGX(x) #x
+#define STRING(x) STRINGX(x)
+#define MY_LOG(msg) __pragma(message(__FILE__"(" STRING(__LINE__) "): " "\033[0;30;42m " msg "\033[0m"))
+
+void logger(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
     static QMutex mutex;
     static QFile file;
 
@@ -35,13 +42,14 @@ void outputMessage(QtMsgType type, const QMessageLogContext &context, const QStr
     }
 
     QString text;
+
     switch (type)
     {
         case QtDebugMsg:
-            text = QString("Debug");
+            text = QString("\033[32m""Debug""\033[0m");
             break;
         case QtWarningMsg:
-            text = QString("Warning");
+            text = QString("\033[35;1m""Warning""\033[0m");
             break;
         case QtCriticalMsg:
             text = QString("Critical");
@@ -52,10 +60,10 @@ void outputMessage(QtMsgType type, const QMessageLogContext &context, const QStr
             text = QString("Info");
     }
 
-    QString message = QString("[%1 File:%2,Line:%3 %4]    %5")
-                          .arg(text)
+    QString message = QString("[File:%1:Line]: [%3] [%4] %5")
                           .arg(QString::fromLocal8Bit(context.file))
                           .arg(QString::number(context.line))
+                          .arg(text)
                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"))
                           .arg(msg);
 
@@ -71,15 +79,30 @@ int main(int argc, char* argv[]) {
     QApplication a(argc, argv);
     a.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
-    qSetMessagePattern("[%{time yyyy-MM-dd h:mm:ss.zzz t}][%{type}] [file://%{file}:%{line}] [%{function}] \n>> %{message}\n");
-
-    if (!qgetenv("QTDIR").isEmpty()) { // start direct in QtCreator
-        qDebug() << "start in QtCreator: " << qgetenv("QTDIR");
-    } else if (!qgetenv("VSAPPIDDIR").isEmpty()) { // start direct in vs
+    if (!qEnvironmentVariableIsEmpty("VSAPPIDDIR")) { // start direct in vs
+        qSetMessagePattern("%{file}(%{line}): "
+                           "[%{type}]:"
+                           " [%{function}]:\n"
+                           " [%{time yyyy-MM-dd h:mm:ss.zzz t}]"
+                           " %{message}");
         qDebug() << "start in vs: " << qgetenv("VSAPPIDDIR");
+    } else if (!qEnvironmentVariableIsEmpty("QTDIR")) { // start direct in QtCreator
+        qSetMessagePattern("\033[1;37m [file://%{file}:%{line}]:\033[0m"
+                           " %{if-debug}\033[1;36m%{endif}%{if-info}\033[1;44m%{endif}%{if-warning}\033[1;43m%{endif}%{if-critical}\033[1;41m%{endif}%{if-fatal}\033[1;41m%{endif}[%{type}]:\033[0m"
+                           "\033[1;35m [%{function}]:\033[0m\n"
+                           "\033[0;37m [%{time yyyy-MM-dd h:mm:ss.zzz t}]\033[0m"
+                           "\033[1;91m %{message}\033[0m");
+        qDebug() << "start in QtCreator: " << qgetenv("QTDIR");
     } else {
-        qInstallMessageHandler(outputMessage);
+        qInstallMessageHandler(logger);
     }
+
+    MY_LOG("This is a log message at compile");
+    qDebug() << "qDebug";
+    qInfo() << "qInfo";
+    qWarning() << "qWarning";
+    qCritical() << "qCritical";
+    // qFatal() << "qFatal";
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
