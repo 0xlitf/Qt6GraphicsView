@@ -95,16 +95,16 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
             painter->setPen(p);
         }
     }
+
+    this->moveFocusPoint();
 }
 
 QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value) {
-    // if (change == ItemSelectedChange && scene()) {
-    //     if (scene()->selectedItems().count() > 1) {
-    //         this->setFlag(QGraphicsItem::ItemIsMovable, true);
-    //     } else {
-    //         this->setFlag(QGraphicsItem::ItemIsMovable, false);
-    //     }
-    // }
+    if (change == QGraphicsItem::ItemPositionChange) {
+        QPointF newPos = value.toPointF();
+        qDebug() << "New Position:" << newPos;
+
+    }
 
     // qDebug() << "change" << change;
     auto focusPointList = this->recalculateFocusPoint();
@@ -404,51 +404,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         } break;
     }
 
-    auto focusPointList = this->recalculateFocusPoint();
-    if (!focusPointList.isEmpty()) {
-        for (int i = 0; i < focusPointList.count(); ++i) {
-            QGraphicsRectItem* rectItem = m_focusPointItemList[i];
-            switch (focusPointList[i].position()) {
-                case FocusPointF::Position::Undefined: {
-
-                } break;
-                case FocusPointF::Position::TopLeft: {
-                    rectItem->setPos(this->mapToScene(m_topLeft.x(), m_topLeft.y()));
-                } break;
-                case FocusPointF::Position::Top: {
-                    rectItem->setPos(this->mapToScene(this->center().x(), m_topLeft.y()));
-                } break;
-                case FocusPointF::Position::TopRight: {
-                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), m_topLeft.y()));
-                } break;
-                case FocusPointF::Position::Right: {
-                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), this->center().y()));
-                } break;
-                case FocusPointF::Position::BottomRight: {
-                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), m_bottomRight.y()));
-                } break;
-                case FocusPointF::Position::Bottom: {
-                    rectItem->setPos(this->mapToScene(this->center().x(), m_bottomRight.y()));
-                } break;
-                case FocusPointF::Position::BottomLeft: {
-                    rectItem->setPos(this->mapToScene(m_topLeft.x(), m_bottomRight.y()));
-                } break;
-                case FocusPointF::Position::Left: {
-                    rectItem->setPos(this->mapToScene(m_topLeft.x(), this->center().y()));
-                } break;
-                case FocusPointF::Position::Body: {
-                    this->setCursor(Qt::SizeAllCursor);
-                    this->update();
-                } break;
-                case FocusPointF::Position::Rotate: {
-                    rectItem->setPos(this->mapToScene(this->center().x(), m_topLeft.y() - 25));
-                } break;
-                default: {
-
-                } break;
-            }
-        }
-    }
     prepareGeometryChange();
     this->recalculateFocusPoint();
     this->update();

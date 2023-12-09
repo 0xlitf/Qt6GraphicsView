@@ -42,6 +42,54 @@ public:
 
     QRectF shapeRect() const;
 
+    void moveFocusPoint() {
+        auto focusPointList = this->recalculateFocusPoint();
+        if (!focusPointList.isEmpty()) {
+            for (int i = 0; i < focusPointList.count() && i < m_focusPointItemList.count(); ++i) {
+                QGraphicsRectItem* rectItem = m_focusPointItemList[i];
+                switch (focusPointList[i].position()) {
+                    case FocusPointF::Position::Undefined: {
+
+                    } break;
+                    case FocusPointF::Position::TopLeft: {
+                        rectItem->setPos(this->mapToScene(m_topLeft.x(), m_topLeft.y()));
+                    } break;
+                    case FocusPointF::Position::Top: {
+                        rectItem->setPos(this->mapToScene(this->center().x(), m_topLeft.y()));
+                    } break;
+                    case FocusPointF::Position::TopRight: {
+                        rectItem->setPos(this->mapToScene(m_bottomRight.x(), m_topLeft.y()));
+                    } break;
+                    case FocusPointF::Position::Right: {
+                        rectItem->setPos(this->mapToScene(m_bottomRight.x(), this->center().y()));
+                    } break;
+                    case FocusPointF::Position::BottomRight: {
+                        rectItem->setPos(this->mapToScene(m_bottomRight.x(), m_bottomRight.y()));
+                    } break;
+                    case FocusPointF::Position::Bottom: {
+                        rectItem->setPos(this->mapToScene(this->center().x(), m_bottomRight.y()));
+                    } break;
+                    case FocusPointF::Position::BottomLeft: {
+                        rectItem->setPos(this->mapToScene(m_topLeft.x(), m_bottomRight.y()));
+                    } break;
+                    case FocusPointF::Position::Left: {
+                        rectItem->setPos(this->mapToScene(m_topLeft.x(), this->center().y()));
+                    } break;
+                    case FocusPointF::Position::Body: {
+                        this->setCursor(Qt::SizeAllCursor);
+                        this->update();
+                    } break;
+                    case FocusPointF::Position::Rotate: {
+                        rectItem->setPos(this->mapToScene(this->center().x(), m_topLeft.y() - 25));
+                    } break;
+                    default: {
+
+                    } break;
+                }
+            }
+        }
+    }
+
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
         // qDebug() << "GraphicsItem::hoverEnterEvent";
