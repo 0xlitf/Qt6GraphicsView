@@ -32,7 +32,7 @@ GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
 }
 
 QRectF GraphicsItem::boundingRect() const {
-    return QRectF(m_topLeft, m_bottomRight) + QMargins(10, 10, 10, 30);
+    return QRectF(m_topLeft, m_bottomRight) + QMargins(10, 30, 10, 10);
 }
 
 QRectF GraphicsItem::shapeRect() const {
@@ -44,7 +44,7 @@ QPainterPath GraphicsItem::shape() const {
     path.addRect(this->shapeRect());
 
     QPointF center{(m_topLeft + m_bottomRight) / 2};
-    path.addRect(QRectF(center.x(), m_bottomRight.y() + 25, 0, 0) + QMargins(2, 2, 2, 2));
+    path.addRect(QRectF(center.x(), m_topLeft.y() - 25, 0, 0) + QMargins(2, 2, 2, 2));
 
     return path;
 }
@@ -494,7 +494,7 @@ QList<FocusPointF> GraphicsItem::recalculateFocusPoint() {
     }
 
     if (m_isRotatable) {
-        focusPointList.append(FocusPointF{this->center().x(), m_bottomRight.y() + 25, FocusPointF::Position::Rotate});
+        focusPointList.append(FocusPointF{this->center().x(), m_topLeft.y() - 25, FocusPointF::Position::Rotate});
     }
 
     return focusPointList;

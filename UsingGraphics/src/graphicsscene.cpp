@@ -13,7 +13,7 @@ GraphicsScene::GraphicsScene(QObject* parent)
     connect(intManager, SIGNAL(valueChanged(QtProperty*, int)), this, SLOT(valueChanged(QtProperty*, int)));
     connect(this, &QGraphicsScene::selectionChanged, this, [=] {
         auto list = this->selectedItems();
-        qDebug() << "selectedItems: " << list.count();
+        // qDebug() << "selectedItems: " << list.count();
         if (list.count() == 0) {
             for (auto item : this->items()) {
                 item->setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -43,11 +43,9 @@ GraphicsScene::GraphicsScene(QObject* parent)
 QVariant GraphicsScene::itemChange(GraphicsItem* item, QGraphicsItem::GraphicsItemChange change, const QVariant& value) {
     qDebug() << "GraphicsScene::itemChange:" << change;
     if (change == QGraphicsItem::ItemPositionChange) {
-        // value is the new position.
         QPointF newPos = value.toPointF();
         QRectF rect = this->sceneRect();
         if (!rect.contains(newPos)) {
-            // Keep the item inside the scene rect.
             newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
             newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
 
