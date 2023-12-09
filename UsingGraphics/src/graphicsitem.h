@@ -40,6 +40,8 @@ public:
     bool proportional() const;
     void setProportional(bool newProportional);
 
+    QRectF shapeRect() const;
+
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
         // qDebug() << "GraphicsItem::hoverEnterEvent";
@@ -114,6 +116,10 @@ protected:
         // QGraphicsItem::keyReleaseEvent(event);
     }
 
+    QPointF center() {
+        return QPointF{(m_topLeft + m_bottomRight) / 2};
+    }
+
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
@@ -124,11 +130,13 @@ protected:
     }
 
 protected:
+    QTransform m_Transform;
     int m_x;
     int m_y;
     double m_initialHeight = 80;
     double m_initialWidth = 120;
     bool m_isProportional = false;
+    bool m_isRotatable = true;
 
     QString m_centerText;
 

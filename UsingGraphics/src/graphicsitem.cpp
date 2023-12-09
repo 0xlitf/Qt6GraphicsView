@@ -32,12 +32,20 @@ GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
 }
 
 QRectF GraphicsItem::boundingRect() const {
-    return QRectF(m_topLeft, m_bottomRight) + QMargins(10, 10, 10, 10);
+    return QRectF(m_topLeft, m_bottomRight) + QMargins(10, 10, 10, 30);
+}
+
+QRectF GraphicsItem::shapeRect() const {
+    return QRectF(m_topLeft, m_bottomRight) + QMargins(2, 2, 2, 2);
 }
 
 QPainterPath GraphicsItem::shape() const {
     QPainterPath path;
-    path.addRect(QRectF(m_topLeft, m_bottomRight) + QMargins(2, 2, 2, 2));
+    path.addRect(this->shapeRect());
+
+    QPointF center{(m_topLeft + m_bottomRight) / 2};
+    path.addRect(QRectF(center.x(), m_bottomRight.y() + 25, 0, 0) + QMargins(2, 2, 2, 2));
+
     return path;
 }
 
@@ -65,12 +73,12 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 
     painter->setPen(QPen(Qt::white, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     QFont f = painter->font();
-    f.setPixelSize(qMin(this->boundingRect().width(), this->boundingRect().height()) / 4);
+    f.setPixelSize(qMin(this->shapeRect().width(), this->shapeRect().height()) / 4);
     painter->setFont(f);
 
     QBrush b = painter->brush();
     painter->setBrush(fillColor);
-    painter->drawText(this->boundingRect(), Qt::AlignCenter, m_centerText);
+    painter->drawText(this->shapeRect(), Qt::AlignCenter, m_centerText);
     painter->setBrush(b);
 
     m_scale = option->levelOfDetailFromTransform(painter->worldTransform());
@@ -372,8 +380,31 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             this->update();
         } break;
         case FocusPointF::Position::Rotate: {
+            QVector2D startVect = QVector2D(m_pressedPos - this->center());
+            startVect.normalize();
+            QVector2D endVect = QVector2D(event->pos() - this->center());
+            endVect.normalize();
 
+            qreal value = QVector2D::dotProduct(startVect, endVect);
+            if (value > 1.0)
+                value = 1.0;
+            else if (value < -1.0)
+                value = -1.0;
 
+            qreal angle = qRadiansToDegrees(qAcos(value));
+
+            QVector3D vect = QVector3D::crossProduct(QVector3D(startVect, 1.0), QVector3D(endVect, 1.0));
+            if (vect.z() < 0)
+                angle *= -1.0;
+
+            this->setTransformOriginPoint(this->center());
+            this->setRotation(this->rotation() + angle);
+
+            this->update();
+
+            prepareGeometryChange();
+            this->recalculateFocusPoint();
+            this->update();
         } break;
         default: {
 
@@ -445,7 +476,7 @@ void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
 }
 
 QList<FocusPointF> GraphicsItem::recalculateFocusPoint() {
-    QPointF center{(m_topLeft + m_bottomRight) / 2};
+
 
     QList<FocusPointF> focusPointList;
     focusPointList.append(FocusPointF{m_topLeft.x(), m_topLeft.y(), FocusPointF::Position::TopLeft});
@@ -456,10 +487,14 @@ QList<FocusPointF> GraphicsItem::recalculateFocusPoint() {
     if (m_isProportional) {
 
     } else {
-        focusPointList.append(FocusPointF{m_topLeft.x(), center.y(), FocusPointF::Position::Left});
-        focusPointList.append(FocusPointF{m_bottomRight.x(), center.y(), FocusPointF::Position::Right});
-        focusPointList.append(FocusPointF{center.x(), m_topLeft.y(), FocusPointF::Position::Top});
-        focusPointList.append(FocusPointF{center.x(), m_bottomRight.y(), FocusPointF::Position::Bottom});
+        focusPointList.append(FocusPointF{m_topLeft.x(), this->center().y(), FocusPointF::Position::Left});
+        focusPointList.append(FocusPointF{m_bottomRight.x(), this->center().y(), FocusPointF::Position::Right});
+        focusPointList.append(FocusPointF{this->center().x(), m_topLeft.y(), FocusPointF::Position::Top});
+        focusPointList.append(FocusPointF{this->center().x(), m_bottomRight.y(), FocusPointF::Position::Bottom});
+    }
+
+    if (m_isRotatable) {
+        focusPointList.append(FocusPointF{this->center().x(), m_bottomRight.y() + 25, FocusPointF::Position::Rotate});
     }
 
     return focusPointList;
