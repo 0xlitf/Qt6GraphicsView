@@ -105,6 +105,36 @@ QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& val
     //         this->setFlag(QGraphicsItem::ItemIsMovable, false);
     //     }
     // }
+
+    // qDebug() << "change" << change;
+    auto focusPointList = this->recalculateFocusPoint();
+    if (change == ItemSelectedChange && scene()) {
+        qDebug() << "ItemSelectedChange" << value.toBool();
+
+        if (value.toBool()) {
+            auto focusPointList = this->recalculateFocusPoint();
+            for (int i = 0; i < focusPointList.count(); ++i) {
+                QGraphicsRectItem* rectItem = new QGraphicsRectItem();
+                rectItem->setPos(this->mapToScene(focusPointList[i].x(), focusPointList[i].y()).toPoint());
+                rectItem->setRect(-2, -2, 4, 4);
+                rectItem->setZValue(100);
+                scene()->addItem(rectItem);
+                rectItem->update();
+                m_focusPointItemList.append(rectItem);
+            }
+        } else {
+            for (int i = 0; i < m_focusPointItemList.count(); ++i) {
+                QGraphicsRectItem* rectItem = m_focusPointItemList[i];
+
+                scene()->removeItem(rectItem);
+
+                delete rectItem;
+                rectItem = nullptr;
+            }
+            m_focusPointItemList.clear();
+        }
+    }
+
     return QGraphicsItem::itemChange(change, value);
 }
 
@@ -374,6 +404,51 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         } break;
     }
 
+    auto focusPointList = this->recalculateFocusPoint();
+    if (!focusPointList.isEmpty()) {
+        for (int i = 0; i < focusPointList.count(); ++i) {
+            QGraphicsRectItem* rectItem = m_focusPointItemList[i];
+            switch (focusPointList[i].position()) {
+                case FocusPointF::Position::Undefined: {
+
+                } break;
+                case FocusPointF::Position::TopLeft: {
+                    rectItem->setPos(this->mapToScene(m_topLeft.x(), m_topLeft.y()));
+                } break;
+                case FocusPointF::Position::Top: {
+                    rectItem->setPos(this->mapToScene(this->center().x(), m_topLeft.y()));
+                } break;
+                case FocusPointF::Position::TopRight: {
+                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), m_topLeft.y()));
+                } break;
+                case FocusPointF::Position::Right: {
+                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), this->center().y()));
+                } break;
+                case FocusPointF::Position::BottomRight: {
+                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), m_bottomRight.y()));
+                } break;
+                case FocusPointF::Position::Bottom: {
+                    rectItem->setPos(this->mapToScene(this->center().x(), m_bottomRight.y()));
+                } break;
+                case FocusPointF::Position::BottomLeft: {
+                    rectItem->setPos(this->mapToScene(m_topLeft.x(), m_bottomRight.y()));
+                } break;
+                case FocusPointF::Position::Left: {
+                    rectItem->setPos(this->mapToScene(m_topLeft.x(), this->center().y()));
+                } break;
+                case FocusPointF::Position::Body: {
+                    this->setCursor(Qt::SizeAllCursor);
+                    this->update();
+                } break;
+                case FocusPointF::Position::Rotate: {
+                    rectItem->setPos(this->mapToScene(this->center().x(), m_topLeft.y() - 25));
+                } break;
+                default: {
+
+                } break;
+            }
+        }
+    }
     prepareGeometryChange();
     this->recalculateFocusPoint();
     this->update();
@@ -443,8 +518,6 @@ void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
 }
 
 QList<FocusPointF> GraphicsItem::recalculateFocusPoint() {
-
-
     QList<FocusPointF> focusPointList;
     focusPointList.append(FocusPointF{m_topLeft.x(), m_topLeft.y(), FocusPointF::Position::TopLeft});
     focusPointList.append(FocusPointF{m_bottomRight.x(), m_topLeft.y(), FocusPointF::Position::TopRight});

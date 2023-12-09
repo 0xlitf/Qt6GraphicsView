@@ -148,6 +148,7 @@ protected:
     qreal m_scale;
 
     FocusPointF::Position m_focusPosition{FocusPointF::Position::Undefined};
+    QList<QGraphicsRectItem*> m_focusPointItemList;
 
     QPointF m_pressedPos{};
 

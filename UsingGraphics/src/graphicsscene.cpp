@@ -361,6 +361,13 @@ void GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+    if (m_movingItem) {
+        // qDebug() << m_movingItem->x();
+    }
+    if (m_currentItem) {
+        // qDebug() << m_currentItem->x();
+    }
+
     if (m_movingItem && m_movingItem == m_currentItem) {
         auto x = m_movingItem->x();
         auto y = m_movingItem->y();
@@ -374,6 +381,7 @@ void GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+    m_movingItem = nullptr;
 
     QGraphicsScene::mouseReleaseEvent(event);
 }

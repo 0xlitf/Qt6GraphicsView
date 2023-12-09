@@ -103,9 +103,9 @@ private:
     QMap<QtProperty*, QString> propertyToId;
     QMap<QString, QtProperty*> idToProperty;
     QMap<QString, bool> idToExpanded;
-    class QtTreePropertyBrowser* m_propertyEditor;
+    class QtTreePropertyBrowser* m_propertyEditor = nullptr;
 
-    QGraphicsItem* m_currentItem;
+    QGraphicsItem* m_currentItem = nullptr;
 
     QtDoublePropertyManager* doubleManager = new QtDoublePropertyManager(this);
     QtIntPropertyManager* intManager = new QtIntPropertyManager(this);

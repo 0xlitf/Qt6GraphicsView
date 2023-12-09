@@ -50,7 +50,6 @@ protected:
             lastPos = event->pos();
 
             m_sceneMovedByRightButton = true;
-            qDebug() << m_sceneMovedByRightButton;
         } else {
             this->setCursor(Qt::ArrowCursor);
         }
