@@ -150,7 +150,7 @@ void GraphicsScene::groupItems() {
 void GraphicsScene::ungroupItems(QGraphicsItemGroup* group) {
     this->clearSelection();
 
-    auto boundingRect = group->mapRectToScene(group->boundingRect()) + QMargins{1,1,1,1};
+    auto boundingRect = group->mapRectToScene(group->boundingRect()) + QMarginsF{1., 1., 1., 1.};
     qDebug() << boundingRect;
 
     for (auto j : group->childItems()) {

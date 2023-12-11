@@ -7,12 +7,12 @@ GraphicsItemGroup::GraphicsItemGroup() {
 }
 
 QRectF GraphicsItemGroup::boundingRect() const {
-    return QRectF(m_topLeft, m_bottomRight) + QMargins(10, 10, 10, 10);
+    return QRectF(m_topLeft, m_bottomRight) + QMarginsF(10., 10., 10., 10.);
 }
 
 QPainterPath GraphicsItemGroup::shape() const {
     QPainterPath path;
-    path.addRect(QRectF(m_topLeft, m_bottomRight) + QMargins(2, 2, 2, 2));
+    path.addRect(QRectF(m_topLeft, m_bottomRight) + QMarginsF(2., 2., 2., 2.));
     return path;
 }
 

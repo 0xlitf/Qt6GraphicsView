@@ -81,7 +81,7 @@ protected:
         //
         // }
         QPointF mousePos = event->pos();
-        QMarginsF margin{1, 1, 1, 1};
+        QMarginsF margin{1., 1., 1., 1.};
 
         if (auto atCorner = [=] {
                 return false;
