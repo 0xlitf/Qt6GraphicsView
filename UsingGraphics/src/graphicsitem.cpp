@@ -144,7 +144,7 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
             QPen p = painter->pen();
             painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
             painter->setBrush(Qt::green);
-            painter->drawRect(QRect(focusPointList[i].x() - 2, focusPointList[i].y() - 2, 4, 4));
+            painter->drawRect(QRectF(focusPointList[i].x() - 2., focusPointList[i].y() - 2., 4., 4.));
             painter->setPen(p);
         }
     }
@@ -153,14 +153,14 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value) {
     // qDebug() << "itemChange" << change;
     if (change == QGraphicsItem::ItemPositionChange) {
-        qDebug() << &*this << change;
+        qDebug() << (void*)this << change;
         QPointF newPos = value.toPointF();
         qDebug() << "New Position:" << newPos;
 
         this->moveFocusPoint();
     }
 
-    if (auto drawSubItems = false && change == ItemSelectedChange && scene()) {
+    if (auto drawSubItems = true && change == ItemSelectedChange && scene()) {
         if (value.toBool()) {
             auto focusPointList = this->recalculateFocusPoint();
             for (int i = 0; i < focusPointList.count(); ++i) {
@@ -419,7 +419,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_topLeft.rx() += offset.x();
 
             m_topLeft.rx() = qMin(m_bottomRight.x() - 20, m_topLeft.x());
-
         } break;
         case FocusPointF::Position::Body: {
             this->setCursor(Qt::SizeAllCursor);

@@ -41,9 +41,7 @@ void GraphicsItemGroup::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     }
 
     painter->setBrush(fillColor);
-    auto topLeft = m_topLeft;
-    auto bottomRight = m_bottomRight;
-    painter->drawRect(QRect(topLeft.x() - 2, topLeft.y() - 2, (bottomRight - topLeft).x() + 4, (bottomRight - topLeft).y() + 4));
+    painter->drawRect(QRectF(m_topLeft.x() - 2., m_topLeft.y() - 2., (m_bottomRight - m_topLeft).x() + 4., (m_bottomRight - m_topLeft).y() + 4.));
     painter->setPen(p);
 
     QBrush b = painter->brush();

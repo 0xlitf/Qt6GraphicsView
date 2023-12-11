@@ -3,7 +3,7 @@
 #include "graphicsitem.h"
 
 FocusItem::FocusItem() {
-    setFlag(ItemIsMovable, true);
+    // setFlag(ItemIsMovable, true);
     setFlag(ItemIsSelectable, false);
     setAcceptHoverEvents(true);
 }
@@ -11,7 +11,7 @@ FocusItem::FocusItem() {
 FocusItem::FocusItem(FocusPointF point, QGraphicsItem* parent)
     : m_focusPoint{point} {
 
-    setFlag(ItemIsMovable, true);
+    // setFlag(ItemIsMovable, true);
     setFlag(ItemIsSelectable, false);
     setAcceptHoverEvents(true);
 
@@ -48,7 +48,7 @@ void FocusItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     QPen p = painter->pen();
     painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter->setBrush(fillColor);
-    painter->drawRect(QRectF(m_topLeft.x(), m_topLeft.y(), QPointF(m_bottomRight - m_topLeft).x(), QPointF(m_bottomRight - m_topLeft).y()));
+    painter->drawRect(QRectF(m_topLeft, m_bottomRight));
     painter->setPen(p);
 
 }
@@ -62,7 +62,7 @@ void FocusItem::setPoint(FocusPointF newPoint) {
 }
 
 void FocusItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
-    m_pressedPos = event->scenePos();
+    m_pressedPos = event->pos();
     qDebug() << "FocusItem::mousePressEvent" << event->pos();
 
     // event->accept();
@@ -290,8 +290,9 @@ void FocusItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         } break;
     }
 
+    this->setPos(event->scenePos() - m_pressedPos);
 
-    m_adsorbItem->moveFocusPoint(m_focusPoint.position());
+    // m_adsorbItem->moveFocusPoint(m_focusPoint.position());
 
     // m_pressedPos = event->pos();
     // this->setPos(event->scenePos() - m_pressedPos);
@@ -305,7 +306,9 @@ void FocusItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
     // this->update();
     this->update();
     m_adsorbItem->update();
-    QGraphicsItem::mouseMoveEvent(event);
+
+    event->accept();
+    // QGraphicsItem::mouseMoveEvent(event);
 }
 
 void FocusItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
