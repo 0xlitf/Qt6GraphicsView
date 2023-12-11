@@ -39,10 +39,13 @@ QRectF GraphicsItem::shapeRect() const {
     return QRectF(m_topLeft, m_bottomRight) + QMarginsF(2., 2., 2., 2.);
 }
 
-void GraphicsItem::moveFocusPoint() {
+void GraphicsItem::moveFocusPoint(const FocusPointF::Position& position) {
     auto focusPointList = this->recalculateFocusPoint();
     if (!focusPointList.isEmpty()) {
         for (int i = 0; i < focusPointList.count() && i < m_focusPointItemList.count(); ++i) {
+            if (position == focusPointList[i].position()) {
+                continue;
+            }
             FocusItem* rectItem = m_focusPointItemList[i];
             switch (focusPointList[i].position()) {
                 case FocusPointF::Position::Undefined: {
@@ -153,7 +156,6 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     //     }
     // }
 
-    this->moveFocusPoint();
 }
 
 QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value) {

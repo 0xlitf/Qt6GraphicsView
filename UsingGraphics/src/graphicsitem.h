@@ -42,7 +42,7 @@ public:
 
     QRectF shapeRect() const;
 
-    void moveFocusPoint();
+    void moveFocusPoint(const FocusPointF::Position& position);
 
     QPointF& topLeft();
     void setTopLeft(QPointF newTopLeft);

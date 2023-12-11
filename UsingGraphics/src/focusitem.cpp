@@ -271,6 +271,9 @@ void FocusItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         } break;
     }
 
+
+    m_adsorbItem->moveFocusPoint(m_focusPoint.position());
+
     // m_pressedPos = event->pos();
     // this->setPos(event->scenePos() - m_pressedPos);
     // qDebug() << "FocusItem::mouseMoveEvent" << offset;
