@@ -1,10 +1,11 @@
 #include "focusitem.h"
+#include <QGraphicsSceneMouseEvent>
 
 FocusItem::FocusItem() {
     setAcceptHoverEvents(true);
 }
 
-FocusItem::FocusItem(FocusPointF point, QGraphicsItem* parent)
+FocusItem::FocusItem(FocusPointF point, QGraphicsRectItem* parent)
     : m_point{point} {
 
     setFlags(ItemIsMovable);
@@ -35,44 +36,34 @@ void FocusItem::setPoint(FocusPointF newPoint) {
 
 void FocusItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
 
-    QColor borderColor = Qt::black;
-    QColor fillColor = Qt::green;
-
-    if (option->state & QStyle::State_MouseOver) {
-        fillColor = Qt::red;
-        borderColor = Qt::white;
-    }
-
-    if (option->state & QStyle::State_Selected) {
-        fillColor = Qt::blue;
-        borderColor = Qt::green;
-    }
-
-    QPen p = painter->pen();
-    painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    painter->setBrush(fillColor);
-    painter->drawRect(QRectF(0, 0, 4, 4));
-    painter->setPen(p);
-
-    QBrush b = painter->brush();
-    painter->setBrush(fillColor);
-    // painter->drawText(QPointF(15, 15), QString("GraphicsItem"));
-    painter->setBrush(b);
+    QGraphicsRectItem::paint(painter, option, widget);
 }
 
 void FocusItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
-    qDebug() << "parent" << this->parentItem();
-    this->setSelected(false);
-    qDebug() << "setSelected" << this->isSelected();
-    QGraphicsItem::mousePressEvent(event);
+
+    QGraphicsRectItem::mousePressEvent(event);
     update();
+
+    event->accept();
 }
 
 void FocusItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-    QGraphicsItem::mouseMoveEvent(event);
+
+
+    event->accept();
+    // QGraphicsRectItem::mouseMoveEvent(event);
 }
 
 void FocusItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
-    QGraphicsItem::mouseReleaseEvent(event);
-    update();
+
+    event->accept();
+    // QGraphicsRectItem::mouseReleaseEvent(event);
+}
+
+QGraphicsItem* FocusItem::adsorbItem() const {
+    return m_adsorbItem;
+}
+
+void FocusItem::setAdsorbItem(QGraphicsItem* newAdsorbItem) {
+    m_adsorbItem = newAdsorbItem;
 }

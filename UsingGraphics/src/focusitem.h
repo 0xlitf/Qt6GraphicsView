@@ -2,15 +2,15 @@
 
 #include "focuspoint.h"
 #include <QCursor>
-#include <QGraphicsItem>
+#include <QGraphicsRectItem>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 #include <QWidget>
 
-class FocusItem : public QGraphicsItem {
+class FocusItem : public QGraphicsRectItem {
 public:
     FocusItem();
-    FocusItem(FocusPointF point, QGraphicsItem* parent = nullptr);
+    FocusItem(FocusPointF point, QGraphicsRectItem* parent = nullptr);
 
     FocusPointF point() const;
     void setPoint(FocusPointF newPoint);
@@ -20,22 +20,32 @@ public:
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
+    QGraphicsItem* adsorbItem() const;
+    void setAdsorbItem(QGraphicsItem* newAdsorbItem);
+
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
-    // void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
-    //     qDebug() << "GraphicsItemFocusItem::hoverEnterEvent";
-    //     setCursor(QCursor(Qt::SizeAllCursor));
-    //     QGraphicsItem::hoverEnterEvent(event);
-    // }
+    void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
+        qDebug() << "FocusItem::hoverEnterEvent";
+        this->setCursor(m_point.cursor());
+        QGraphicsRectItem::hoverEnterEvent(event);
+    }
 
-    // void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override {
-    //     unsetCursor();
-    //     QGraphicsItem::hoverLeaveEvent(event);
-    // }
+    void hoverMoveEvent(QGraphicsSceneHoverEvent* event) {
+        qDebug() << "FocusItem::hoverMoveEvent";
+        this->setCursor(m_point.cursor());
+        QGraphicsRectItem::hoverMoveEvent(event);
+    }
+
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override {
+        unsetCursor();
+        QGraphicsRectItem::hoverLeaveEvent(event);
+    }
 
 private:
     FocusPointF m_point;
+    QGraphicsItem* m_adsorbItem = nullptr;
 };
 
