@@ -11,6 +11,7 @@
 #include <QMenu>
 #include <QPainter>
 #include <cmath>
+#include <QMatrix4x4>
 #include <QStyleOptionGraphicsItem>
 
 template <typename T> int sgn(T val) {
@@ -255,7 +256,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                     width = abs(y / proportionalScale);
                     height = abs(y);
                 } else if (x >= 0 && y >= 0) {
-
                 }
 
                 m_topLeft.rx() = m_bottomRight.x() - width;
@@ -305,7 +305,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 }
 
                 m_bottomRight.rx() = m_topLeft.x() + width;
-                m_topLeft.ry() = m_bottomRight.y() - abs(height) ;
+                m_topLeft.ry() = m_bottomRight.y() - abs(height);
             } else {
                 QPointF offset = event->pos() - m_pressedPos;
                 m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
@@ -425,7 +425,11 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             this->setCursor(Qt::SizeAllCursor);
 
             if (bool singleMove = !(this->flags() & QGraphicsItem::ItemIsMovable) && !m_pressedPos.isNull()) {
-                this->setPos(event->scenePos() - m_pressedPos);
+                QVector2D pressedVect = QVector2D(m_pressedPos);
+                QMatrix4x4 matrix;
+                matrix.rotate(this->rotation(), 0, 0, 1);
+                QVector3D rotatedVector = matrix * QVector3D(pressedVect.x(), pressedVect.y(), 0);
+                this->setPos(event->scenePos() - rotatedVector.toVector2D().toPointF());
             }
             this->update();
         } break;
