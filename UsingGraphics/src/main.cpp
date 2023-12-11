@@ -88,10 +88,10 @@ int main(int argc, char* argv[]) {
         qDebug() << "start in vs: " << qgetenv("VSAPPIDDIR");
     } else if (!qEnvironmentVariableIsEmpty("QTDIR")) { // start direct in QtCreator
         qSetMessagePattern("\033[0;37m [file://%{file}:%{line}]:\033[0m"
-                           " %{if-debug}\033[1;36m%{endif}%{if-info}\033[1;44m%{endif}%{if-warning}\033[1;43m%{endif}%{if-critical}\033[1;41m%{endif}%{if-fatal}\033[1;41m%{endif}[%{type}]:\033[0m"
+                           " %{if-debug}\033[1;37m%{endif}%{if-info}\033[1;44m%{endif}%{if-warning}\033[1;43m%{endif}%{if-critical}\033[1;41m%{endif}%{if-fatal}\033[1;41m%{endif}[%{type}]:\033[0m"
                            "\033[1;35m [%{function}]:\033[0m\n"
                            "\033[0;37m [%{time yyyy-MM-dd h:mm:ss.zzz t}]\033[0m"
-                           "\033[1;91m %{message}\033[0m");
+                           "\033[1;36m %{message}\033[0m");
         qDebug() << "start in QtCreator: " << qgetenv("QTDIR");
     } else {
         qInstallMessageHandler(logger);
