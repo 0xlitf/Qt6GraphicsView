@@ -143,6 +143,32 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
+    bool sceneEventFilter(QGraphicsItem* watched, QEvent* event) {
+        auto item = dynamic_cast<FocusItem*>(watched);
+        m_focusPosition = item->point().position();
+        if (event->type() == QEvent::GraphicsSceneMousePress) {
+            QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            qDebug() << "GraphicsSceneMousePress" << mouseEvent->scenePos();
+
+            this->mousePressEvent(mouseEvent);
+            return true;
+        } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
+            QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            qDebug() << "GraphicsSceneMouseMove:" << mouseEvent->scenePos();
+
+            this->mouseMoveEvent(mouseEvent);
+            return true;
+        } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+            QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            qDebug() << "GraphicsSceneMouseRelease:" << mouseEvent->scenePos();
+
+            this->mouseReleaseEvent(mouseEvent);
+            return true;
+        }
+
+        return false;
+    }
+
 protected:
     QTransform m_Transform;
     int m_x;

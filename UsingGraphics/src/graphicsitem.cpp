@@ -152,15 +152,16 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 
 QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value) {
     // qDebug() << "itemChange" << change;
-    if (change == QGraphicsItem::ItemPositionChange) {
-        qDebug() << (void*)this << change;
-        QPointF newPos = value.toPointF();
-        qDebug() << "New Position:" << newPos;
+    // if (change == QGraphicsItem::ItemPositionChange) {
+    //     qDebug() << (void*)this << change;
+    //     QPointF newPos = value.toPointF();
+    //     qDebug() << "New Position:" << newPos;
 
-        this->moveFocusPoint();
-    }
+    //     this->moveFocusPoint();
+    // }
 
     if (auto drawSubItems = true && change == ItemSelectedChange && scene()) {
+        qDebug() << drawSubItems << change;
         if (value.toBool()) {
             auto focusPointList = this->recalculateFocusPoint();
             for (int i = 0; i < focusPointList.count(); ++i) {
@@ -171,6 +172,7 @@ QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& val
                 // rectItem->setRect(-2, -2, 4, 4);
                 rectItem->setZValue(100);
                 scene()->addItem(rectItem);
+                rectItem->installSceneEventFilter(this);
                 rectItem->update();
                 m_focusPointItemList.append(rectItem);
             }
@@ -194,9 +196,9 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     if (this->group()) {
         return;
     }
-    qDebug() << this->flags();
 
-    m_pressedPos = event->pos();
+    m_pressedPos = event->scenePos();
+    qDebug() << "m_pressedPos " << event->scenePos();
 
     switch (m_focusPosition) {
         case FocusPointF::Position::Undefined: {
@@ -235,7 +237,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         } break;
         case FocusPointF::Position::TopLeft: {
             if (m_isProportional) {
-                auto now = event->pos();
+                auto now = event->scenePos();
 
                 double x = (now - m_bottomRight).x();
                 double y = (now - m_bottomRight).y();
@@ -261,9 +263,9 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_topLeft.rx() = m_bottomRight.x() - width;
                 m_topLeft.ry() = m_bottomRight.y() - height;
             } else {
-                QPointF offset = event->pos() - m_pressedPos;
-                m_pressedPos.rx() = offset.x() < 0 ? event->pos().x() : m_topLeft.x();
-                m_pressedPos.ry() = offset.y() < 0 ? event->pos().y() : m_topLeft.y();
+                QPointF offset = event->scenePos() - m_pressedPos;
+                m_pressedPos.rx() = offset.x() < 0 ? event->scenePos().x() : m_topLeft.x();
+                m_pressedPos.ry() = offset.y() < 0 ? event->scenePos().y() : m_topLeft.y();
 
                 m_topLeft += offset.toPoint();
             }
@@ -271,8 +273,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
         } break;
         case FocusPointF::Position::Top: {
-            QPointF offset = event->pos() - m_pressedPos;
-            m_pressedPos.ry() = offset.y() < 0 ? event->pos().y() : m_topLeft.y();
+            QPointF offset = event->scenePos() - m_pressedPos;
+            m_pressedPos.ry() = offset.y() < 0 ? event->scenePos().y() : m_topLeft.y();
 
             m_topLeft.ry() += offset.y();
 
@@ -280,7 +282,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         } break;
         case FocusPointF::Position::TopRight: {
             if (m_isProportional) {
-                auto now = event->pos();
+                auto now = event->scenePos();
 
                 double x = (now - m_topLeft).x();
                 double y = (now - m_bottomRight).y();
@@ -307,9 +309,9 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_bottomRight.rx() = m_topLeft.x() + width;
                 m_topLeft.ry() = m_bottomRight.y() - abs(height);
             } else {
-                QPointF offset = event->pos() - m_pressedPos;
-                m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
-                m_pressedPos.ry() = offset.y() > 0 ? event->pos().y() : m_topLeft.y();
+                QPointF offset = event->scenePos() - m_pressedPos;
+                m_pressedPos.rx() = offset.x() > 0 ? event->scenePos().x() : m_bottomRight.x();
+                m_pressedPos.ry() = offset.y() > 0 ? event->scenePos().y() : m_topLeft.y();
 
                 m_bottomRight.rx() += offset.toPoint().x();
                 m_topLeft.ry() += offset.toPoint().y();
@@ -318,8 +320,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
         } break;
         case FocusPointF::Position::Right: {
-            QPointF offset = event->pos() - m_pressedPos;
-            m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
+            QPointF offset = event->scenePos() - m_pressedPos;
+            m_pressedPos.rx() = offset.x() > 0 ? event->scenePos().x() : m_bottomRight.x();
 
             m_bottomRight.rx() += offset.x();
 
@@ -327,7 +329,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         } break;
         case FocusPointF::Position::BottomRight: {
             if (m_isProportional) {
-                auto now = event->pos();
+                auto now = event->scenePos();
 
                 double x = (now - m_topLeft).x();
                 double y = (now - m_topLeft).y();
@@ -354,10 +356,11 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_bottomRight.rx() = m_topLeft.x() + width;
                 m_bottomRight.ry() = m_topLeft.y() + height;
             } else {
-                QPointF offset = event->pos() - m_pressedPos;
-
-                m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
-                m_pressedPos.ry() = offset.y() > 0 ? event->pos().y() : m_bottomRight.y();
+                QPointF offset = event->scenePos() - m_pressedPos;
+                qDebug() << "scenePos " << event->scenePos() << "m_pressedPos " << m_pressedPos << "offset " << offset;
+                auto scenePos = this->mapToScene(m_bottomRight);
+                m_pressedPos.rx() = offset.x() > 0 ? event->scenePos().x() : scenePos.x();
+                m_pressedPos.ry() = offset.y() > 0 ? event->scenePos().y() : scenePos.y();
 
                 m_bottomRight += offset.toPoint();
             }
@@ -366,8 +369,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
         } break;
         case FocusPointF::Position::Bottom: {
-            QPointF offset = event->pos() - m_pressedPos;
-            m_pressedPos.ry() = offset.y() > 0 ? event->pos().y() : m_bottomRight.y();
+            QPointF offset = event->scenePos() - m_pressedPos;
+            m_pressedPos.ry() = offset.y() > 0 ? event->scenePos().y() : m_bottomRight.y();
 
             m_bottomRight.ry() += offset.y();
 
@@ -375,7 +378,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         } break;
         case FocusPointF::Position::BottomLeft: {
             if (m_isProportional) {
-                auto now = event->pos();
+                auto now = event->scenePos();
 
                 double x = (now - m_bottomRight).x();
                 double y = (now - m_topLeft).y();
@@ -402,9 +405,9 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_topLeft.rx() = m_bottomRight.x() - width;
                 m_bottomRight.ry() = m_topLeft.y() + abs(height);
             } else {
-                QPointF offset = event->pos() - m_pressedPos;
-                m_pressedPos.rx() = offset.x() < 0 ? event->pos().x() : m_topLeft.x();
-                m_pressedPos.ry() = offset.y() < 0 ? event->pos().y() : m_bottomRight.y();
+                QPointF offset = event->scenePos() - m_pressedPos;
+                m_pressedPos.rx() = offset.x() < 0 ? event->scenePos().x() : m_topLeft.x();
+                m_pressedPos.ry() = offset.y() < 0 ? event->scenePos().y() : m_bottomRight.y();
 
                 m_topLeft.rx() += offset.toPoint().x();
                 m_bottomRight.ry() += offset.toPoint().y();
@@ -413,8 +416,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
         } break;
         case FocusPointF::Position::Left: {
-            QPointF offset = event->pos() - m_pressedPos;
-            m_pressedPos.rx() = offset.x() < 0 ? event->pos().x() : m_topLeft.x();
+            QPointF offset = event->scenePos() - m_pressedPos;
+            m_pressedPos.rx() = offset.x() < 0 ? event->scenePos().x() : m_topLeft.x();
 
             m_topLeft.rx() += offset.x();
 
@@ -435,7 +438,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         case FocusPointF::Position::Rotate: {
             QVector2D startVect = QVector2D(m_pressedPos - this->center());
             startVect.normalize();
-            QVector2D endVect = QVector2D(event->pos() - this->center());
+            QVector2D endVect = QVector2D(event->scenePos() - this->center());
             endVect.normalize();
 
             qreal value = QVector2D::dotProduct(startVect, endVect);
@@ -457,6 +460,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
         } break;
     }
+
+    this->moveFocusPoint();
 
     prepareGeometryChange();
     this->recalculateFocusPoint();
