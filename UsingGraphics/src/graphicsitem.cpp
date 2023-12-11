@@ -30,7 +30,7 @@ GraphicsItem::GraphicsItem(const QColor& color, int x, int y) {
 
     this->setAcceptHoverEvents(true);
 
-    this->recalculateFocusPoint();
+    // this->recalculateFocusPoint();
 }
 
 QRectF GraphicsItem::boundingRect() const {
@@ -427,11 +427,15 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             this->setCursor(Qt::SizeAllCursor);
 
             if (bool singleMove = !(this->flags() & QGraphicsItem::ItemIsMovable) && !m_pressedPos.isNull()) {
-                QVector2D pressedVect = QVector2D(m_pressedPos);
+                auto innerPos = this->mapFromScene(m_pressedPos);
+
+                QVector2D pressedVect = QVector2D(innerPos);
                 QMatrix4x4 matrix;
                 matrix.rotate(this->rotation(), 0, 0, 1);
                 QVector3D rotatedVector = matrix * QVector3D(pressedVect.x(), pressedVect.y(), 0);
                 this->setPos(event->scenePos() - rotatedVector.toVector2D().toPointF());
+
+                m_pressedPos = event->scenePos();
             }
             this->update();
         } break;
@@ -464,7 +468,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
     this->moveFocusPoint();
 
     prepareGeometryChange();
-    this->recalculateFocusPoint();
+    // this->recalculateFocusPoint();
     this->update();
 
     event->accept();
