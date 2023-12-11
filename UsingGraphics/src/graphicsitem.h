@@ -84,7 +84,6 @@ protected:
         QMarginsF margin{1., 1., 1., 1.};
 
         if (auto atCorner = [=] {
-                return false;
                 if (this->flags() & QGraphicsItem::ItemIsMovable) {
                     this->setCursor(Qt::SizeAllCursor);
                     return false;

@@ -143,18 +143,18 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 
     m_scale = option->levelOfDetailFromTransform(painter->worldTransform());
 
-    // if (this->isSelected()) {
-    //     auto focusPointList = this->recalculateFocusPoint();
-    //     // qDebug() << "focusPointList.count()" << focusPointList.count();
+    if (this->isSelected()) {
+        auto focusPointList = this->recalculateFocusPoint();
+        // qDebug() << "focusPointList.count()" << focusPointList.count();
 
-    //     for (int i = 0; i < focusPointList.count(); ++i) {
-    //         QPen p = painter->pen();
-    //         painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    //         painter->setBrush(Qt::green);
-    //         painter->drawRect(QRect(focusPointList[i].x() - 2, focusPointList[i].y() - 2, 4, 4));
-    //         painter->setPen(p);
-    //     }
-    // }
+        for (int i = 0; i < focusPointList.count(); ++i) {
+            QPen p = painter->pen();
+            painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            painter->setBrush(Qt::green);
+            painter->drawRect(QRect(focusPointList[i].x() - 2, focusPointList[i].y() - 2, 4, 4));
+            painter->setPen(p);
+        }
+    }
 
 }
 
@@ -165,32 +165,32 @@ QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& val
 
     }
 
-    if (change == ItemSelectedChange && scene()) {
-        if (value.toBool()) {
-            auto focusPointList = this->recalculateFocusPoint();
-            for (int i = 0; i < focusPointList.count(); ++i) {
-                FocusItem* rectItem = new FocusItem();
-                rectItem->setPoint(focusPointList[i]);
-                rectItem->setAdsorbItem(this);
-                rectItem->setPos(this->mapToScene(focusPointList[i].x(), focusPointList[i].y()).toPoint());
-                rectItem->setRect(-2, -2, 4, 4);
-                rectItem->setZValue(100);
-                scene()->addItem(rectItem);
-                rectItem->update();
-                m_focusPointItemList.append(rectItem);
-            }
-        } else {
-            for (int i = 0; i < m_focusPointItemList.count(); ++i) {
-                FocusItem* rectItem = m_focusPointItemList[i];
+    // if (change == ItemSelectedChange && scene()) {
+    //     if (value.toBool()) {
+    //         auto focusPointList = this->recalculateFocusPoint();
+    //         for (int i = 0; i < focusPointList.count(); ++i) {
+    //             FocusItem* rectItem = new FocusItem();
+    //             rectItem->setPoint(focusPointList[i]);
+    //             rectItem->setAdsorbItem(this);
+    //             rectItem->setPos(this->mapToScene(focusPointList[i].x(), focusPointList[i].y()).toPoint());
+    //             rectItem->setRect(-2, -2, 4, 4);
+    //             rectItem->setZValue(100);
+    //             scene()->addItem(rectItem);
+    //             rectItem->update();
+    //             m_focusPointItemList.append(rectItem);
+    //         }
+    //     } else {
+    //         for (int i = 0; i < m_focusPointItemList.count(); ++i) {
+    //             FocusItem* rectItem = m_focusPointItemList[i];
 
-                scene()->removeItem(rectItem);
+    //             scene()->removeItem(rectItem);
 
-                delete rectItem;
-                rectItem = nullptr;
-            }
-            m_focusPointItemList.clear();
-        }
-    }
+    //             delete rectItem;
+    //             rectItem = nullptr;
+    //         }
+    //         m_focusPointItemList.clear();
+    //     }
+    // }
 
     return QGraphicsItem::itemChange(change, value);
 }
@@ -238,195 +238,195 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         case FocusPointF::Position::Undefined: {
 
         } break;
-        // case FocusPointF::Position::TopLeft: {
-        //     if (m_isProportional) {
-        //         auto now = event->pos();
+        case FocusPointF::Position::TopLeft: {
+            if (m_isProportional) {
+                auto now = event->pos();
 
-        //         double x = (now - m_bottomRight).x();
-        //         double y = (now - m_bottomRight).y();
+                double x = (now - m_bottomRight).x();
+                double y = (now - m_bottomRight).y();
 
-        //         double width{0.}, height{0.};
-        //         if (x < 0 && y < 0) {
-        //             if (abs(y / x) < proportionalScale) {
-        //                 width = abs(x);
-        //                 height = abs(x * proportionalScale);
-        //             } else {
-        //                 width = abs(y / proportionalScale);
-        //                 height = abs(y);
-        //             }
-        //         } else if (x < 0 && y >= 0) {
-        //             width = abs(x);
-        //             height = abs(x * proportionalScale);
-        //         } else if (x >= 0 && y < 0) {
-        //             width = abs(y / proportionalScale);
-        //             height = abs(y);
-        //         } else if (x >= 0 && y >= 0) {
+                double width{0.}, height{0.};
+                if (x < 0 && y < 0) {
+                    if (abs(y / x) < proportionalScale) {
+                        width = abs(x);
+                        height = abs(x * proportionalScale);
+                    } else {
+                        width = abs(y / proportionalScale);
+                        height = abs(y);
+                    }
+                } else if (x < 0 && y >= 0) {
+                    width = abs(x);
+                    height = abs(x * proportionalScale);
+                } else if (x >= 0 && y < 0) {
+                    width = abs(y / proportionalScale);
+                    height = abs(y);
+                } else if (x >= 0 && y >= 0) {
 
-        //         }
+                }
 
-        //         m_topLeft.rx() = m_bottomRight.x() - width;
-        //         m_topLeft.ry() = m_bottomRight.y() - height;
-        //     } else {
-        //         QPointF offset = event->pos() - m_pressedPos;
-        //         m_pressedPos.rx() = offset.x() < 0 ? event->pos().x() : m_topLeft.x();
-        //         m_pressedPos.ry() = offset.y() < 0 ? event->pos().y() : m_topLeft.y();
+                m_topLeft.rx() = m_bottomRight.x() - width;
+                m_topLeft.ry() = m_bottomRight.y() - height;
+            } else {
+                QPointF offset = event->pos() - m_pressedPos;
+                m_pressedPos.rx() = offset.x() < 0 ? event->pos().x() : m_topLeft.x();
+                m_pressedPos.ry() = offset.y() < 0 ? event->pos().y() : m_topLeft.y();
 
-        //         m_topLeft += offset.toPoint();
-        //     }
-        //     m_topLeft.rx() = qMin(m_bottomRight.x() - 20 / this->proportionalScale(), m_topLeft.x());
-        //     m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
-        // } break;
-        // case FocusPointF::Position::Top: {
-        //     QPointF offset = event->pos() - m_pressedPos;
-        //     m_pressedPos.ry() = offset.y() < 0 ? event->pos().y() : m_topLeft.y();
+                m_topLeft += offset.toPoint();
+            }
+            m_topLeft.rx() = qMin(m_bottomRight.x() - 20 / this->proportionalScale(), m_topLeft.x());
+            m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
+        } break;
+        case FocusPointF::Position::Top: {
+            QPointF offset = event->pos() - m_pressedPos;
+            m_pressedPos.ry() = offset.y() < 0 ? event->pos().y() : m_topLeft.y();
 
-        //     m_topLeft.ry() += offset.y();
+            m_topLeft.ry() += offset.y();
 
-        //     m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
-        // } break;
-        // case FocusPointF::Position::TopRight: {
-        //     if (m_isProportional) {
-        //         auto now = event->pos();
+            m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
+        } break;
+        case FocusPointF::Position::TopRight: {
+            if (m_isProportional) {
+                auto now = event->pos();
 
-        //         double x = (now - m_topLeft).x();
-        //         double y = (now - m_bottomRight).y();
+                double x = (now - m_topLeft).x();
+                double y = (now - m_bottomRight).y();
 
-        //         double width{0.}, height{0.};
-        //         if (x < 0 && y < 0) {
-        //             width = abs(y / proportionalScale);
-        //             height = abs(y);
-        //         } else if (x < 0 && y >= 0) {
+                double width{0.}, height{0.};
+                if (x < 0 && y < 0) {
+                    width = abs(y / proportionalScale);
+                    height = abs(y);
+                } else if (x < 0 && y >= 0) {
 
-        //         } else if (x >= 0 && y < 0) {
-        //             if (abs(y / x) < proportionalScale) {
-        //                 width = abs(x);
-        //                 height = abs(x * proportionalScale);
-        //             } else {
-        //                 width = abs(y / proportionalScale);
-        //                 height = abs(y);
-        //             }
-        //         } else if (x >= 0 && y >= 0) {
-        //             width = abs(x);
-        //             height = abs(x * proportionalScale);
-        //         }
+                } else if (x >= 0 && y < 0) {
+                    if (abs(y / x) < proportionalScale) {
+                        width = abs(x);
+                        height = abs(x * proportionalScale);
+                    } else {
+                        width = abs(y / proportionalScale);
+                        height = abs(y);
+                    }
+                } else if (x >= 0 && y >= 0) {
+                    width = abs(x);
+                    height = abs(x * proportionalScale);
+                }
 
-        //         m_bottomRight.rx() = m_topLeft.x() + width;
-        //         m_topLeft.ry() = m_bottomRight.y() - abs(height) ;
-        //     } else {
-        //         QPointF offset = event->pos() - m_pressedPos;
-        //         m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
-        //         m_pressedPos.ry() = offset.y() > 0 ? event->pos().y() : m_topLeft.y();
+                m_bottomRight.rx() = m_topLeft.x() + width;
+                m_topLeft.ry() = m_bottomRight.y() - abs(height) ;
+            } else {
+                QPointF offset = event->pos() - m_pressedPos;
+                m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
+                m_pressedPos.ry() = offset.y() > 0 ? event->pos().y() : m_topLeft.y();
 
-        //         m_bottomRight.rx() += offset.toPoint().x();
-        //         m_topLeft.ry() += offset.toPoint().y();
-        //     }
-        //     m_bottomRight.rx() = qMax(m_topLeft.x() + 20 / this->proportionalScale(), m_bottomRight.x());
-        //     m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
-        // } break;
-        // case FocusPointF::Position::Right: {
-        //     QPointF offset = event->pos() - m_pressedPos;
-        //     m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
+                m_bottomRight.rx() += offset.toPoint().x();
+                m_topLeft.ry() += offset.toPoint().y();
+            }
+            m_bottomRight.rx() = qMax(m_topLeft.x() + 20 / this->proportionalScale(), m_bottomRight.x());
+            m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
+        } break;
+        case FocusPointF::Position::Right: {
+            QPointF offset = event->pos() - m_pressedPos;
+            m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
 
-        //     m_bottomRight.rx() += offset.x();
+            m_bottomRight.rx() += offset.x();
 
-        //     m_bottomRight.rx() = qMax(m_topLeft.x() + 20, m_bottomRight.x());
-        // } break;
-        // case FocusPointF::Position::BottomRight: {
-        //     if (m_isProportional) {
-        //         auto now = event->pos();
+            m_bottomRight.rx() = qMax(m_topLeft.x() + 20, m_bottomRight.x());
+        } break;
+        case FocusPointF::Position::BottomRight: {
+            if (m_isProportional) {
+                auto now = event->pos();
 
-        //         double x = (now - m_topLeft).x();
-        //         double y = (now - m_topLeft).y();
+                double x = (now - m_topLeft).x();
+                double y = (now - m_topLeft).y();
 
-        //         double width{0.}, height{0.};
-        //         if (x < 0 && y < 0) {
+                double width{0.}, height{0.};
+                if (x < 0 && y < 0) {
 
-        //         } else if (x < 0 && y >= 0) {
-        //             width = abs(y / proportionalScale);
-        //             height = abs(y);
-        //         } else if (x >= 0 && y < 0) {
-        //             width = abs(x);
-        //             height = abs(x * proportionalScale);
-        //         } else if (x >= 0 && y >= 0) {
-        //             if (abs(y / x) < proportionalScale) {
-        //                 width = abs(x);
-        //                 height = abs(x * proportionalScale);
-        //             } else {
-        //                 width = abs(y / proportionalScale);
-        //                 height = abs(y);
-        //             }
-        //         }
+                } else if (x < 0 && y >= 0) {
+                    width = abs(y / proportionalScale);
+                    height = abs(y);
+                } else if (x >= 0 && y < 0) {
+                    width = abs(x);
+                    height = abs(x * proportionalScale);
+                } else if (x >= 0 && y >= 0) {
+                    if (abs(y / x) < proportionalScale) {
+                        width = abs(x);
+                        height = abs(x * proportionalScale);
+                    } else {
+                        width = abs(y / proportionalScale);
+                        height = abs(y);
+                    }
+                }
 
-        //         m_bottomRight.rx() = m_topLeft.x() + width;
-        //         m_bottomRight.ry() = m_topLeft.y() + height;
-        //     } else {
-        //         QPointF offset = event->pos() - m_pressedPos;
+                m_bottomRight.rx() = m_topLeft.x() + width;
+                m_bottomRight.ry() = m_topLeft.y() + height;
+            } else {
+                QPointF offset = event->pos() - m_pressedPos;
 
-        //         m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
-        //         m_pressedPos.ry() = offset.y() > 0 ? event->pos().y() : m_bottomRight.y();
+                m_pressedPos.rx() = offset.x() > 0 ? event->pos().x() : m_bottomRight.x();
+                m_pressedPos.ry() = offset.y() > 0 ? event->pos().y() : m_bottomRight.y();
 
-        //         m_bottomRight += offset.toPoint();
-        //     }
+                m_bottomRight += offset.toPoint();
+            }
 
-        //     m_bottomRight.rx() = qMax(m_topLeft.x() + 20 / this->proportionalScale(), m_bottomRight.x());
-        //     m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
-        // } break;
-        // case FocusPointF::Position::Bottom: {
-        //     QPointF offset = event->pos() - m_pressedPos;
-        //     m_pressedPos.ry() = offset.y() > 0 ? event->pos().y() : m_bottomRight.y();
+            m_bottomRight.rx() = qMax(m_topLeft.x() + 20 / this->proportionalScale(), m_bottomRight.x());
+            m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
+        } break;
+        case FocusPointF::Position::Bottom: {
+            QPointF offset = event->pos() - m_pressedPos;
+            m_pressedPos.ry() = offset.y() > 0 ? event->pos().y() : m_bottomRight.y();
 
-        //     m_bottomRight.ry() += offset.y();
+            m_bottomRight.ry() += offset.y();
 
-        //     m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
-        // } break;
-        // case FocusPointF::Position::BottomLeft: {
-        //     if (m_isProportional) {
-        //         auto now = event->pos();
+            m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
+        } break;
+        case FocusPointF::Position::BottomLeft: {
+            if (m_isProportional) {
+                auto now = event->pos();
 
-        //         double x = (now - m_bottomRight).x();
-        //         double y = (now - m_topLeft).y();
+                double x = (now - m_bottomRight).x();
+                double y = (now - m_topLeft).y();
 
-        //         double width{0.}, height{0.};
-        //         if (x < 0 && y < 0) {
-        //             width = abs(x);
-        //             height = abs(x * proportionalScale);
-        //         } else if (x < 0 && y >= 0) {
-        //             if (abs(y / x) < proportionalScale) {
-        //                 width = abs(x);
-        //                 height = abs(x * proportionalScale);
-        //             } else {
-        //                 width = abs(y / proportionalScale);
-        //                 height = abs(y);
-        //             }
-        //         } else if (x >= 0 && y < 0) {
+                double width{0.}, height{0.};
+                if (x < 0 && y < 0) {
+                    width = abs(x);
+                    height = abs(x * proportionalScale);
+                } else if (x < 0 && y >= 0) {
+                    if (abs(y / x) < proportionalScale) {
+                        width = abs(x);
+                        height = abs(x * proportionalScale);
+                    } else {
+                        width = abs(y / proportionalScale);
+                        height = abs(y);
+                    }
+                } else if (x >= 0 && y < 0) {
 
-        //         } else if (x >= 0 && y >= 0) {
-        //             width = abs(y / proportionalScale);
-        //             height = abs(y);
-        //         }
+                } else if (x >= 0 && y >= 0) {
+                    width = abs(y / proportionalScale);
+                    height = abs(y);
+                }
 
-        //         m_topLeft.rx() = m_bottomRight.x() - width;
-        //         m_bottomRight.ry() = m_topLeft.y() + abs(height);
-        //     } else {
-        //         QPointF offset = event->pos() - m_pressedPos;
-        //         m_pressedPos.rx() = offset.x() < 0 ? event->pos().x() : m_topLeft.x();
-        //         m_pressedPos.ry() = offset.y() < 0 ? event->pos().y() : m_bottomRight.y();
+                m_topLeft.rx() = m_bottomRight.x() - width;
+                m_bottomRight.ry() = m_topLeft.y() + abs(height);
+            } else {
+                QPointF offset = event->pos() - m_pressedPos;
+                m_pressedPos.rx() = offset.x() < 0 ? event->pos().x() : m_topLeft.x();
+                m_pressedPos.ry() = offset.y() < 0 ? event->pos().y() : m_bottomRight.y();
 
-        //         m_topLeft.rx() += offset.toPoint().x();
-        //         m_bottomRight.ry() += offset.toPoint().y();
-        //     }
-        //     m_topLeft.rx() = qMin(m_bottomRight.x() - 20 / this->proportionalScale(), m_topLeft.x());
-        //     m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
-        // } break;
-        // case FocusPointF::Position::Left: {
-        //     QPointF offset = event->pos() - m_pressedPos;
-        //     m_pressedPos.rx() = offset.x() < 0 ? event->pos().x() : m_topLeft.x();
+                m_topLeft.rx() += offset.toPoint().x();
+                m_bottomRight.ry() += offset.toPoint().y();
+            }
+            m_topLeft.rx() = qMin(m_bottomRight.x() - 20 / this->proportionalScale(), m_topLeft.x());
+            m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
+        } break;
+        case FocusPointF::Position::Left: {
+            QPointF offset = event->pos() - m_pressedPos;
+            m_pressedPos.rx() = offset.x() < 0 ? event->pos().x() : m_topLeft.x();
 
-        //     m_topLeft.rx() += offset.x();
+            m_topLeft.rx() += offset.x();
 
-        //     m_topLeft.rx() = qMin(m_bottomRight.x() - 20, m_topLeft.x());
+            m_topLeft.rx() = qMin(m_bottomRight.x() - 20, m_topLeft.x());
 
-        // } break;
+        } break;
         case FocusPointF::Position::Body: {
             this->setCursor(Qt::SizeAllCursor);
 
@@ -436,9 +436,9 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             this->update();
         } break;
         case FocusPointF::Position::Rotate: {
-            QVector2D startVect = QVector2D(m_pressedPos - this->mapToScene(this->center()));
+            QVector2D startVect = QVector2D(m_pressedPos - this->center());
             startVect.normalize();
-            QVector2D endVect = QVector2D(event->pos() - this->mapToScene(this->center()));
+            QVector2D endVect = QVector2D(event->pos() - this->center());
             endVect.normalize();
 
             qreal value = QVector2D::dotProduct(startVect, endVect);
