@@ -98,7 +98,7 @@ ViewFrame::ViewFrame(const QString& name, QWidget* parent)
     m_antialiasButton = new QToolButton;
     m_antialiasButton->setText(tr("Antialiasing"));
     m_antialiasButton->setCheckable(true);
-    m_antialiasButton->setChecked(false);
+    m_antialiasButton->setChecked(true);
     m_printButton = new QToolButton;
     m_printButton->setVisible(false);
     m_printButton->setIcon(QIcon(":/images/printer.svg").pixmap(QSize(100, 100)));

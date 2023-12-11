@@ -2,15 +2,15 @@
 
 #include "focuspoint.h"
 #include <QCursor>
-#include <QGraphicsRectItem>
+#include <QGraphicsItem>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 #include <QWidget>
 
-class FocusItem : public QGraphicsRectItem {
+class FocusItem : public QGraphicsItem {
 public:
     FocusItem();
-    FocusItem(FocusPointF point, QGraphicsRectItem* parent = nullptr);
+    FocusItem(FocusPointF point, QGraphicsItem* parent = nullptr);
 
     FocusPointF point() const;
     void setPoint(FocusPointF newPoint);
@@ -30,22 +30,26 @@ protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
         // qDebug() << "FocusItem::hoverEnterEvent";
         this->setCursor(m_focusPoint.cursor());
-        QGraphicsRectItem::hoverEnterEvent(event);
+        QGraphicsItem::hoverEnterEvent(event);
     }
 
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) {
         // qDebug() << "FocusItem::hoverMoveEvent";
         this->setCursor(m_focusPoint.cursor());
-        QGraphicsRectItem::hoverMoveEvent(event);
+        QGraphicsItem::hoverMoveEvent(event);
     }
 
     void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override {
         unsetCursor();
-        QGraphicsRectItem::hoverLeaveEvent(event);
+        QGraphicsItem::hoverLeaveEvent(event);
     }
 
 private:
     FocusPointF m_focusPoint;
+
+    QPointF m_topLeft{-2, -2};
+    QPointF m_bottomRight{2, 2};
+
     class GraphicsItem* m_adsorbItem = nullptr;
 
     QPointF m_pressedPos{};

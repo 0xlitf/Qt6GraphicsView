@@ -8,7 +8,7 @@ FocusItem::FocusItem() {
     setAcceptHoverEvents(true);
 }
 
-FocusItem::FocusItem(FocusPointF point, QGraphicsRectItem* parent)
+FocusItem::FocusItem(FocusPointF point, QGraphicsItem* parent)
     : m_focusPoint{point} {
 
     setFlag(ItemIsMovable, true);
@@ -20,13 +20,37 @@ FocusItem::FocusItem(FocusPointF point, QGraphicsRectItem* parent)
 }
 
 QRectF FocusItem::boundingRect() const {
-    return QRectF(0, 0, 10, 10);
+    return QRectF(m_topLeft.x(), m_topLeft.y(), QPointF(m_bottomRight - m_topLeft).x(), QPointF(m_bottomRight - m_topLeft).y()) + QMarginsF(10., 10., 10., 10.);
 }
 
 QPainterPath FocusItem::shape() const {
     QPainterPath path;
-    path.addRect(QRectF(0, 0, 4, 4).toRect());
+    auto rect = QRectF(m_topLeft.x(), m_topLeft.y(), QPointF(m_bottomRight - m_topLeft).x(), QPointF(m_bottomRight - m_topLeft).y()) + QMarginsF(1., 1., 1., 1.);
+    path.addRect(rect.toRect());
     return path;
+}
+
+void FocusItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
+
+    QColor borderColor = Qt::red;
+    QColor fillColor = Qt::red;
+
+    if (option->state & QStyle::State_MouseOver) {
+        fillColor = fillColor.lighter(125);
+        borderColor = Qt::black;
+    }
+
+    if (option->state & QStyle::State_Selected) {
+        fillColor = fillColor.darker(150);
+        borderColor = Qt::green;
+    }
+
+    QPen p = painter->pen();
+    painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter->setBrush(fillColor);
+    painter->drawRect(QRectF(m_topLeft.x(), m_topLeft.y(), QPointF(m_bottomRight - m_topLeft).x(), QPointF(m_bottomRight - m_topLeft).y()));
+    painter->setPen(p);
+
 }
 
 FocusPointF FocusItem::point() const {
@@ -37,21 +61,16 @@ void FocusItem::setPoint(FocusPointF newPoint) {
     m_focusPoint = newPoint;
 }
 
-void FocusItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
-
-    QGraphicsRectItem::paint(painter, option, widget);
-}
-
 void FocusItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     m_pressedPos = event->scenePos();
     qDebug() << "FocusItem::mousePressEvent" << event->pos();
 
     // event->accept();
-    QGraphicsRectItem::mousePressEvent(event);
+    QGraphicsItem::mousePressEvent(event);
 }
 
 void FocusItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-    // qDebug() << "FocusItem::mouseMoveEvent event->pos()" << event->scenePos() << "m_pressedPos" << m_pressedPos << "offset" << event->scenePos() - m_pressedPos;
+    qDebug() << "FocusItem::mouseMoveEvent event->pos()" << event->scenePos() << "m_pressedPos" << m_pressedPos << "offset" << event->scenePos() - m_pressedPos;
     QPointF offset = event->scenePos() - m_pressedPos;
 
     switch (m_focusPoint.position()) {
@@ -284,13 +303,14 @@ void FocusItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
     // event->accept();
     // this->update();
-
-    QGraphicsRectItem::mouseMoveEvent(event);
+    this->update();
+    m_adsorbItem->update();
+    QGraphicsItem::mouseMoveEvent(event);
 }
 
 void FocusItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 
-    QGraphicsRectItem::mouseReleaseEvent(event);
+    QGraphicsItem::mouseReleaseEvent(event);
 }
 
 GraphicsItem* FocusItem::adsorbItem() const {
