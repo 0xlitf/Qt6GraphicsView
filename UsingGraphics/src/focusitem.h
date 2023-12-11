@@ -20,22 +20,22 @@ public:
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
-    QGraphicsItem* adsorbItem() const;
-    void setAdsorbItem(QGraphicsItem* newAdsorbItem);
+    class GraphicsItem* adsorbItem() const;
+    void setAdsorbItem(class GraphicsItem* newAdsorbItem);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
-        qDebug() << "FocusItem::hoverEnterEvent";
-        this->setCursor(m_point.cursor());
+        // qDebug() << "FocusItem::hoverEnterEvent";
+        this->setCursor(m_focusPoint.cursor());
         QGraphicsRectItem::hoverEnterEvent(event);
     }
 
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) {
-        qDebug() << "FocusItem::hoverMoveEvent";
-        this->setCursor(m_point.cursor());
+        // qDebug() << "FocusItem::hoverMoveEvent";
+        this->setCursor(m_focusPoint.cursor());
         QGraphicsRectItem::hoverMoveEvent(event);
     }
 
@@ -45,7 +45,10 @@ protected:
     }
 
 private:
-    FocusPointF m_point;
-    QGraphicsItem* m_adsorbItem = nullptr;
+    FocusPointF m_focusPoint;
+    class GraphicsItem* m_adsorbItem = nullptr;
+
+    QPointF m_pressedPos{};
+
 };
 

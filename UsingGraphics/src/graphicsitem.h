@@ -50,6 +50,20 @@ public:
     QPointF& bottomRight();
     void setBottomRight(QPointF newBottomRight);
 
+    FocusPointF::Position focusPosition() const;
+    void setFocusPosition(FocusPointF::Position newFocusPosition);
+
+    bool isProportional() const;
+    void setIsProportional(bool newIsProportional);
+
+    double proportionalScale() {
+        return m_initialHeight / m_initialWidth;
+    }
+
+    QPointF center() {
+        return QPointF{(m_topLeft + m_bottomRight) / 2};
+    }
+
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
         // qDebug() << "GraphicsItem::hoverEnterEvent";
@@ -70,6 +84,7 @@ protected:
         QMarginsF margin{1, 1, 1, 1};
 
         if (auto atCorner = [=] {
+                return false;
                 if (this->flags() & QGraphicsItem::ItemIsMovable) {
                     this->setCursor(Qt::SizeAllCursor);
                     return false;
@@ -124,18 +139,10 @@ protected:
         // QGraphicsItem::keyReleaseEvent(event);
     }
 
-    QPointF center() {
-        return QPointF{(m_topLeft + m_bottomRight) / 2};
-    }
-
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
-
-    double proportionalScale() {
-        return m_initialHeight / m_initialWidth;
-    }
 
 protected:
     QTransform m_Transform;
