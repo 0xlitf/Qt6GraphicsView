@@ -440,9 +440,11 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             this->update();
         } break;
         case FocusPointF::Position::Rotate: {
-            QVector2D startVect = QVector2D(m_pressedPos - this->center());
+            auto sceneCenter = this->mapToScene(this->center());
+            qDebug() << "sceneCenter" << sceneCenter;
+            QVector2D startVect = QVector2D(m_pressedPos - sceneCenter);
             startVect.normalize();
-            QVector2D endVect = QVector2D(event->scenePos() - this->center());
+            QVector2D endVect = QVector2D(event->scenePos() - sceneCenter);
             endVect.normalize();
 
             qreal value = QVector2D::dotProduct(startVect, endVect);
@@ -459,6 +461,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
             this->setTransformOriginPoint(this->center());
             this->setRotation(this->rotation() + angle);
+
+            m_pressedPos = event->scenePos();
         } break;
         default: {
 
