@@ -55,34 +55,34 @@ void GraphicsItem::moveFocusPoint(const FocusPointF::Position& position = FocusP
 
                 } break;
                 case FocusPointF::Position::TopLeft: {
-                    rectItem->setPos(this->mapToScene(m_topLeft.x(), m_topLeft.y()).toPoint());
+                    rectItem->setPos(this->mapToScene(m_topLeft.x(), m_topLeft.y()));
                 } break;
                 case FocusPointF::Position::Top: {
-                    rectItem->setPos(this->mapToScene(this->center().x(), m_topLeft.y()).toPoint());
+                    rectItem->setPos(this->mapToScene(this->center().x(), m_topLeft.y()));
                 } break;
                 case FocusPointF::Position::TopRight: {
-                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), m_topLeft.y()).toPoint());
+                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), m_topLeft.y()));
                 } break;
                 case FocusPointF::Position::Right: {
-                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), this->center().y()).toPoint());
+                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), this->center().y()));
                 } break;
                 case FocusPointF::Position::BottomRight: {
-                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), m_bottomRight.y()).toPoint());
+                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), m_bottomRight.y()));
                 } break;
                 case FocusPointF::Position::Bottom: {
-                    rectItem->setPos(this->mapToScene(this->center().x(), m_bottomRight.y()).toPoint());
+                    rectItem->setPos(this->mapToScene(this->center().x(), m_bottomRight.y()));
                 } break;
                 case FocusPointF::Position::BottomLeft: {
-                    rectItem->setPos(this->mapToScene(m_topLeft.x(), m_bottomRight.y()).toPoint());
+                    rectItem->setPos(this->mapToScene(m_topLeft.x(), m_bottomRight.y()));
                 } break;
                 case FocusPointF::Position::Left: {
-                    rectItem->setPos(this->mapToScene(m_topLeft.x(), this->center().y()).toPoint());
+                    rectItem->setPos(this->mapToScene(m_topLeft.x(), this->center().y()));
                 } break;
                 case FocusPointF::Position::Body: {
 
                 } break;
                 case FocusPointF::Position::Rotate: {
-                    rectItem->setPos(this->mapToScene(this->center().x(), m_topLeft.y() - 25).toPoint());
+                    rectItem->setPos(this->mapToScene(this->center().x(), m_topLeft.y() - 25));
                 } break;
                 default: {
 
@@ -160,7 +160,7 @@ QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& val
         this->moveFocusPoint();
     }
 
-    if ((void*)this && change == ItemSelectedChange && scene()) {
+    if (true && change == ItemSelectedChange && scene()) {
         qDebug() << (void*)this << change;
         if (value.toBool()) {
             auto focusPointList = this->recalculateFocusPoint();
@@ -169,7 +169,6 @@ QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& val
                 rectItem->setPoint(focusPointList[i]);
                 rectItem->setAdsorbItem(this);
                 rectItem->setPos(this->mapToScene(focusPointList[i].x(), focusPointList[i].y()).toPoint());
-                // rectItem->setRect(-2, -2, 4, 4);
                 rectItem->setZValue(100);
                 scene()->addItem(rectItem);
                 rectItem->installSceneEventFilter(this);
@@ -444,16 +443,18 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             endVect.normalize();
 
             qreal value = QVector2D::dotProduct(startVect, endVect);
-            if (value > 1.0)
+            if (value > 1.0) {
                 value = 1.0;
-            else if (value < -1.0)
+            } else if (value < -1.0) {
                 value = -1.0;
+            }
 
             qreal angle = qRadiansToDegrees(qAcos(value));
 
             QVector3D vect = QVector3D::crossProduct(QVector3D(startVect, 1.0), QVector3D(endVect, 1.0));
-            if (vect.z() < 0)
+            if (vect.z() < 0) {
                 angle *= -1.0;
+            }
 
             this->setTransformOriginPoint(this->center());
             this->setRotation(this->rotation() + angle);
@@ -468,6 +469,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
     this->moveFocusPoint();
 
     event->accept();
+    this->update();
     QGraphicsItem::mouseMoveEvent(event);
 }
 
