@@ -432,7 +432,7 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 QMatrix4x4 matrix;
                 matrix.rotate(this->rotation(), 0, 0, 1);
                 QVector3D rotatedVector = matrix.map(QVector3D(pressedVect.x(), pressedVect.y(), 0));
-                this->setPos(event->scenePos() - rotatedVector.toVector2D().toPointF());
+                this->setPos(event->scenePos().toPoint() - rotatedVector.toVector2D().toPoint());
             }
             this->update();
         } break;

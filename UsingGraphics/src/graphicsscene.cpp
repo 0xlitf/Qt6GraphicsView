@@ -285,7 +285,7 @@ void GraphicsScene::setPropertyEditor(QtTreePropertyBrowser* newPropertyEditor) 
 }
 
 void GraphicsScene::keyPressEvent(QKeyEvent* event) {
-    qDebug() << "GraphicsScene keyPressEvent: " << Qt::Key(event->key());
+    // qDebug() << "GraphicsScene keyPressEvent: " << Qt::Key(event->key());
 
     switch (Qt::Key(event->key())) {
         case Qt::Key_F1: {
@@ -330,7 +330,7 @@ void GraphicsScene::keyPressEvent(QKeyEvent* event) {
 
 void GraphicsScene::keyReleaseEvent(QKeyEvent* event) {
 
-    qDebug() << "GraphicsScene keyReleaseEvent: " << Qt::Key(event->key());
+    // qDebug() << "GraphicsScene keyReleaseEvent: " << Qt::Key(event->key());
     QGraphicsScene::keyReleaseEvent(event);
 }
 

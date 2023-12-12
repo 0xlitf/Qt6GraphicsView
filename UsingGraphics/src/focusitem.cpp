@@ -32,7 +32,7 @@ QPainterPath FocusItem::shape() const {
 
 void FocusItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
 
-    QColor borderColor = Qt::black;
+    QColor borderColor = Qt::gray;
     QColor fillColor = Qt::transparent;
 
     if (option->state & QStyle::State_MouseOver) {

@@ -123,17 +123,15 @@ protected:
     }
 
     void keyPressEvent(QKeyEvent *event) override {
-        qDebug() << "GraphicsItem keyPressEvent: " << Qt::Key(event->key());
-
         event->accept();
+        // qDebug() << "GraphicsItem keyPressEvent: " << Qt::Key(event->key());
 
         // QGraphicsItem::keyPressEvent(event);
     }
 
     void keyReleaseEvent(QKeyEvent *event) override {
-        qDebug() << "GraphicsItem keyReleaseEvent: " << Qt::Key(event->key());
-
         event->accept();
+        // qDebug() << "GraphicsItem keyReleaseEvent: " << Qt::Key(event->key());
 
         // QGraphicsItem::keyReleaseEvent(event);
     }
