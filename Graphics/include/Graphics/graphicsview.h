@@ -5,10 +5,12 @@
 #include <QWheelEvent>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include "graphics_global.h"
 
 class ViewFrame;
 
-class GraphicsView : public QGraphicsView {
+class GRAPHICS_EXPORT GraphicsView : public QGraphicsView
+{
     Q_OBJECT
 public:
     GraphicsView(ViewFrame* v);

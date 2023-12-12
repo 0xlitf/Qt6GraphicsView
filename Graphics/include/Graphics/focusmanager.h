@@ -4,8 +4,10 @@
 #include "focusitem.h"
 #include "focuspoint.h"
 #include "graphicsitem.h"
+#include "graphics_global.h"
 
-class FocusManager : public QObject {
+class GRAPHICS_EXPORT FocusManager : public QObject
+{
     Q_OBJECT
 public:
     explicit FocusManager(QGraphicsScene* parent = nullptr);
@@ -58,4 +60,3 @@ private:
     QList<QGraphicsItem*>  m_focusItemList{};
     QGraphicsScene* m_scene = nullptr;
 };
-

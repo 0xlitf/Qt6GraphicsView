@@ -2,6 +2,7 @@
 #include "graphicsview.h"
 #include <QFrame>
 #include <QGraphicsView>
+#include "graphics_global.h"
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -11,7 +12,8 @@ QT_END_NAMESPACE
 
 class GraphicsView;
 
-class ViewFrame : public QFrame {
+class GRAPHICS_EXPORT ViewFrame : public QFrame
+{
     Q_OBJECT
 public:
     explicit ViewFrame(const QString& name, QWidget* parent = nullptr);

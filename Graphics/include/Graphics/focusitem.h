@@ -6,8 +6,10 @@
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 #include <QWidget>
+#include "graphics_global.h"
 
-class FocusItem : public QGraphicsItem {
+class GRAPHICS_EXPORT FocusItem : public QGraphicsItem
+{
 public:
     FocusItem();
     FocusItem(FocusPointF point, QGraphicsItem* parent = nullptr);
@@ -56,6 +58,4 @@ private:
     class GraphicsItem* m_adsorbItem = nullptr;
 
     QPointF m_pressedPos{};
-
 };
-

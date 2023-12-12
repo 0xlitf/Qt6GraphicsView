@@ -10,8 +10,10 @@
 #include "focuspoint.h"
 #include "focusitem.h"
 #include "focuspoint.h"
+#include "graphics_global.h"
 
-class GraphicsItem : public QGraphicsObject {
+class GRAPHICS_EXPORT GraphicsItem : public QGraphicsObject
+{
     Q_OBJECT
 public:
     enum {

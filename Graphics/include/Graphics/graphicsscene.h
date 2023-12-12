@@ -12,11 +12,13 @@
 #include "QtProperty"
 #include "QtTreePropertyBrowser"
 #include "graphicsitemgroup.h"
+#include "graphics_global.h"
 
 class GraphicsItem;
 class FocusManager;
 
-class GraphicsScene : public QGraphicsScene {
+class GRAPHICS_EXPORT GraphicsScene : public QGraphicsScene
+{
     Q_OBJECT
 public:
     enum AlignmentFlag {
@@ -114,4 +116,3 @@ private:
 
     QList<QGraphicsItem*>  m_focusItemList{};
 };
-

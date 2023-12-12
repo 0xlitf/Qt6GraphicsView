@@ -3,8 +3,10 @@
 #include "graphicsitem.h"
 #include <QGraphicsItemGroup>
 #include <QKeyEvent>
+#include "graphics_global.h"
 
-class GraphicsItemGroup : public QGraphicsItemGroup {
+class GRAPHICS_EXPORT GraphicsItemGroup : public QGraphicsItemGroup
+{
 public:
     GraphicsItemGroup();
 
@@ -52,4 +54,3 @@ protected:
     QPointF m_topLeft;
     QPointF m_bottomRight;
 };
-

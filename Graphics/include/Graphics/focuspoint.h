@@ -4,8 +4,10 @@
 #include <QCursor>
 #include <QMap>
 #include <QObject>
+#include "graphics_global.h"
 
-class FocusPointF : public QPointF{
+class GRAPHICS_EXPORT FocusPointF : public QPointF
+{
 public:
     enum struct Position {
         Undefined,
