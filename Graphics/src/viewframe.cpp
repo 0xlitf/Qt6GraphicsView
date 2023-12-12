@@ -13,7 +13,7 @@
 #include <QtMath>
 #include <QtWidgets>
 
-ViewFrame::ViewFrame(const QString& name, QWidget* parent)
+ViewFrame::ViewFrame(QWidget* parent)
     : QFrame(parent) {
     setFrameStyle(Sunken | StyledPanel);
     m_graphicsView = new GraphicsView(this);

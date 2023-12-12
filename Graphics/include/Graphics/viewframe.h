@@ -16,7 +16,7 @@ class GRAPHICS_EXPORT ViewFrame : public QFrame
 {
     Q_OBJECT
 public:
-    explicit ViewFrame(const QString& name, QWidget* parent = nullptr);
+    explicit ViewFrame(QWidget* parent = nullptr);
 
     QGraphicsView* view() const;
 

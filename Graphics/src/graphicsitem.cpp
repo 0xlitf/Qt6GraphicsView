@@ -185,6 +185,8 @@ QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& val
                 rectItem = nullptr;
             }
             m_focusPointItemList.clear();
+
+            m_focusItem = nullptr;
         }
     }
 
@@ -207,16 +209,18 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
         case FocusPointF::Position::BottomRight:
         case FocusPointF::Position::Bottom:
         case FocusPointF::Position::BottomLeft:
-        case FocusPointF::Position::Left: {
-            m_pressedPos = this->mapFromItem(m_focusItem, event->pos());
+        case FocusPointF::Position::Left:
+        case FocusPointF::Position::Rotate: {
+            if (m_focusItem) {
+                m_pressedPos = this->mapFromItem(m_focusItem, event->pos());
+            } else {
+                m_pressedPos = event->pos();
+            }
         } break;
         case FocusPointF::Position::Body: {
             m_pressedPos = event->pos();
             this->setCursor(Qt::SizeAllCursor);
             this->update();
-        } break;
-        case FocusPointF::Position::Rotate: {
-            m_pressedPos = this->mapFromItem(m_focusItem, event->pos());
         } break;
         default: {
 
@@ -230,6 +234,8 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
     auto proportionalScale = this->proportionalScale();
 
     this->prepareGeometryChange();
+
+    qDebug() << "m_focusPosition" << (int)m_focusPosition;
 
     switch (m_focusPosition) {
         case FocusPointF::Position::Undefined: {
@@ -263,9 +269,16 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_topLeft.rx() = m_bottomRight.x() - width;
                 m_topLeft.ry() = m_bottomRight.y() - height;
             } else {
-                QPointF offset = this->mapFromItem(m_focusItem, event->pos()) - m_pressedPos;
-                m_pressedPos.rx() = offset.x() < 0 ? this->mapFromItem(m_focusItem, event->pos()).x() : m_topLeft.x();
-                m_pressedPos.ry() = offset.y() < 0 ? this->mapFromItem(m_focusItem, event->pos()).y() : m_topLeft.y();
+                auto pos = [&] {
+                    if (m_focusItem) {
+                        return this->mapFromItem(m_focusItem, event->pos());
+                    } else {
+                        return event->pos();
+                    }
+                }();
+                QPointF offset = pos - m_pressedPos;
+                m_pressedPos.rx() = offset.x() < 0 ? pos.x() : m_topLeft.x();
+                m_pressedPos.ry() = offset.y() < 0 ? pos.y() : m_topLeft.y();
 
                 m_topLeft += offset.toPoint();
             }
@@ -273,8 +286,15 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
         } break;
         case FocusPointF::Position::Top: {
-            QPointF offset = this->mapFromItem(m_focusItem, event->pos()) - m_pressedPos;
-            m_pressedPos.ry() = offset.y() < 0 ? this->mapFromItem(m_focusItem, event->pos()).y() : m_topLeft.y();
+            auto pos = [&] {
+                if (m_focusItem) {
+                    return this->mapFromItem(m_focusItem, event->pos());
+                } else {
+                    return event->pos();
+                }
+            }();
+            QPointF offset = pos - m_pressedPos;
+            m_pressedPos.ry() = offset.y() < 0 ? pos.y() : m_topLeft.y();
 
             m_topLeft.ry() += offset.y();
 
@@ -309,9 +329,16 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_bottomRight.rx() = m_topLeft.x() + width;
                 m_topLeft.ry() = m_bottomRight.y() - abs(height);
             } else {
-                QPointF offset = this->mapFromItem(m_focusItem, event->pos()) - m_pressedPos;
-                m_pressedPos.rx() = offset.x() > 0 ? m_focusItem->mapToItem(this, event->pos()).x() : m_bottomRight.x();
-                m_pressedPos.ry() = offset.y() > 0 ? m_focusItem->mapToItem(this, event->pos()).y() : m_topLeft.y();
+                auto pos = [&] {
+                    if (m_focusItem) {
+                        return this->mapFromItem(m_focusItem, event->pos());
+                    } else {
+                        return event->pos();
+                    }
+                }();
+                QPointF offset = pos - m_pressedPos;
+                m_pressedPos.rx() = offset.x() > 0 ? pos.x() : m_bottomRight.x();
+                m_pressedPos.ry() = offset.y() > 0 ? pos.y() : m_topLeft.y();
 
                 m_bottomRight.rx() += offset.toPoint().x();
                 m_topLeft.ry() += offset.toPoint().y();
@@ -320,8 +347,15 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_topLeft.ry() = qMin(m_bottomRight.y() - 20, m_topLeft.y());
         } break;
         case FocusPointF::Position::Right: {
-            QPointF offset = this->mapFromItem(m_focusItem, event->pos()) - m_pressedPos;
-            m_pressedPos.rx() = offset.x() > 0 ? this->mapFromItem(m_focusItem, event->pos()).x() : m_bottomRight.x();
+            auto pos = [&] {
+                if (m_focusItem) {
+                    return this->mapFromItem(m_focusItem, event->pos());
+                } else {
+                    return event->pos();
+                }
+            }();
+            QPointF offset = pos - m_pressedPos;
+            m_pressedPos.rx() = offset.x() > 0 ? pos.x() : m_bottomRight.x();
 
             m_bottomRight.rx() += offset.x();
 
@@ -356,9 +390,16 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_bottomRight.rx() = m_topLeft.x() + width;
                 m_bottomRight.ry() = m_topLeft.y() + height;
             } else {
-                QPointF offset = this->mapFromItem(m_focusItem, event->pos()) - m_pressedPos;
-                m_pressedPos.rx() = offset.x() > 0 ? this->mapFromItem(m_focusItem, event->pos()).x() : m_bottomRight.x();
-                m_pressedPos.ry() = offset.y() > 0 ? this->mapFromItem(m_focusItem, event->pos()).y() : m_bottomRight.y();
+                auto pos = [&] {
+                    if (m_focusItem) {
+                        return this->mapFromItem(m_focusItem, event->pos());
+                    } else {
+                        return event->pos();
+                    }
+                    }();
+                QPointF offset = pos - m_pressedPos;
+                m_pressedPos.rx() = offset.x() > 0 ? pos.x() : m_bottomRight.x();
+                m_pressedPos.ry() = offset.y() > 0 ? pos.y() : m_bottomRight.y();
 
                 m_bottomRight += offset.toPoint();
             }
@@ -367,8 +408,15 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
         } break;
         case FocusPointF::Position::Bottom: {
-            QPointF offset = this->mapFromItem(m_focusItem, event->pos()) - m_pressedPos;
-            m_pressedPos.ry() = offset.y() > 0 ? this->mapFromItem(m_focusItem, event->pos()).y() : m_bottomRight.y();
+            auto pos = [&] {
+                if (m_focusItem) {
+                    return this->mapFromItem(m_focusItem, event->pos());
+                } else {
+                    return event->pos();
+                }
+            }();
+            QPointF offset = pos - m_pressedPos;
+            m_pressedPos.ry() = offset.y() > 0 ? pos.y() : m_bottomRight.y();
 
             m_bottomRight.ry() += offset.y();
 
@@ -403,9 +451,16 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 m_topLeft.rx() = m_bottomRight.x() - width;
                 m_bottomRight.ry() = m_topLeft.y() + abs(height);
             } else {
-                QPointF offset = this->mapFromItem(m_focusItem, event->pos()) - m_pressedPos;
-                m_pressedPos.rx() = offset.x() < 0 ? this->mapFromItem(m_focusItem, event->pos()).x() : m_topLeft.x();
-                m_pressedPos.ry() = offset.y() < 0 ? this->mapFromItem(m_focusItem, event->pos()).y() : m_bottomRight.y();
+                auto pos = [&] {
+                    if (m_focusItem) {
+                        return this->mapFromItem(m_focusItem, event->pos());
+                    } else {
+                        return event->pos();
+                    }
+                }();
+                QPointF offset = pos - m_pressedPos;
+                m_pressedPos.rx() = offset.x() < 0 ? pos.x() : m_topLeft.x();
+                m_pressedPos.ry() = offset.y() < 0 ? pos.y() : m_bottomRight.y();
 
                 m_topLeft.rx() += offset.toPoint().x();
                 m_bottomRight.ry() += offset.toPoint().y();
@@ -414,8 +469,15 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_bottomRight.ry() = qMax(m_topLeft.y() + 20, m_bottomRight.y());
         } break;
         case FocusPointF::Position::Left: {
-            QPointF offset = this->mapFromItem(m_focusItem, event->pos()) - m_pressedPos;
-            m_pressedPos.rx() = offset.x() < 0 ? this->mapFromItem(m_focusItem, event->pos()).x() : m_topLeft.x();
+            auto pos = [&] {
+                if (m_focusItem) {
+                    return this->mapFromItem(m_focusItem, event->pos());
+                } else {
+                    return event->pos();
+                }
+            }();
+            QPointF offset = pos - m_pressedPos;
+            m_pressedPos.rx() = offset.x() < 0 ? pos.x() : m_topLeft.x();
 
             m_topLeft.rx() += offset.x();
 
@@ -436,11 +498,19 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             this->update();
         } break;
         case FocusPointF::Position::Rotate: {
-            auto innerPos = this->mapFromItem(m_focusItem, event->pos());
+            auto innerPos = [&] {
+                if (m_focusItem) {
+                    return this->mapFromItem(m_focusItem, event->pos());
+                } else {
+                    return event->pos();
+                }
+            }();
             QVector2D startVect = QVector2D(m_pressedPos - this->center());
             startVect.normalize();
             QVector2D endVect = QVector2D(innerPos - this->center());
             endVect.normalize();
+
+            qDebug() << "m_pressedPos" << m_pressedPos << "innerPos" << innerPos << "event->pos()" << event->pos() << "this->center()" << this->center();
 
             qreal value = QVector2D::dotProduct(startVect, endVect);
             if (value > 1.0) {
@@ -458,8 +528,6 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
             this->setTransformOriginPoint(this->center());
             this->setRotation(this->rotation() + angle);
-
-            m_pressedPos = this->mapFromItem(m_focusItem, event->pos());
         } break;
         default: {
 

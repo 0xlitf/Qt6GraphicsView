@@ -47,7 +47,7 @@ add_library(${PROJECT_NAME} SHARED
 )
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
+target_link_libraries(${PROJECT_NAME} PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Core5Compat
     Qt${QT_VERSION_MAJOR}::OpenGLWidgets
