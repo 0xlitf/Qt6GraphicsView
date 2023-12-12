@@ -22,6 +22,9 @@ public:
 
     class GraphicsItem* adsorbItem() const;
     void setAdsorbItem(class GraphicsItem* newAdsorbItem);
+    void needUpdateGeometry() {
+        this->prepareGeometryChange();
+    }
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;

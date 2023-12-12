@@ -148,19 +148,19 @@ protected:
         m_focusPosition = m_focusItem->point().position();
         if (event->type() == QEvent::GraphicsSceneMousePress) {
             QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
-            qDebug() << "GraphicsSceneMousePress" << mouseEvent->scenePos();
+            // qDebug() << "GraphicsSceneMousePress" << mouseEvent->scenePos();
 
             this->mousePressEvent(mouseEvent);
             return true;
         } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
             QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
-            qDebug() << "GraphicsSceneMouseMove:" << mouseEvent->scenePos();
+            // qDebug() << "GraphicsSceneMouseMove:" << mouseEvent->scenePos();
 
             this->mouseMoveEvent(mouseEvent);
             return true;
         } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
             QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
-            qDebug() << "GraphicsSceneMouseRelease:" << mouseEvent->scenePos();
+            // qDebug() << "GraphicsSceneMouseRelease:" << mouseEvent->scenePos();
 
             this->mouseReleaseEvent(mouseEvent);
             return true;

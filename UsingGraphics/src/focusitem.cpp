@@ -48,7 +48,7 @@ void FocusItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     QPen p = painter->pen();
     painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter->setBrush(fillColor);
-    painter->drawRect(QRectF(m_topLeft, m_bottomRight));
+    painter->drawRect(QRectF(m_topLeft, m_bottomRight) += QMarginsF(1., 1., 1., 1.));
     painter->setPen(p);
 
 }
