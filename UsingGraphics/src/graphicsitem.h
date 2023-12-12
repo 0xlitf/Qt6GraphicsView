@@ -144,8 +144,8 @@ protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
     bool sceneEventFilter(QGraphicsItem* watched, QEvent* event) {
-        auto item = dynamic_cast<FocusItem*>(watched);
-        m_focusPosition = item->point().position();
+        m_focusItem = dynamic_cast<FocusItem*>(watched);
+        m_focusPosition = m_focusItem->point().position();
         if (event->type() == QEvent::GraphicsSceneMousePress) {
             QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
             qDebug() << "GraphicsSceneMousePress" << mouseEvent->scenePos();
@@ -189,6 +189,8 @@ protected:
 
     FocusPointF::Position m_focusPosition{FocusPointF::Position::Undefined};
     QList<FocusItem*> m_focusPointItemList;
+
+    FocusItem* m_focusItem = nullptr;
 
     QPointF m_pressedPos{};
 
