@@ -161,7 +161,7 @@ QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& val
     }
 
     if (true && change == ItemSelectedChange && scene()) {
-        qDebug() << (void*)this << change;
+        // qDebug() << (void*)this << change;
         if (value.toBool()) {
             auto focusPointList = this->recalculateFocusPoint();
             for (int i = 0; i < focusPointList.count(); ++i) {
