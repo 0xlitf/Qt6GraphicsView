@@ -172,21 +172,21 @@ protected:
         if (event->type() == QEvent::GraphicsSceneMousePress) {
             QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
             // qDebug() << "GraphicsSceneMousePress" << mouseEvent->scenePos();
-            mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()));
+            mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()).toPoint());
 
             this->mousePressEvent(mouseEvent);
             return true;
         } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
             QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
             // qDebug() << "GraphicsSceneMouseMove:" << mouseEvent->scenePos();
-            mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()));
+            mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()).toPoint());
 
             this->mouseMoveEvent(mouseEvent);
             return true;
         } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
             QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
             // qDebug() << "GraphicsSceneMouseRelease:" << mouseEvent->scenePos();
-            mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()));
+            mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()).toPoint());
 
             this->mouseReleaseEvent(mouseEvent);
             return true;
