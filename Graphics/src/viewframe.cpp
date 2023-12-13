@@ -23,6 +23,8 @@ ViewFrame::ViewFrame(QWidget* parent)
     m_graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
     m_graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
+    m_graphicsView->setRenderHint(QPainter::Antialiasing, true);
+
     int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
     QSize iconSize(size, size);
 

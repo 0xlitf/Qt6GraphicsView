@@ -20,6 +20,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Core Quick Widgets Xml Core5Compat OpenGLWidgets Gui Svg)
 find_package(Qt${QT_VERSION_MAJOR} 6.6 REQUIRED COMPONENTS Widgets LinguistTools Core Quick Widgets Xml Core5Compat OpenGLWidgets Gui Svg)
 
+add_subdirectory("../../dynamic_effect/Effect" Effect.out)
+
 file(GLOB_RECURSE ${PROJECT_NAME_UPPER}_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/*.h")
 file(GLOB_RECURSE ${PROJECT_NAME_UPPER}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/*")
 file(GLOB ${PROJECT_NAME_UPPER}_UI "${CMAKE_CURRENT_SOURCE_DIR}/ui/*.ui")
@@ -55,6 +57,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     Qt6::Svg
     debug ${QtPropertyBrowser_DIR}/lib/Windows/qtpropertybrowserd.lib
     optimized ${QtPropertyBrowser_DIR}/lib/Windows/qtpropertybrowser.lib
+    Effect::Effect
 )
 
 if (TARGET ${PROJECT_NAME})

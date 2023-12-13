@@ -23,12 +23,30 @@ public:
         return Type;
     }
 
-    GraphicsItem() = default;
-    GraphicsItem(const QColor& color, int x, int y);
+    GraphicsItem(QGraphicsItem *parent = nullptr);
+    GraphicsItem(const QColor& color, int x, int y, QGraphicsItem *parent = nullptr);
 
+    QList<QGraphicsItem*> findItemsAbove(QGraphicsItem* baseItem) {
+        QList<QGraphicsItem*> itemsAbove;
+
+        if (!baseItem || !baseItem->scene())
+            return itemsAbove;
+
+        QGraphicsScene* scene = baseItem->scene();
+        QList<QGraphicsItem*> allItems = scene->items();
+
+        foreach (QGraphicsItem* item, allItems) {
+            if (item != baseItem && item->zValue() > baseItem->zValue() && baseItem->collidesWithItem(item)) {
+                itemsAbove.append(item);
+            }
+        }
+
+        return itemsAbove;
+    }
 
     virtual QList<FocusPointF> recalculateFocusPoint();
 
+    virtual QRectF shapeRect() const;
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
@@ -42,13 +60,13 @@ public:
     bool proportional() const;
     void setProportional(bool newProportional);
 
-    QRectF shapeRect() const;
+    void moveFocusPoint(const FocusPointF::Position& position = FocusPointF::Position::Undefined);
 
-    void moveFocusPoint(const FocusPointF::Position& position);
-
+    QPointF topLeft() const;
     QPointF& topLeft();
     void setTopLeft(QPointF newTopLeft);
 
+    QPointF bottomRight() const;
     QPointF& bottomRight();
     void setBottomRight(QPointF newBottomRight);
 
@@ -65,6 +83,12 @@ public:
     QPointF center() {
         return QPointF{(m_topLeft + m_bottomRight) / 2};
     }
+
+    double initialHeight() const;
+    void setInitialHeight(double newInitialHeight);
+
+    double initialWidth() const;
+    void setInitialWidth(double newInitialWidth);
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
@@ -169,7 +193,7 @@ protected:
         return false;
     }
 
-protected:
+private:
     QTransform m_Transform;
     int m_x;
     int m_y;
