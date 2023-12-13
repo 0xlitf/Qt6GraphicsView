@@ -180,13 +180,13 @@ void GraphicsItemBase::mousePressEvent(QGraphicsSceneMouseEvent* event) {
         case FocusPointF::Position::Left:
         case FocusPointF::Position::Rotate: {
             if (m_focusItem) {
-                m_pressedPos = this->mapFromItem(m_focusItem, event->pos());
+                m_pressedPos = this->mapFromItem(m_focusItem, event->pos()).toPoint();
             } else {
-                m_pressedPos = event->pos();
+                m_pressedPos = event->pos().toPoint();
             }
         } break;
         case FocusPointF::Position::Body: {
-            m_pressedPos = event->pos();
+            m_pressedPos = event->pos().toPoint();
             this->setCursor(Qt::SizeAllCursor);
             this->update();
         } break;
@@ -510,7 +510,7 @@ void GraphicsItemBase::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsItemBase::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
-    m_pressedPos = QPointF{};
+    m_pressedPos = QPoint{};
     QGraphicsItem::mouseReleaseEvent(event);
     update();
 }

@@ -212,7 +212,7 @@ private:
 
     FocusItem* m_focusItem = nullptr;
 
-    QPointF m_pressedPos{};
+    QPoint m_pressedPos{};
 
     class GraphicsScene* m_scene = nullptr;
 };
