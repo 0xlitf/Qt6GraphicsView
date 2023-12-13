@@ -19,6 +19,8 @@ public:
 
     void startTimer();
 
+    QColor getColorAtPos(const QPointF& pos);
+
 protected:
     QTimer* m_timer = new QTimer(this);
 

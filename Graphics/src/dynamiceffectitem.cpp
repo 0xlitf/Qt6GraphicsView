@@ -61,8 +61,15 @@ void DynamicEffectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     }
 }
 
+QColor DynamicEffectItem::getColorAtPos(const QPointF& pos) {
+    int i = (pos.x() - this->topLeft().x()) / (this->topLeft().x() - this->bottomRight().x());
+    int j = (pos.y() - this->topLeft().y()) / (this->topLeft().y() - this->bottomRight().y());
+
+    return QColor(m_frame(i, j, 0), m_frame(i, j, 1), m_frame(i, j, 2));
+}
+
 void DynamicEffectItem::startTimer() {
-    m_timer->setInterval(1000 / m_bps);
+    m_timer->setInterval(1000 / 1);
     // m_timer->setSingleShot(true);
     connect(m_timer, &QTimer::timeout, [&]() {
         m_frame = m_colorScrolling->getNextFrame();
@@ -70,10 +77,14 @@ void DynamicEffectItem::startTimer() {
         QList<QGraphicsItem*> itemsAboveEllipse = findItemsAbove(this);
 
         // qDebug() << "Items above ellipseItem:" << itemsAboveEllipse.count();
-        // foreach (QGraphicsItem *item, itemsAboveEllipse)
-        // {
-        //     qDebug() << item;
-        // }
+        foreach (QGraphicsItem* graphicsItem, itemsAboveEllipse) {
+            auto item = dynamic_cast<GraphicsItem*>(graphicsItem);
+            auto shadowPos = this->mapFromScene(item->scenePos());
+            qDebug() << item << shadowPos;
+
+            QColor color = this->getColorAtPos(shadowPos);
+            item->setColor(color);
+        }
 
         this->update();
     });
