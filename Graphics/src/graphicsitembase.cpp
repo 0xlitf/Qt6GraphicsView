@@ -18,16 +18,8 @@ template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 
-GraphicsItem::GraphicsItem(QGraphicsItem* parent): QGraphicsObject(parent) {
-
-}
-
-GraphicsItem::GraphicsItem(const QColor& color, int x, int y, QGraphicsItem* parent)
+GraphicsItemBase::GraphicsItemBase(QGraphicsItem* parent)
     : QGraphicsObject(parent) {
-    m_x = x;
-    m_y = y;
-    m_color = color;
-    setZValue((x + y) % 2);
 
     this->setFlag(QGraphicsItem::ItemIsFocusable);
     this->setFlag(QGraphicsItem::ItemIsSelectable);
@@ -38,15 +30,15 @@ GraphicsItem::GraphicsItem(const QColor& color, int x, int y, QGraphicsItem* par
     // this->recalculateFocusPoint();
 }
 
-QRectF GraphicsItem::boundingRect() const {
+QRectF GraphicsItemBase::boundingRect() const {
     return QRectF(m_topLeft, m_bottomRight) + QMarginsF(30., 30., 30., 30.);
 }
 
-QRectF GraphicsItem::shapeRect() const {
+QRectF GraphicsItemBase::shapeRect() const {
     return QRectF(m_topLeft, m_bottomRight) + QMarginsF(2., 2., 2., 2.);
 }
 
-QPainterPath GraphicsItem::shape() const {
+QPainterPath GraphicsItemBase::shape() const {
     QPainterPath path;
     path.addRect(this->shapeRect());
 
@@ -56,37 +48,8 @@ QPainterPath GraphicsItem::shape() const {
     return path;
 }
 
-void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
+void GraphicsItemBase::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
     Q_UNUSED(widget);
-
-    QColor borderColor = m_color;
-    QColor fillColor = m_color;
-
-    if (option->state & QStyle::State_MouseOver) {
-        fillColor = fillColor.lighter(125);
-        borderColor = Qt::black;
-    }
-
-    if (option->state & QStyle::State_Selected) {
-        fillColor = fillColor.darker(150);
-        borderColor = Qt::green;
-    }
-
-    QPen p = painter->pen();
-    painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    painter->setBrush(fillColor);
-    painter->drawEllipse(QRectF(m_topLeft.x(), m_topLeft.y(), QPointF(m_bottomRight - m_topLeft).x(), QPointF(m_bottomRight - m_topLeft).y()));
-    painter->setPen(p);
-
-    painter->setPen(QPen(Qt::white, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    QFont f = painter->font();
-    f.setPixelSize(qMin(this->shapeRect().width(), this->shapeRect().height()) / 4);
-    painter->setFont(f);
-
-    QBrush b = painter->brush();
-    painter->setBrush(fillColor);
-    painter->drawText(this->shapeRect(), Qt::AlignCenter, m_centerText);
-    painter->setBrush(b);
 
     m_scale = option->levelOfDetailFromTransform(painter->worldTransform());
 
@@ -96,7 +59,7 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 
         for (int i = 0; i < focusPointList.count(); ++i) {
             QPen p = painter->pen();
-            painter->setPen(QPen(borderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            painter->setPen(QPen(Qt::gray, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
             painter->setBrush(Qt::green);
             painter->drawRect(QRectF(focusPointList[i].x() - 2., focusPointList[i].y() - 2., 4., 4.));
             painter->setPen(p);
@@ -104,7 +67,7 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     }
 }
 
-QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value) {
+QVariant GraphicsItemBase::itemChange(GraphicsItemChange change, const QVariant& value) {
     // qDebug() << "itemChange" << change;
     if (change == QGraphicsItem::ItemPositionChange) {
         // QPointF newPos = value.toPointF();
@@ -146,7 +109,7 @@ QVariant GraphicsItem::itemChange(GraphicsItemChange change, const QVariant& val
     return QGraphicsItem::itemChange(change, value);
 }
 
-void GraphicsItem::moveFocusPoint(const FocusPointF::Position& position) {
+void GraphicsItemBase::moveFocusPoint(const FocusPointF::Position& position) {
     auto focusPointList = this->recalculateFocusPoint();
     if (!focusPointList.isEmpty()) {
         for (int i = 0; i < focusPointList.count() && i < m_focusPointItemList.count(); ++i) {
@@ -198,7 +161,7 @@ void GraphicsItem::moveFocusPoint(const FocusPointF::Position& position) {
     }
 }
 
-void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+void GraphicsItemBase::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     if (this->group()) {
         return;
     }
@@ -235,7 +198,7 @@ void GraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     QGraphicsItem::mousePressEvent(event);
 }
 
-void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+void GraphicsItemBase::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
     auto proportionalScale = this->proportionalScale();
 
     this->prepareGeometryChange();
@@ -546,13 +509,13 @@ void GraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
     QGraphicsItem::mouseMoveEvent(event);
 }
 
-void GraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+void GraphicsItemBase::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
     m_pressedPos = QPointF{};
     QGraphicsItem::mouseReleaseEvent(event);
     update();
 }
 
-void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
+void GraphicsItemBase::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
     this->setSelected(true);
 
     m_scene = dynamic_cast<GraphicsScene*>(this->scene());
@@ -603,67 +566,67 @@ void GraphicsItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
     } else if (selectedAction == alignVLineAction) {
         m_scene->alignItems(m_scene->selectedItems(), GraphicsScene::AlignVLine);
     } else {
-        qDebug() << "GraphicsItem selectedAction not match";
+        qDebug() << "GraphicsItemBase selectedAction not match";
     }
 }
 
-double GraphicsItem::initialWidth() const {
+double GraphicsItemBase::initialWidth() const {
     return m_initialWidth;
 }
 
-void GraphicsItem::setInitialWidth(double newInitialWidth) {
+void GraphicsItemBase::setInitialWidth(double newInitialWidth) {
     m_initialWidth = newInitialWidth;
 }
 
-double GraphicsItem::initialHeight() const {
+double GraphicsItemBase::initialHeight() const {
     return m_initialHeight;
 }
 
-void GraphicsItem::setInitialHeight(double newInitialHeight) {
+void GraphicsItemBase::setInitialHeight(double newInitialHeight) {
     m_initialHeight = newInitialHeight;
 }
 
-bool GraphicsItem::isProportional() const {
+bool GraphicsItemBase::isProportional() const {
     return m_isProportional;
 }
 
-void GraphicsItem::setIsProportional(bool newIsProportional) {
+void GraphicsItemBase::setIsProportional(bool newIsProportional) {
     m_isProportional = newIsProportional;
 }
 
-FocusPointF::Position GraphicsItem::focusPosition() const {
+FocusPointF::Position GraphicsItemBase::focusPosition() const {
     return m_focusPosition;
 }
 
-void GraphicsItem::setFocusPosition(FocusPointF::Position newFocusPosition) {
+void GraphicsItemBase::setFocusPosition(FocusPointF::Position newFocusPosition) {
     m_focusPosition = newFocusPosition;
 }
 
-QPointF GraphicsItem::topLeft() const {
+QPointF GraphicsItemBase::topLeft() const {
     return m_topLeft;
 }
 
-QPointF& GraphicsItem::topLeft() {
+QPointF& GraphicsItemBase::topLeft() {
     return m_topLeft;
 }
 
-void GraphicsItem::setTopLeft(QPointF newTopLeft) {
+void GraphicsItemBase::setTopLeft(QPointF newTopLeft) {
     m_topLeft = newTopLeft;
 }
 
-QPointF GraphicsItem::bottomRight() const {
+QPointF GraphicsItemBase::bottomRight() const {
     return m_bottomRight;
 }
 
-QPointF& GraphicsItem::bottomRight() {
+QPointF& GraphicsItemBase::bottomRight() {
     return m_bottomRight;
 }
 
-void GraphicsItem::setBottomRight(QPointF newBottomRight) {
+void GraphicsItemBase::setBottomRight(QPointF newBottomRight) {
     m_bottomRight = newBottomRight;
 }
 
-QList<FocusPointF> GraphicsItem::recalculateFocusPoint() {
+QList<FocusPointF> GraphicsItemBase::recalculateFocusPoint() {
     QList<FocusPointF> focusPointList;
     focusPointList.append(FocusPointF{m_topLeft.x(), m_topLeft.y(), FocusPointF::Position::TopLeft});
     focusPointList.append(FocusPointF{m_bottomRight.x(), m_topLeft.y(), FocusPointF::Position::TopRight});
@@ -686,18 +649,18 @@ QList<FocusPointF> GraphicsItem::recalculateFocusPoint() {
     return focusPointList;
 }
 
-bool GraphicsItem::proportional() const {
+bool GraphicsItemBase::proportional() const {
     return m_isProportional;
 }
 
-void GraphicsItem::setProportional(bool newProportional) {
+void GraphicsItemBase::setProportional(bool newProportional) {
     m_isProportional = newProportional;
 }
 
-QString GraphicsItem::centerText() const {
+QString GraphicsItemBase::centerText() const {
     return m_centerText;
 }
 
-void GraphicsItem::setCenterText(const QString& newCenterText) {
+void GraphicsItemBase::setCenterText(const QString& newCenterText) {
     m_centerText = newCenterText;
 }

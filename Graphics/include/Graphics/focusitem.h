@@ -22,8 +22,8 @@ public:
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
-    class GraphicsItem* adsorbItem() const;
-    void setAdsorbItem(class GraphicsItem* newAdsorbItem);
+    class GraphicsItemBase* adsorbItem() const;
+    void setAdsorbItem(class GraphicsItemBase* newAdsorbItem);
     void needUpdateGeometry() {
         this->prepareGeometryChange();
     }
@@ -55,7 +55,7 @@ private:
     QPointF m_topLeft{-2, -2};
     QPointF m_bottomRight{2, 2};
 
-    class GraphicsItem* m_adsorbItem = nullptr;
+    class GraphicsItemBase* m_adsorbItem = nullptr;
 
     QPointF m_pressedPos{};
 };

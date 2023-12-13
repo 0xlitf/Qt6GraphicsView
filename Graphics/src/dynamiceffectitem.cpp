@@ -69,8 +69,7 @@ void DynamicEffectItem::startTimer() {
 
         QList<QGraphicsItem*> itemsAboveEllipse = findItemsAbove(this);
 
-        // 打印结果
-        qDebug() << "Items above ellipseItem:" << itemsAboveEllipse.count();
+        // qDebug() << "Items above ellipseItem:" << itemsAboveEllipse.count();
         // foreach (QGraphicsItem *item, itemsAboveEllipse)
         // {
         //     qDebug() << item;

@@ -12,7 +12,7 @@
 #include "focuspoint.h"
 #include "graphics_global.h"
 
-class GRAPHICS_EXPORT GraphicsItem : public QGraphicsObject
+class GRAPHICS_EXPORT GraphicsItemBase : public QGraphicsObject
 {
     Q_OBJECT
 public:
@@ -23,8 +23,7 @@ public:
         return Type;
     }
 
-    GraphicsItem(QGraphicsItem *parent = nullptr);
-    GraphicsItem(const QColor& color, int x, int y, QGraphicsItem *parent = nullptr);
+    GraphicsItemBase(QGraphicsItem *parent = nullptr);
 
     QList<QGraphicsItem*> findItemsAbove(QGraphicsItem* baseItem) {
         QList<QGraphicsItem*> itemsAbove;
@@ -92,13 +91,13 @@ public:
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
-        // qDebug() << "GraphicsItem::hoverEnterEvent";
+        // qDebug() << "GraphicsItemBase::hoverEnterEvent";
 
         QGraphicsItem::hoverEnterEvent(event);
     }
 
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) {
-        // qDebug() << "GraphicsItem::hoverMoveEvent";
+        // qDebug() << "GraphicsItemBase::hoverMoveEvent";
         // hoverMoveEvent中区分this->isSelected()将导致pressed后无法直接拖动
         // if (!this->isSelected()) {
         //     // m_hoverPoint.setPosition(FocusPoint::Position::Center);
@@ -130,7 +129,7 @@ protected:
                 }
                 return false;
             }()) {
-            // qDebug() << "GraphicsItem::hoverMoveEvent atCorner";
+            // qDebug() << "GraphicsItemBase::hoverMoveEvent atCorner";
         } else {
             auto parentRect = QRectF(m_topLeft, m_bottomRight);
             if (parentRect.contains(mousePos)) {
@@ -150,14 +149,14 @@ protected:
 
     void keyPressEvent(QKeyEvent *event) override {
         event->accept();
-        // qDebug() << "GraphicsItem keyPressEvent: " << Qt::Key(event->key());
+        // qDebug() << "GraphicsItemBase keyPressEvent: " << Qt::Key(event->key());
 
         // QGraphicsItem::keyPressEvent(event);
     }
 
     void keyReleaseEvent(QKeyEvent *event) override {
         event->accept();
-        // qDebug() << "GraphicsItem keyReleaseEvent: " << Qt::Key(event->key());
+        // qDebug() << "GraphicsItemBase keyReleaseEvent: " << Qt::Key(event->key());
 
         // QGraphicsItem::keyReleaseEvent(event);
     }
@@ -195,8 +194,7 @@ protected:
 
 private:
     QTransform m_Transform;
-    int m_x;
-    int m_y;
+
     double m_initialHeight = 80;
     double m_initialWidth = 120;
     bool m_isProportional = false;
@@ -206,8 +204,6 @@ private:
 
     QPointF m_topLeft{-m_initialWidth/2, -m_initialHeight/2};
     QPointF m_bottomRight{m_initialWidth/2, m_initialHeight/2};
-
-    QColor m_color;
 
     qreal m_scale;
 

@@ -316,10 +316,10 @@ void FocusItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
     QGraphicsItem::mouseReleaseEvent(event);
 }
 
-GraphicsItem* FocusItem::adsorbItem() const {
+GraphicsItemBase* FocusItem::adsorbItem() const {
     return m_adsorbItem;
 }
 
-void FocusItem::setAdsorbItem(GraphicsItem* newAdsorbItem) {
+void FocusItem::setAdsorbItem(GraphicsItemBase* newAdsorbItem) {
     m_adsorbItem = newAdsorbItem;
 }
