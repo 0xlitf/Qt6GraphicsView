@@ -1,15 +1,14 @@
 #pragma once
 
 #include "focuspoint.h"
+#include "graphics_global.h"
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 #include <QWidget>
-#include "graphics_global.h"
 
-class GRAPHICS_EXPORT FocusItem : public QGraphicsItem
-{
+class GRAPHICS_EXPORT FocusItem : public QGraphicsItem {
 public:
     FocusItem();
     FocusItem(FocusPointF point, QGraphicsItem* parent = nullptr);
@@ -28,27 +27,16 @@ public:
         this->prepareGeometryChange();
     }
 
+    inline void setPos(const QPointF& pos) {
+        this->prepareGeometryChange();
+        QGraphicsItem::setPos(pos);
+    }
+    inline void setPos(qreal x, qreal y) {
+        this->prepareGeometryChange();
+        QGraphicsItem::setPos(x, y);
+    }
+
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
-    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
-    void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
-        // qDebug() << "FocusItem::hoverEnterEvent";
-        this->setCursor(m_focusPoint.cursor());
-        QGraphicsItem::hoverEnterEvent(event);
-    }
-
-    void hoverMoveEvent(QGraphicsSceneHoverEvent* event) {
-        // qDebug() << "FocusItem::hoverMoveEvent";
-        this->setCursor(m_focusPoint.cursor());
-        QGraphicsItem::hoverMoveEvent(event);
-    }
-
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override {
-        unsetCursor();
-        QGraphicsItem::hoverLeaveEvent(event);
-    }
-
 private:
     FocusPointF m_focusPoint;
 
