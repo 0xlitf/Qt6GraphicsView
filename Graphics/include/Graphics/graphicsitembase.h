@@ -181,7 +181,13 @@ protected:
         } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
             QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
             // qDebug() << "GraphicsSceneMouseMove:" << mouseEvent->scenePos();
-            mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()).toPoint());
+            // qDebug() << "this->scene()->selectedItems().count():" << this->scene()->selectedItems().count();
+            if (this->scene()->selectedItems().count() > 1) {
+                m_focusPosition = FocusPointF::Position::Body;
+                mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()).toPoint());
+            } else {
+                mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()).toPoint());
+            }
 
             this->mouseMoveEvent(mouseEvent);
             return true;

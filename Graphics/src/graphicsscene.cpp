@@ -49,8 +49,9 @@ QVariant GraphicsScene::itemChange(GraphicsItem* item, QGraphicsItem::GraphicsIt
             newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
             newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
 
-            if (item != m_currentItem)
+            if (item != m_currentItem) {
                 return QPointF();
+            }
 
             doubleManager->setValue(idToProperty[QLatin1String("xpos")], item->x());
             doubleManager->setValue(idToProperty[QLatin1String("ypos")], item->y());
