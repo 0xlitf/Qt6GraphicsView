@@ -22,19 +22,19 @@ protected:
 
 protected:
     void enterEvent(QEnterEvent *event) override {
-        qDebug() << "GraphicsView::enterEvent";
+        // qDebug() << "GraphicsView::enterEvent";
 
         QGraphicsView::enterEvent(event);
     }
 
     void moveEvent(QMoveEvent *event) override {
-        qDebug() << "GraphicsView::moveEvent";
+        // qDebug() << "GraphicsView::moveEvent";
 
         QGraphicsView::moveEvent(event);
     }
 
     void leaveEvent(QEvent *event) override {
-        qDebug() << "GraphicsView::leaveEvent";
+        // qDebug() << "GraphicsView::leaveEvent";
         unsetCursor();
         QGraphicsView::leaveEvent(event);
     }

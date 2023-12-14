@@ -303,7 +303,7 @@ void GraphicsItemBase::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         } break;
         case FocusPointF::Position::BottomRight: {
             if (m_isProportional) {
-                auto now = this->mapFromItem(m_focusItem, event->pos());
+                auto now = event->pos();
 
                 double x = (now - m_topLeft).x();
                 double y = (now - m_topLeft).y();

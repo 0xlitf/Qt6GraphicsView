@@ -406,11 +406,13 @@ void GraphicsScene::valueChanged(QtProperty* property, double value) {
 }
 
 void GraphicsScene::valueChanged(QtProperty* property, int value) {
-    if (!propertyToId.contains(property))
+    if (!propertyToId.contains(property)) {
         return;
+    }
 
-    if (!m_currentItem)
+    if (!m_currentItem) {
         return;
+    }
 
     QString id = propertyToId[property];
     if (id == QLatin1String("zpos")) {

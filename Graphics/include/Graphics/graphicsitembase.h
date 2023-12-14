@@ -93,7 +93,7 @@ public:
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
-        qDebug() << "GraphicsItemBase::hoverEnterEvent";
+        // qDebug() << "GraphicsItemBase::hoverEnterEvent";
 
         QGraphicsItem::hoverEnterEvent(event);
     }
@@ -172,14 +172,14 @@ protected:
         m_focusItem = dynamic_cast<FocusItem*>(watched);
         m_focusPosition = m_focusItem->point().position();
         if (event->type() == QEvent::GraphicsSceneMousePress) {
-            QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            auto mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
             // qDebug() << "GraphicsSceneMousePress" << mouseEvent->scenePos();
             mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()).toPoint());
 
             this->mousePressEvent(mouseEvent);
             return true;
         } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
-            QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            auto mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
             // qDebug() << "GraphicsSceneMouseMove:" << mouseEvent->scenePos();
             // qDebug() << "this->scene()->selectedItems().count():" << this->scene()->selectedItems().count();
             if (this->scene()->selectedItems().count() > 1) {
@@ -192,11 +192,32 @@ protected:
             this->mouseMoveEvent(mouseEvent);
             return true;
         } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
-            QGraphicsSceneMouseEvent* mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            auto mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
             // qDebug() << "GraphicsSceneMouseRelease:" << mouseEvent->scenePos();
             mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()).toPoint());
 
             this->mouseReleaseEvent(mouseEvent);
+            return true;
+        } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
+            auto mouseEvent = static_cast<QGraphicsSceneHoverEvent*>(event);
+            // qDebug() << "GraphicsSceneHoverEnter" << mouseEvent->scenePos();
+            mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()).toPoint());
+
+            this->hoverEnterEvent(mouseEvent);
+            return true;
+        } else if (event->type() == QEvent::GraphicsSceneHoverMove) {
+            auto mouseEvent = static_cast<QGraphicsSceneHoverEvent*>(event);
+            // qDebug() << "GraphicsSceneHoverMove" << mouseEvent->scenePos();
+            mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()).toPoint());
+
+            this->hoverMoveEvent(mouseEvent);
+            return true;
+        } else if (event->type() == QEvent::GraphicsSceneHoverLeave) {
+            auto mouseEvent = static_cast<QGraphicsSceneHoverEvent*>(event);
+            // qDebug() << "GraphicsSceneHoverLeave" << mouseEvent->scenePos();
+            mouseEvent->setPos(this->mapFromScene(mouseEvent->scenePos()).toPoint());
+
+            this->hoverLeaveEvent(mouseEvent);
             return true;
         }
 
@@ -208,7 +229,7 @@ private:
 
     double m_initialHeight = 80;
     double m_initialWidth = 120;
-    bool m_isProportional = false;
+    bool m_isProportional = true;
     bool m_isRotatable = true;
 
     QString m_centerText;
