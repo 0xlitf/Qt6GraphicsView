@@ -10,6 +10,13 @@
 
 class GRAPHICS_EXPORT FocusItem : public QGraphicsItem {
 public:
+    enum {
+        Type = UserType + 4
+    };
+    int type() const override {
+        return Type;
+    }
+
     FocusItem();
     FocusItem(FocusPointF point, QGraphicsItem* parent = nullptr);
 

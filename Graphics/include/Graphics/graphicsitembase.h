@@ -25,7 +25,7 @@ public:
 
     GraphicsItemBase(QGraphicsItem *parent = nullptr);
 
-    QList<QGraphicsItem*> findItemsAbove(QGraphicsItem* baseItem) {
+    QList<QGraphicsItem*> findItemsAbove(QGraphicsItem* baseItem, int type = QGraphicsItem::UserType + 2) {
         QList<QGraphicsItem*> itemsAbove;
 
         if (!baseItem || !baseItem->scene())
@@ -34,8 +34,8 @@ public:
         QGraphicsScene* scene = baseItem->scene();
         QList<QGraphicsItem*> allItems = scene->items();
 
-        foreach (QGraphicsItem* item, allItems) {
-            if (item != baseItem && item->zValue() > baseItem->zValue() && baseItem->collidesWithItem(item)) {
+        for (QGraphicsItem* item: allItems) {
+            if (item != baseItem && item->zValue() > baseItem->zValue() && baseItem->shape().contains(baseItem->mapFromScene(item->pos())) && type == QGraphicsItem::UserType + 2) {
                 itemsAbove.append(item);
             }
         }

@@ -18,7 +18,7 @@ class GRAPHICS_EXPORT GraphicsItem : public GraphicsItemBase
     Q_OBJECT
 public:
     enum {
-        Type = UserType + 3
+        Type = UserType + 2
     };
     int type() const override {
         return Type;

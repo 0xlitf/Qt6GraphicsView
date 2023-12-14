@@ -9,6 +9,13 @@
 class GRAPHICS_EXPORT DynamicEffectItem : public GraphicsItem
 {
 public:
+    enum {
+        Type = UserType + 3
+    };
+    int type() const override {
+        return Type;
+    }
+
     DynamicEffectItem();
 
     QRectF shapeRect() const;

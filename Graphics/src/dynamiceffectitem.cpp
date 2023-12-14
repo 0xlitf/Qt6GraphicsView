@@ -62,29 +62,37 @@ void DynamicEffectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
 }
 
 QColor DynamicEffectItem::getColorAtPos(const QPointF& pos) {
-    int i = (pos.x() - this->topLeft().x()) / (this->topLeft().x() - this->bottomRight().x());
-    int j = (pos.y() - this->topLeft().y()) / (this->topLeft().y() - this->bottomRight().y());
+    Eigen::array<Eigen::Index, 3> dims = m_frame.dimensions();
+    double i = (pos.x() - this->topLeft().x()) / (this->bottomRight().x() - this->topLeft().x()) * dims[0];
+    double j = (pos.y() - this->topLeft().y()) / (this->bottomRight().y() - this->topLeft().y()) * dims[1];
 
-    return QColor(m_frame(i, j, 0), m_frame(i, j, 1), m_frame(i, j, 2));
+    //qDebug() << (int)i << (int)j;
+
+    return QColor(m_frame((int)i, (int)j, 0), m_frame((int)i, (int)j, 1), m_frame((int)i, (int)j, 2));
 }
 
 void DynamicEffectItem::startTimer() {
-    m_timer->setInterval(1000 / 1);
+    m_timer->setInterval(1000 / m_bps);
     // m_timer->setSingleShot(true);
     connect(m_timer, &QTimer::timeout, [&]() {
         m_frame = m_colorScrolling->getNextFrame();
 
         QList<QGraphicsItem*> itemsAboveEllipse = findItemsAbove(this);
 
-        // qDebug() << "Items above ellipseItem:" << itemsAboveEllipse.count();
-        foreach (QGraphicsItem* graphicsItem, itemsAboveEllipse) {
+        int i = 0;
+        for (QGraphicsItem* graphicsItem: itemsAboveEllipse) {
             auto item = dynamic_cast<GraphicsItem*>(graphicsItem);
-            auto shadowPos = this->mapFromScene(item->scenePos());
-            qDebug() << item << shadowPos;
+            if (item && item->type() == QGraphicsItem::UserType + 2) {
+                auto shadowPos = this->mapFromScene(item->pos());
+                //qDebug() << item << shadowPos;
 
-            QColor color = this->getColorAtPos(shadowPos);
-            item->setColor(color);
+                QColor color = this->getColorAtPos(shadowPos);
+                item->setColor(color);
+
+                ++i;
+            }
         }
+        qDebug() << "Items above ellipseItem:" << itemsAboveEllipse.count() << "truly items count:" << i;
 
         this->update();
     });
