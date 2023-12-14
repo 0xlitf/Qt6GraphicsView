@@ -335,6 +335,7 @@ void GraphicsScene::keyReleaseEvent(QKeyEvent* event) {
 }
 
 void GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+    qDebug() << "GraphicsScene::mousePressEvent";
     QPointF scenePos = event->scenePos();
     QGraphicsItem* item = this->itemAt(scenePos, QTransform());
 
@@ -381,6 +382,7 @@ void GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+    qDebug() << "GraphicsScene::mouseReleaseEvent";
     m_movingItem = nullptr;
 
     QGraphicsScene::mouseReleaseEvent(event);

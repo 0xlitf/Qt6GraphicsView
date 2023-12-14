@@ -89,9 +89,11 @@ public:
     double initialWidth() const;
     void setInitialWidth(double newInitialWidth);
 
+    void updateTopLeftAndBottomRight();
+
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
-        // qDebug() << "GraphicsItemBase::hoverEnterEvent";
+        qDebug() << "GraphicsItemBase::hoverEnterEvent";
 
         QGraphicsItem::hoverEnterEvent(event);
     }

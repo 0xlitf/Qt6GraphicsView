@@ -21,11 +21,35 @@ protected:
 #endif
 
 protected:
+    void enterEvent(QEnterEvent *event) override {
+        qDebug() << "GraphicsView::enterEvent";
+
+        QGraphicsView::enterEvent(event);
+    }
+
+    void moveEvent(QMoveEvent *event) override {
+        qDebug() << "GraphicsView::moveEvent";
+
+        QGraphicsView::moveEvent(event);
+    }
+
+    void leaveEvent(QEvent *event) override {
+        qDebug() << "GraphicsView::leaveEvent";
+        unsetCursor();
+        QGraphicsView::leaveEvent(event);
+    }
+
     void mousePressEvent(QMouseEvent *event) override {
+        qDebug() << "GraphicsView::mousePressEvent" << event->buttons() << this->cursor();
         m_pressPoint = event->pos();
 
-        if (event->button() == Qt::RightButton) {
+        if (event->buttons() == Qt::LeftButton) {
+            QGraphicsView::mousePressEvent(event);
+        } else if (event->button() == Qt::RightButton) {
+            this->unsetCursor();
             lastPos = event->pos();
+
+            event->accept();
         } else {
             QGraphicsView::mousePressEvent(event);
         }
@@ -34,14 +58,14 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override {
         QPointF point = event->pos() - m_pressPoint;
 
-        if (point.manhattanLength() > 1) {
-            if (event->buttons() == Qt::LeftButton) {
-                this->setCursor(Qt::SizeAllCursor);
-            } else if (event->buttons() == Qt::RightButton) {
-                this->setCursor(Qt::ClosedHandCursor);
-            }
+        // if (point.manhattanLength() > 1) {
+        //     if (event->buttons() == Qt::LeftButton) {
+        //         this->setCursor(Qt::SizeAllCursor);
+        //     } else if (event->buttons() == Qt::RightButton) {
+        //         this->setCursor(Qt::ClosedHandCursor);
+        //     }
 
-        }
+        // }
 
         if (event->buttons() == Qt::LeftButton) {
 
@@ -51,22 +75,40 @@ protected:
             verticalScrollBar()->setValue(verticalScrollBar()->value() - delta.y());
             lastPos = event->pos();
 
-            m_sceneMovedByRightButton = true;
-        } else {
-            this->setCursor(Qt::ArrowCursor);
+            if (point.manhattanLength() > 1) {
+                m_sceneMovedByRightButton = true;
+
+                this->setCursor(Qt::ClosedHandCursor);
+                this->viewport()->setCursor(Qt::ClosedHandCursor);
+            }
+            qDebug() << "GraphicsView::mouseMoveEvent" << event->buttons() << point.manhattanLength() << this->cursor();
+
+            event->accept();
+            this->update();
         }
 
         QGraphicsView::mouseMoveEvent(event);
     }
 
     void mouseReleaseEvent(QMouseEvent* event) override {
+        qDebug() << "GraphicsView::mouseReleaseEvent" << m_sceneMovedByRightButton ;
         this->setCursor(Qt::ArrowCursor);
+        this->viewport()->setCursor(Qt::ArrowCursor);
 
+        if (m_sceneMovedByRightButton) {
+            event->accept();
+        } else {
+            QGraphicsView::mouseReleaseEvent(event);
+        }
+    }
+
+    void contextMenuEvent(QContextMenuEvent *event) {
+        qDebug() << "GraphicsView::contextMenuEvent" << m_sceneMovedByRightButton ;
         if (m_sceneMovedByRightButton) {
             event->accept();
             m_sceneMovedByRightButton = false;
         } else {
-            QGraphicsView::mouseReleaseEvent(event);
+            QGraphicsView::contextMenuEvent(event);
         }
     }
 

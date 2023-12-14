@@ -27,7 +27,6 @@ GraphicsItemBase::GraphicsItemBase(QGraphicsItem* parent)
 
     this->setAcceptHoverEvents(true);
 
-    // this->recalculateFocusPoint();
 }
 
 QRectF GraphicsItemBase::boundingRect() const {
@@ -162,6 +161,7 @@ void GraphicsItemBase::moveFocusPoint(const FocusPointF::Position& position) {
 }
 
 void GraphicsItemBase::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+    qDebug() << "GraphicsItemBase::mousePressEvent";
     if (this->group()) {
         return;
     }
@@ -452,12 +452,14 @@ void GraphicsItemBase::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsItemBase::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+    qDebug() << "GraphicsItemBase::mouseReleaseEvent";
     m_pressedPos = QPoint{};
     QGraphicsItem::mouseReleaseEvent(event);
     update();
 }
 
 void GraphicsItemBase::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
+    qDebug() << "GraphicsItemBase::contextMenuEvent";
     this->setSelected(true);
 
     m_scene = dynamic_cast<GraphicsScene*>(this->scene());
@@ -512,12 +514,18 @@ void GraphicsItemBase::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
     }
 }
 
+void GraphicsItemBase::updateTopLeftAndBottomRight() {
+    m_topLeft = QPointF{-this->initialWidth()/2, -this->initialHeight()/2};
+    m_bottomRight = QPointF{this->initialWidth()/2, this->initialHeight()/2};
+}
+
 double GraphicsItemBase::initialWidth() const {
     return m_initialWidth;
 }
 
 void GraphicsItemBase::setInitialWidth(double newInitialWidth) {
     m_initialWidth = newInitialWidth;
+    this->updateTopLeftAndBottomRight();
 }
 
 double GraphicsItemBase::initialHeight() const {
@@ -526,6 +534,7 @@ double GraphicsItemBase::initialHeight() const {
 
 void GraphicsItemBase::setInitialHeight(double newInitialHeight) {
     m_initialHeight = newInitialHeight;
+    this->updateTopLeftAndBottomRight();
 }
 
 bool GraphicsItemBase::isProportional() const {

@@ -21,6 +21,8 @@ template <typename T> int sgn(T val) {
 GraphicsItem::GraphicsItem(QGraphicsItem* parent)
     : GraphicsItemBase(parent) {
 
+    this->setInitialWidth(80);
+    this->setInitialHeight(80);
 }
 
 QRectF GraphicsItem::shapeRect() const {
@@ -63,9 +65,9 @@ void GraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     painter->drawEllipse(QRectF(this->topLeft().x(), this->topLeft().y(), QPointF(this->bottomRight() - this->topLeft()).x(), QPointF(this->bottomRight() - this->topLeft()).y()));
     painter->setPen(p);
 
-    painter->setPen(QPen(Qt::white, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     QFont f = painter->font();
-    f.setPixelSize(qMin(this->shapeRect().width(), this->shapeRect().height()) / 4);
+    f.setPixelSize(qMin(this->shapeRect().width(), this->shapeRect().height()) / 3);
     painter->setFont(f);
 
     QBrush b = painter->brush();

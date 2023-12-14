@@ -11,8 +11,8 @@ DynamicEffectItem::DynamicEffectItem()
 
     this->startTimer();
 
-    this->setInitialWidth(500);
-    this->setInitialHeight(500);
+    this->setInitialWidth(600);
+    this->setInitialHeight(600);
 
     this->setTopLeft({-this->initialWidth() / 2, -this->initialHeight() / 2});
     this->setBottomRight({this->initialWidth() / 2, this->initialHeight() / 2});
@@ -88,11 +88,11 @@ void DynamicEffectItem::startTimer() {
 
                 QColor color = this->getColorAtPos(shadowPos);
                 item->setColor(color);
-
+                item->update();
                 ++i;
             }
         }
-        qDebug() << "Items above ellipseItem:" << itemsAboveEllipse.count() << "truly items count:" << i;
+        //qDebug() << "Items above ellipseItem:" << itemsAboveEllipse.count() << "truly items count:" << i;
 
         this->update();
     });
