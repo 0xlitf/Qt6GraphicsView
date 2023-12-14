@@ -125,31 +125,31 @@ void GraphicsItemBase::moveFocusPoint(const FocusPointF::Position& position) {
                     rectItem->setPos(this->mapToScene(m_topLeft.x(), m_topLeft.y()));
                 } break;
                 case FocusPointF::Position::Top: {
-                    rectItem->setPos(this->mapToScene(this->center().x(), m_topLeft.y()));
+                    rectItem->setPos(this->mapToScene(this->centerPos().x(), m_topLeft.y()));
                 } break;
                 case FocusPointF::Position::TopRight: {
                     rectItem->setPos(this->mapToScene(m_bottomRight.x(), m_topLeft.y()));
                 } break;
                 case FocusPointF::Position::Right: {
-                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), this->center().y()));
+                    rectItem->setPos(this->mapToScene(m_bottomRight.x(), this->centerPos().y()));
                 } break;
                 case FocusPointF::Position::BottomRight: {
                     rectItem->setPos(this->mapToScene(m_bottomRight.x(), m_bottomRight.y()));
                 } break;
                 case FocusPointF::Position::Bottom: {
-                    rectItem->setPos(this->mapToScene(this->center().x(), m_bottomRight.y()));
+                    rectItem->setPos(this->mapToScene(this->centerPos().x(), m_bottomRight.y()));
                 } break;
                 case FocusPointF::Position::BottomLeft: {
                     rectItem->setPos(this->mapToScene(m_topLeft.x(), m_bottomRight.y()));
                 } break;
                 case FocusPointF::Position::Left: {
-                    rectItem->setPos(this->mapToScene(m_topLeft.x(), this->center().y()));
+                    rectItem->setPos(this->mapToScene(m_topLeft.x(), this->centerPos().y()));
                 } break;
                 case FocusPointF::Position::Body: {
 
                 } break;
                 case FocusPointF::Position::Rotate: {
-                    rectItem->setPos(this->mapToScene(this->center().x(), m_topLeft.y() - 25));
+                    rectItem->setPos(this->mapToScene(this->centerPos().x(), m_topLeft.y() - 25));
                 } break;
                 default: {
 
@@ -415,12 +415,12 @@ void GraphicsItemBase::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         } break;
         case FocusPointF::Position::Rotate: {
             auto pos = event->pos().toPoint();
-            QVector2D startVect = QVector2D(m_pressedPos - this->center());
+            QVector2D startVect = QVector2D(m_pressedPos - this->centerPos());
             startVect.normalize();
-            QVector2D endVect = QVector2D(pos - this->center());
+            QVector2D endVect = QVector2D(pos - this->centerPos());
             endVect.normalize();
 
-            qDebug() << "m_pressedPos" << m_pressedPos << "innerPos" << pos << "event->pos()" << event->pos() << "this->center()" << this->center();
+            qDebug() << "m_pressedPos" << m_pressedPos << "innerPos" << pos << "event->pos()" << event->pos() << "this->center()" << this->centerPos();
 
             qreal value = QVector2D::dotProduct(startVect, endVect);
             if (value > 1.0) {
@@ -436,7 +436,7 @@ void GraphicsItemBase::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
                 angle *= -1.0;
             }
 
-            this->setTransformOriginPoint(this->center());
+            this->setTransformOriginPoint(this->centerPos());
             this->setRotation(this->rotation() + angle);
         } break;
         default: {
@@ -587,14 +587,14 @@ QList<FocusPointF> GraphicsItemBase::recalculateFocusPoint() {
     if (m_isProportional) {
 
     } else {
-        focusPointList.append(FocusPointF{m_topLeft.x(), this->center().y(), FocusPointF::Position::Left});
-        focusPointList.append(FocusPointF{m_bottomRight.x(), this->center().y(), FocusPointF::Position::Right});
-        focusPointList.append(FocusPointF{this->center().x(), m_topLeft.y(), FocusPointF::Position::Top});
-        focusPointList.append(FocusPointF{this->center().x(), m_bottomRight.y(), FocusPointF::Position::Bottom});
+        focusPointList.append(FocusPointF{m_topLeft.x(), this->centerPos().y(), FocusPointF::Position::Left});
+        focusPointList.append(FocusPointF{m_bottomRight.x(), this->centerPos().y(), FocusPointF::Position::Right});
+        focusPointList.append(FocusPointF{this->centerPos().x(), m_topLeft.y(), FocusPointF::Position::Top});
+        focusPointList.append(FocusPointF{this->centerPos().x(), m_bottomRight.y(), FocusPointF::Position::Bottom});
     }
 
     if (m_isRotatable) {
-        focusPointList.append(FocusPointF{this->center().x(), m_topLeft.y() - 25, FocusPointF::Position::Rotate});
+        focusPointList.append(FocusPointF{this->centerPos().x(), m_topLeft.y() - 25, FocusPointF::Position::Rotate});
     }
 
     return focusPointList;

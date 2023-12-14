@@ -36,7 +36,7 @@ public:
 
         for (QGraphicsItem* gitem : allItems) {
             auto item = dynamic_cast<GraphicsItemBase*>(gitem);
-            if (item && item != baseItem && item->zValue() > baseItem->zValue() && baseItem->shape().contains(baseItem->mapFromItem(item, item->center())) && type == QGraphicsItem::UserType + 2) {
+            if (item && item != baseItem && item->zValue() > baseItem->zValue() && baseItem->shape().contains(baseItem->mapFromItem(item, item->centerPos())) && type == QGraphicsItem::UserType + 2) {
                 itemsAbove.append(item);
             }
         }
@@ -80,8 +80,12 @@ public:
         return m_initialHeight / m_initialWidth;
     }
 
-    QPointF center() {
+    QPointF centerPos() {
         return QPointF{(m_topLeft + m_bottomRight) / 2};
+    }
+
+    QPointF centerScenePos() {
+        return this->mapToScene(QPointF{(m_topLeft+ m_bottomRight) / 2}) ;
     }
 
     double initialHeight() const;
