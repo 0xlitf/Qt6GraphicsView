@@ -515,8 +515,8 @@ void GraphicsItemBase::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
 }
 
 void GraphicsItemBase::updateTopLeftAndBottomRight() {
-    m_topLeft = QPointF{-this->initialWidth()/2, -this->initialHeight()/2};
-    m_bottomRight = QPointF{this->initialWidth()/2, this->initialHeight()/2};
+    m_topLeft = QPointF{-this->initialWidth() / 2, -this->initialHeight() / 2};
+    m_bottomRight = QPointF{this->initialWidth() / 2, this->initialHeight() / 2};
 }
 
 double GraphicsItemBase::initialWidth() const {

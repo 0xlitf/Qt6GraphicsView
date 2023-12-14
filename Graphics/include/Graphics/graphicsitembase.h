@@ -34,8 +34,9 @@ public:
         QGraphicsScene* scene = baseItem->scene();
         QList<QGraphicsItem*> allItems = scene->items();
 
-        for (QGraphicsItem* item: allItems) {
-            if (item != baseItem && item->zValue() > baseItem->zValue() && baseItem->shape().contains(baseItem->mapFromScene(item->pos())) && type == QGraphicsItem::UserType + 2) {
+        for (QGraphicsItem* gitem : allItems) {
+            auto item = dynamic_cast<GraphicsItemBase*>(gitem);
+            if (item && item != baseItem && item->zValue() > baseItem->zValue() && baseItem->shape().contains(baseItem->mapFromItem(item, item->center())) && type == QGraphicsItem::UserType + 2) {
                 itemsAbove.append(item);
             }
         }

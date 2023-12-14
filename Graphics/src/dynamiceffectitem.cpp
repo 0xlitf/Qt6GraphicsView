@@ -83,7 +83,7 @@ void DynamicEffectItem::startTimer() {
         for (QGraphicsItem* graphicsItem: itemsAboveEllipse) {
             auto item = dynamic_cast<GraphicsItem*>(graphicsItem);
             if (item && item->type() == QGraphicsItem::UserType + 2) {
-                auto shadowPos = this->mapFromScene(item->pos());
+                auto shadowPos = this->mapFromItem(item, item->center());
                 //qDebug() << item << shadowPos;
 
                 QColor color = this->getColorAtPos(shadowPos);
