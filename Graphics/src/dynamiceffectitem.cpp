@@ -16,6 +16,8 @@ DynamicEffectItem::DynamicEffectItem()
 
     this->setTopLeft({-this->initialWidth() / 2, -this->initialHeight() / 2});
     this->setBottomRight({this->initialWidth() / 2, this->initialHeight() / 2});
+
+    m_colorScrolling->setCircularDiffusion(false);
 }
 
 QRectF DynamicEffectItem::shapeRect() const {
@@ -63,8 +65,8 @@ void DynamicEffectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
 
 QColor DynamicEffectItem::getColorAtPos(const QPointF& pos) {
     Eigen::array<Eigen::Index, 3> dims = m_frame.dimensions();
-    double i = (pos.x() - this->topLeft().x()) / (this->bottomRight().x() - this->topLeft().x()) * dims[0];
-    double j = (pos.y() - this->topLeft().y()) / (this->bottomRight().y() - this->topLeft().y()) * dims[1];
+    double j = (pos.x() - this->topLeft().x()) / (this->bottomRight().x() - this->topLeft().x()) * dims[0];
+    double i = (pos.y() - this->topLeft().y()) / (this->bottomRight().y() - this->topLeft().y()) * dims[1];
 
     //qDebug() << (int)i << (int)j;
 
