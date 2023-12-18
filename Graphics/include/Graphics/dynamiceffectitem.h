@@ -17,8 +17,13 @@ public:
     }
 
     DynamicEffectItem();
+    ~DynamicEffectItem();
 
-    QRectF shapeRect() const;
+    void setCircularDiffusion(bool circularDiffusion) {
+        m_colorScrolling->setCircularDiffusion(circularDiffusion);
+    }
+
+    QRectF shapeRect() const override;
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;

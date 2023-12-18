@@ -17,7 +17,13 @@ DynamicEffectItem::DynamicEffectItem()
     this->setTopLeft({-this->initialWidth() / 2, -this->initialHeight() / 2});
     this->setBottomRight({this->initialWidth() / 2, this->initialHeight() / 2});
 
-    m_colorScrolling->setCircularDiffusion(false);
+    m_colorScrolling->setCircularDiffusion(true);
+}
+
+DynamicEffectItem::~DynamicEffectItem()
+{
+    m_timer->stop();
+    delete m_colorScrolling;
 }
 
 QRectF DynamicEffectItem::shapeRect() const {

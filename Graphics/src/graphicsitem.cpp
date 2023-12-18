@@ -85,3 +85,33 @@ QColor GraphicsItem::color() const {
 void GraphicsItem::setColor(const QColor& newColor) {
     m_color = newColor;
 }
+
+int GraphicsItem::getNonius() const
+{
+    return m_nonius;
+}
+
+void GraphicsItem::setNonius(int newNonius)
+{
+    m_nonius = newNonius;
+}
+
+int GraphicsItem::getUniverse() const
+{
+    return m_universe;
+}
+
+void GraphicsItem::setUniverse(int newUniverse)
+{
+    m_universe = newUniverse;
+}
+
+int GraphicsItem::getLightIndex() const
+{
+    return m_lightIndex;
+}
+
+void GraphicsItem::setLightIndex(int newLightIndex)
+{
+    m_lightIndex = newLightIndex;
+}
