@@ -38,7 +38,7 @@ protected:
 
     int m_bps = 24;
 
-    Eigen::Tensor<float, 3, 1> m_frame;
+    QSharedPointer<Eigen::Tensor<float, 3, Eigen::RowMajor>> m_frame;
 
     Effect::CircleDiffusion* m_colorScrolling = new Effect::CircleDiffusion(100, 100);
 

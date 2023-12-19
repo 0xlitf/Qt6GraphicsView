@@ -14,8 +14,8 @@ DynamicEffectItem::DynamicEffectItem()
     this->setInitialWidth(600);
     this->setInitialHeight(600);
 
-    this->setTopLeft({-this->initialWidth() / 2, -this->initialHeight() / 2});
-    this->setBottomRight({this->initialWidth() / 2, this->initialHeight() / 2});
+    this->setTopLeft({ -this->initialWidth() / 2, -this->initialHeight() / 2 });
+    this->setBottomRight({ this->initialWidth() / 2, this->initialHeight() / 2 });
 
     m_colorScrolling->setCircularDiffusion(true);
 }
@@ -38,7 +38,7 @@ QPainterPath DynamicEffectItem::shape() const {
     QPainterPath path;
     path.addRect(this->shapeRect());
 
-    QPointF center{(this->topLeft() + this->bottomRight()) / 2};
+    QPointF center{ (this->topLeft() + this->bottomRight()) / 2 };
     path.addRect(QRectF(center.x(), this->topLeft().y() - 25, 0, 0) + QMarginsF(2., 2., 2., 2.));
 
     return path;
@@ -52,31 +52,35 @@ void DynamicEffectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     painter->setPen(pen);
     painter->setRenderHint(QPainter::Antialiasing);
 
-    Eigen::array<Eigen::Index, 3> dims = m_frame.dimensions();
-    auto offset = this->bottomRight() - this->topLeft();
-    double mosaicWidth = offset.x() / dims[0];
-    double mosaicHeight = offset.y() / dims[1];
-    for (int i = 0; i < dims[0]; ++i) {
-        for (int j = 0; j < dims[1]; ++j) {
-            auto rect = QPointF(j * mosaicWidth + this->topLeft().x(), i * mosaicHeight + this->topLeft().y());
-            if (auto c = QColor(m_frame(i, j, 0), m_frame(i, j, 1), m_frame(i, j, 2)); c != QColor()) {
-                painter->setBrush(c);
-            } else {
-                painter->setBrush(Qt::gray);
+    if (m_frame) {
+        Eigen::array<Eigen::Index, 3> dims = m_frame->dimensions();
+        auto offset = this->bottomRight() - this->topLeft();
+        double mosaicWidth = offset.x() / dims[0];
+        double mosaicHeight = offset.y() / dims[1];
+        for (int i = 0; i < dims[0]; ++i) {
+            for (int j = 0; j < dims[1]; ++j) {
+                auto rect = QPointF(j * mosaicWidth + this->topLeft().x(), i * mosaicHeight + this->topLeft().y());
+                if (auto c = QColor((*m_frame)(i, j, 0), (*m_frame)(i, j, 1), (*m_frame)(i, j, 2)); c != QColor()) {
+                    painter->setBrush(c);
+                }
+                else {
+                    painter->setBrush(Qt::gray);
+                }
+                painter->drawRect(QRectF(rect, QSizeF(mosaicWidth, mosaicHeight)));
             }
-            painter->drawRect(QRectF(rect, QSizeF(mosaicWidth, mosaicHeight)));
         }
     }
+
 }
 
 QColor DynamicEffectItem::getColorAtPos(const QPointF& pos) {
-    Eigen::array<Eigen::Index, 3> dims = m_frame.dimensions();
+    Eigen::array<Eigen::Index, 3> dims = m_frame->dimensions();
     double j = (pos.x() - this->topLeft().x()) / (this->bottomRight().x() - this->topLeft().x()) * dims[0];
     double i = (pos.y() - this->topLeft().y()) / (this->bottomRight().y() - this->topLeft().y()) * dims[1];
 
     //qDebug() << (int)i << (int)j;
 
-    return QColor(m_frame((int)i, (int)j, 0), m_frame((int)i, (int)j, 1), m_frame((int)i, (int)j, 2));
+    return QColor((*m_frame)((int)i, (int)j, 0), (*m_frame)((int)i, (int)j, 1), (*m_frame)((int)i, (int)j, 2));
 }
 
 void DynamicEffectItem::startTimer() {
@@ -88,7 +92,7 @@ void DynamicEffectItem::startTimer() {
         QList<QGraphicsItem*> itemsAboveEllipse = findItemsAbove(this);
 
         int i = 0;
-        for (QGraphicsItem* graphicsItem: itemsAboveEllipse) {
+        for (QGraphicsItem* graphicsItem : itemsAboveEllipse) {
             auto item = dynamic_cast<GraphicsItem*>(graphicsItem);
             if (item && item->type() == QGraphicsItem::UserType + 2) {
                 auto shadowPos = this->mapFromScene(item->centerScenePos());
@@ -103,6 +107,6 @@ void DynamicEffectItem::startTimer() {
         //qDebug() << "Items above ellipseItem:" << itemsAboveEllipse.count() << "truly items count:" << i;
 
         this->update();
-    });
+        });
     m_timer->start();
 }
