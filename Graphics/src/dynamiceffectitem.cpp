@@ -87,7 +87,7 @@ void DynamicEffectItem::startTimer() {
     m_timer->setInterval(1000 / m_bps); // m_bps
     // m_timer->setSingleShot(true);
     connect(m_timer, &QTimer::timeout, [&]() {
-        m_frame = m_colorScrolling->get();
+        m_frame = m_colorScrolling->next();
 
         QList<QGraphicsItem*> itemsAboveEllipse = findItemsAbove(this);
 
