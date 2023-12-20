@@ -47,12 +47,17 @@ QPainterPath DynamicEffectItem::shape() const {
 void DynamicEffectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
 
     QPen pen;
-
     pen.setColor(Qt::transparent);
     painter->setPen(pen);
-    painter->setRenderHint(QPainter::Antialiasing);
+    // painter->setRenderHint(QPainter::Antialiasing);
 
-    if (m_frame) {
+    auto frame = m_colorScrolling->next();
+    // qDebug() << "frame" << frame;
+    if (!frame.isNull()) {
+        m_frame = frame;
+    }
+
+    if (!m_frame.isNull()) {
         Eigen::array<Eigen::Index, 3> dims = m_frame->dimensions();
         auto offset = this->bottomRight() - this->topLeft();
         double mosaicWidth = offset.x() / dims[0];
@@ -70,25 +75,25 @@ void DynamicEffectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
             }
         }
     }
-
 }
 
 QColor DynamicEffectItem::getColorAtPos(const QPointF& pos) {
-    Eigen::array<Eigen::Index, 3> dims = m_frame->dimensions();
-    double j = (pos.x() - this->topLeft().x()) / (this->bottomRight().x() - this->topLeft().x()) * dims[0];
-    double i = (pos.y() - this->topLeft().y()) / (this->bottomRight().y() - this->topLeft().y()) * dims[1];
+    if (m_frame) {
+        Eigen::array<Eigen::Index, 3> dims = m_frame->dimensions();
+        double j = (pos.x() - this->topLeft().x()) / (this->bottomRight().x() - this->topLeft().x()) * dims[0];
+        double i = (pos.y() - this->topLeft().y()) / (this->bottomRight().y() - this->topLeft().y()) * dims[1];
 
-    //qDebug() << (int)i << (int)j;
+        //qDebug() << (int)i << (int)j;
 
-    return QColor((*m_frame)((int)i, (int)j, 0), (*m_frame)((int)i, (int)j, 1), (*m_frame)((int)i, (int)j, 2));
+        return QColor((*m_frame)((int) i, (int) j, 0), (*m_frame)((int) i, (int) j, 1), (*m_frame)((int) i, (int) j, 2));
+    }
+    return QColor();
 }
 
 void DynamicEffectItem::startTimer() {
     m_timer->setInterval(1000 / m_bps); // m_bps
     // m_timer->setSingleShot(true);
     connect(m_timer, &QTimer::timeout, [&]() {
-        m_frame = m_colorScrolling->next();
-
         QList<QGraphicsItem*> itemsAboveEllipse = findItemsAbove(this);
 
         int i = 0;
@@ -104,6 +109,7 @@ void DynamicEffectItem::startTimer() {
                 ++i;
             }
         }
+
         //qDebug() << "Items above ellipseItem:" << itemsAboveEllipse.count() << "truly items count:" << i;
         this->update();
         });
