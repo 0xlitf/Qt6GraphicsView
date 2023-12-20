@@ -13,9 +13,7 @@
 #include "graphics_global.h"
 #include "graphicsitembase.h"
 
-class GRAPHICS_EXPORT GraphicsItem : public GraphicsItemBase
-{
-    Q_OBJECT
+class GRAPHICS_EXPORT GraphicsItem : public GraphicsItemBase {
 public:
     enum {
         Type = UserType + 2

@@ -6,8 +6,7 @@
 #include "circlediffusion.h"
 #include "graphicsitem.h"
 
-class GRAPHICS_EXPORT DynamicEffectItem : public GraphicsItem
-{
+class GRAPHICS_EXPORT DynamicEffectItem : public GraphicsItem {
 public:
     enum {
         Type = UserType + 3
@@ -34,12 +33,11 @@ public:
     QColor getColorAtPos(const QPointF& pos);
 
 protected:
-    QTimer* m_timer = new QTimer(this);
+    QTimer* m_timer = new QTimer();
 
     int m_bps = 24;
 
     QSharedPointer<Eigen::Tensor<float, 3, Eigen::RowMajor>> m_frame;
 
     Effect::CircleDiffusion* m_colorScrolling = new Effect::CircleDiffusion(100, 100);
-
 };

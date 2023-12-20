@@ -11,9 +11,7 @@
 #include "focusitem.h"
 #include "graphics_global.h"
 
-class GRAPHICS_EXPORT GraphicsItemBase : public QGraphicsObject
-{
-    Q_OBJECT
+class GRAPHICS_EXPORT GraphicsItemBase : public QGraphicsItem {
 public:
     enum {
         Type = UserType + 1
@@ -95,15 +93,20 @@ public:
 
     void updateTopLeftAndBottomRight();
 
+    bool isMoving();
+
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override {
+#ifdef DEBUG_ITEM_EVENT
         // qDebug() << "GraphicsItemBase::hoverEnterEvent";
-
+#endif
         QGraphicsItem::hoverEnterEvent(event);
     }
 
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) {
+#ifdef DEBUG_ITEM_EVENT
         // qDebug() << "GraphicsItemBase::hoverMoveEvent";
+#endif
         // hoverMoveEvent中区分this->isSelected()将导致pressed后无法直接拖动
         // if (!this->isSelected()) {
         //     // m_hoverPoint.setPosition(FocusPoint::Position::Center);
@@ -149,20 +152,27 @@ protected:
     }
 
     void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override {
+#ifdef DEBUG_ITEM_EVENT
+        // qDebug() << "GraphicsItemBase::hoverLeaveEvent";
+#endif
         unsetCursor();
         QGraphicsItem::hoverLeaveEvent(event);
     }
 
     void keyPressEvent(QKeyEvent *event) override {
+#ifdef DEBUG_ITEM_EVENT
+        qDebug() << "GraphicsItemBase keyPressEvent: " << Qt::Key(event->key());
+#endif
         event->accept();
-        // qDebug() << "GraphicsItemBase keyPressEvent: " << Qt::Key(event->key());
 
         // QGraphicsItem::keyPressEvent(event);
     }
 
     void keyReleaseEvent(QKeyEvent *event) override {
+#ifdef DEBUG_ITEM_EVENT
+        qDebug() << "GraphicsItemBase keyReleaseEvent: " << Qt::Key(event->key());
+#endif
         event->accept();
-        // qDebug() << "GraphicsItemBase keyReleaseEvent: " << Qt::Key(event->key());
 
         // QGraphicsItem::keyReleaseEvent(event);
     }

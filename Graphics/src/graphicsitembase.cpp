@@ -1,6 +1,4 @@
 
-#include "graphicsitem.h"
-
 #include "graphicsscene.h"
 #include <QAction>
 #include <QContextMenuEvent>
@@ -64,6 +62,8 @@ void GraphicsItemBase::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
             painter->setPen(p);
         }
     }
+
+    // this->moveFocusPoint();
 }
 
 QVariant GraphicsItemBase::itemChange(GraphicsItemChange change, const QVariant& value) {
@@ -75,40 +75,41 @@ QVariant GraphicsItemBase::itemChange(GraphicsItemChange change, const QVariant&
         this->moveFocusPoint();
     }
 
-    // if (true && change == ItemSelectedChange && scene()) {
-    //     // qDebug() << (void*)this << change;
-    //     if (value.toBool()) {
-    //         auto focusPointList = this->recalculateFocusPoint();
-    //         for (int i = 0; i < focusPointList.count(); ++i) {
-    //             FocusItem* item = new FocusItem();
-    //             item->setPoint(focusPointList[i]);
-    //             item->setAdsorbItem(this);
-    //             item->setPos(this->mapToScene(focusPointList[i].x(), focusPointList[i].y()).toPoint());
-    //             item->setZValue(100);
-    //             scene()->addItem(item);
-    //             item->installSceneEventFilter(this);
-    //             item->update();
-    //             m_focusPointItemList.append(item);
-    //         }
-    //     } else {
-    //         for (int i = 0; i < m_focusPointItemList.count(); ++i) {
-    //             FocusItem* rectItem = m_focusPointItemList[i];
+    if (true && change == ItemSelectedChange && scene()) {
+        // qDebug() << (void*)this << change;
+        if (value.toBool()) {
+            auto focusPointList = this->recalculateFocusPoint();
+            for (int i = 0; i < focusPointList.count(); ++i) {
+                FocusItem* item = new FocusItem();
+                item->setPoint(focusPointList[i]);
+                item->setAdsorbItem(this);
+                item->setPos(this->mapToScene(focusPointList[i].x(), focusPointList[i].y()).toPoint());
+                item->setZValue(100);
+                scene()->addItem(item);
+                item->installSceneEventFilter(this);
+                item->update();
+                m_focusPointItemList.append(item);
+            }
+        } else {
+            for (int i = 0; i < m_focusPointItemList.count(); ++i) {
+                FocusItem* rectItem = m_focusPointItemList[i];
 
-    //             scene()->removeItem(rectItem);
+                scene()->removeItem(rectItem);
 
-    //             delete rectItem;
-    //             rectItem = nullptr;
-    //         }
-    //         m_focusPointItemList.clear();
+                delete rectItem;
+                rectItem = nullptr;
+            }
+            m_focusPointItemList.clear();
 
-    //         m_focusItem = nullptr;
-    //     }
-    // }
+            m_focusItem = nullptr;
+        }
+    }
 
     return QGraphicsItem::itemChange(change, value);
 }
 
 void GraphicsItemBase::moveFocusPoint(const FocusPointF::Position& position) {
+    // qDebug() << "GraphicsItemBase::moveFocusPoint";
     auto focusPointList = this->recalculateFocusPoint();
     if (!focusPointList.isEmpty()) {
         for (int i = 0; i < focusPointList.count() && i < m_focusPointItemList.count(); ++i) {
@@ -117,6 +118,10 @@ void GraphicsItemBase::moveFocusPoint(const FocusPointF::Position& position) {
             }
             FocusItem* rectItem = m_focusPointItemList[i];
             rectItem->setRotation(this->rotation());
+
+            auto x = this->scenePos().x() - ((m_bottomRight - m_topLeft) / 2).x();
+            auto y = this->scenePos().y() - ((m_bottomRight - m_topLeft) / 2).y();
+
             switch (focusPointList[i].position()) {
                 case FocusPointF::Position::Undefined: {
 
@@ -161,7 +166,9 @@ void GraphicsItemBase::moveFocusPoint(const FocusPointF::Position& position) {
 }
 
 void GraphicsItemBase::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+#ifdef DEBUG_ITEM_EVENT
     qDebug() << "GraphicsItemBase::mousePressEvent";
+#endif
     if (this->group()) {
         return;
     }
@@ -195,12 +202,15 @@ void GraphicsItemBase::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsItemBase::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+#ifdef DEBUG_ITEM_EVENT
+    qDebug() << "GraphicsItemBase::mouseMoveEvent" << event;
+#endif
+    if (m_pressedPos.isNull()) {
+        return;
+    }
     auto proportionalScale = this->proportionalScale();
-
     this->prepareGeometryChange();
-
     // qDebug() << "m_focusPosition" << (int)m_focusPosition;
-
     switch (m_focusPosition) {
         case FocusPointF::Position::Undefined: {
 
@@ -452,7 +462,9 @@ void GraphicsItemBase::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsItemBase::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+#ifdef DEBUG_ITEM_EVENT
     qDebug() << "GraphicsItemBase::mouseReleaseEvent";
+#endif
     m_pressedPos = QPoint{};
     QGraphicsItem::mouseReleaseEvent(event);
     update();

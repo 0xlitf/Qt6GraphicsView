@@ -13,7 +13,6 @@ class GraphicsScene;
 
 class GRAPHICS_EXPORT RoundItem : public GraphicsItem
 {
-    Q_OBJECT
 public:
     RoundItem(const QColor& color, int x, int y);
     RoundItem() = default;

@@ -3,6 +3,10 @@
 
 #include <QtCore/qglobal.h>
 
+#define DEBUG_ITEM_EVENT
+// #define DEBUG_SCENE_EVENT
+// #define DEBUG_VIEW_EVENT
+
 #if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #  define Q_DECL_EXPORT __declspec(dllexport)
 #  define Q_DECL_IMPORT __declspec(dllimport)

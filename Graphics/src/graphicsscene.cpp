@@ -286,7 +286,9 @@ void GraphicsScene::setPropertyEditor(QtTreePropertyBrowser* newPropertyEditor) 
 }
 
 void GraphicsScene::keyPressEvent(QKeyEvent* event) {
-    // qDebug() << "GraphicsScene keyPressEvent: " << Qt::Key(event->key());
+#ifdef DEBUG_SCENE_EVENT
+    qDebug() << "GraphicsScene keyPressEvent: " << Qt::Key(event->key());
+#endif
 
     switch (Qt::Key(event->key())) {
         case Qt::Key_F1: {
@@ -330,14 +332,17 @@ void GraphicsScene::keyPressEvent(QKeyEvent* event) {
 
 
 void GraphicsScene::keyReleaseEvent(QKeyEvent* event) {
-
-    // qDebug() << "GraphicsScene keyReleaseEvent: " << Qt::Key(event->key());
+#ifdef DEBUG_SCENE_EVENT
+    qDebug() << "GraphicsScene keyReleaseEvent: " << Qt::Key(event->key());
+#endif
     QGraphicsScene::keyReleaseEvent(event);
 }
 
 void GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
-    m_isPressed = true;
+#ifdef DEBUG_SCENE_EVENT
     qDebug() << "GraphicsScene::mousePressEvent";
+#endif
+    m_isPressed = true;
     QPointF scenePos = event->scenePos();
     QGraphicsItem* item = this->itemAt(scenePos, QTransform());
 
@@ -364,6 +369,9 @@ void GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+#ifdef DEBUG_SCENE_EVENT
+    qDebug() << "GraphicsScene::mouseMoveEvent";
+#endif
     if (m_isPressed) {
         m_isMoving = true;
     }
@@ -388,7 +396,9 @@ void GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+#ifdef DEBUG_SCENE_EVENT
     qDebug() << "GraphicsScene::mouseReleaseEvent";
+#endif
     m_isPressed = false;
     m_isMoving = false;
     m_movingItem = nullptr;

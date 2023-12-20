@@ -78,6 +78,9 @@ public:
 
     void setPropertyEditor(QtTreePropertyBrowser* newPropertyEditor);
 
+    bool isMoving() const;
+    void setMoving(bool newIsMoving);
+
 public slots:
     void valueChanged(QtProperty* property, double value);
     void valueChanged(QtProperty* property, int value);
@@ -115,4 +118,7 @@ private:
     FocusManager* m_focusManager = nullptr;
 
     QList<QGraphicsItem*>  m_focusItemList{};
+
+    bool m_isMoving = false;
+    bool m_isPressed = false;
 };

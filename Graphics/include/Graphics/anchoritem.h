@@ -15,7 +15,6 @@
 
 class GRAPHICS_EXPORT AnchorItem : public QObject, public QGraphicsItem
 {
-    Q_OBJECT
 public:
     AnchorItem(QRectF rect = QRectF(0, 0, 200, 200), QPixmap map = QPixmap(":/icons/circle_green.png"));
     QRectF boundingRect() const override;

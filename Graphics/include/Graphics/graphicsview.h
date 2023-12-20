@@ -22,25 +22,33 @@ protected:
 
 protected:
     void enterEvent(QEnterEvent *event) override {
-        // qDebug() << "GraphicsView::enterEvent";
+#ifdef DEBUG_VIEW_EVENT
+        qDebug() << "GraphicsView::enterEvent";
+#endif
 
         QGraphicsView::enterEvent(event);
     }
 
     void moveEvent(QMoveEvent *event) override {
-        // qDebug() << "GraphicsView::moveEvent";
+#ifdef DEBUG_VIEW_EVENT
+        qDebug() << "GraphicsView::moveEvent";
+#endif
 
         QGraphicsView::moveEvent(event);
     }
 
     void leaveEvent(QEvent *event) override {
-        // qDebug() << "GraphicsView::leaveEvent";
+#ifdef DEBUG_VIEW_EVENT
+        qDebug() << "GraphicsView::leaveEvent";
+#endif
         unsetCursor();
         QGraphicsView::leaveEvent(event);
     }
 
     void mousePressEvent(QMouseEvent *event) override {
-        qDebug() << "GraphicsView::mousePressEvent" << event->buttons() << this->cursor();
+#ifdef DEBUG_VIEW_EVENT
+        qDebug() << "GraphicsView::mousePressEvent" << event->buttons();
+#endif
         m_pressPoint = event->pos();
 
         if (event->buttons() == Qt::LeftButton) {
@@ -56,6 +64,9 @@ protected:
     }
 
     void mouseMoveEvent(QMouseEvent* event) override {
+#ifdef DEBUG_VIEW_EVENT
+        qDebug() << "GraphicsView::mouseMoveEvent" << event->buttons();
+#endif
         QPointF point = event->pos() - m_pressPoint;
 
         // if (point.manhattanLength() > 1) {
@@ -91,7 +102,9 @@ protected:
     }
 
     void mouseReleaseEvent(QMouseEvent* event) override {
+#ifdef DEBUG_VIEW_EVENT
         qDebug() << "GraphicsView::mouseReleaseEvent" << m_sceneMovedByRightButton ;
+#endif
         this->setCursor(Qt::ArrowCursor);
         this->viewport()->setCursor(Qt::ArrowCursor);
 
@@ -103,7 +116,9 @@ protected:
     }
 
     void contextMenuEvent(QContextMenuEvent *event) {
+#ifdef DEBUG_VIEW_EVENT
         qDebug() << "GraphicsView::contextMenuEvent" << m_sceneMovedByRightButton ;
+#endif
         if (m_sceneMovedByRightButton) {
             event->accept();
             m_sceneMovedByRightButton = false;
