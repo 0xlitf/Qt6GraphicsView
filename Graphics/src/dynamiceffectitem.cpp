@@ -23,6 +23,7 @@ DynamicEffectItem::DynamicEffectItem()
 DynamicEffectItem::~DynamicEffectItem()
 {
     m_timer->stop();
+    delete m_timer;
     delete m_colorScrolling;
 }
 
@@ -93,7 +94,8 @@ QColor DynamicEffectItem::getColorAtPos(const QPointF& pos) {
 void DynamicEffectItem::startTimer() {
     m_timer->setInterval(1000 / m_bps); // m_bps
     // m_timer->setSingleShot(true);
-    connect(m_timer, &QTimer::timeout, [&]() {
+    QObject::connect(m_timer, &QTimer::timeout, [&]() {
+
         QList<QGraphicsItem*> itemsAboveEllipse = findItemsAbove(this);
 
         int i = 0;

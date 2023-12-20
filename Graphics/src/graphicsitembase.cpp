@@ -19,7 +19,7 @@ template <typename T> int sgn(T val) {
 }
 
 GraphicsItemBase::GraphicsItemBase(QGraphicsItem* parent)
-    : QGraphicsObject(parent) {
+    : QGraphicsItem(parent) {
 
     this->setFlag(QGraphicsItem::ItemIsFocusable);
     this->setFlag(QGraphicsItem::ItemIsSelectable);
@@ -52,7 +52,7 @@ void GraphicsItemBase::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
 
     m_scale = option->levelOfDetailFromTransform(painter->worldTransform());
 
-    if (this->isSelected()) {
+    if (this->isSelected() && !this->isMoving()) {
         auto focusPointList = this->recalculateFocusPoint();
         // qDebug() << "focusPointList.count()" << focusPointList.count();
 
@@ -70,40 +70,40 @@ QVariant GraphicsItemBase::itemChange(GraphicsItemChange change, const QVariant&
     // qDebug() << "itemChange" << change;
     if (change == QGraphicsItem::ItemPositionChange) {
         // QPointF newPos = value.toPointF();
-        // qDebug() << (void*)this << change << "New Position:" << newPos;
+        // qDebug() << (void*)this << change << "New Position:";
 
         this->moveFocusPoint();
     }
 
-    if (true && change == ItemSelectedChange && scene()) {
-        // qDebug() << (void*)this << change;
-        if (value.toBool()) {
-            auto focusPointList = this->recalculateFocusPoint();
-            for (int i = 0; i < focusPointList.count(); ++i) {
-                FocusItem* item = new FocusItem();
-                item->setPoint(focusPointList[i]);
-                item->setAdsorbItem(this);
-                item->setPos(this->mapToScene(focusPointList[i].x(), focusPointList[i].y()).toPoint());
-                item->setZValue(100);
-                scene()->addItem(item);
-                item->installSceneEventFilter(this);
-                item->update();
-                m_focusPointItemList.append(item);
-            }
-        } else {
-            for (int i = 0; i < m_focusPointItemList.count(); ++i) {
-                FocusItem* rectItem = m_focusPointItemList[i];
+    // if (true && change == ItemSelectedChange && scene()) {
+    //     // qDebug() << (void*)this << change;
+    //     if (value.toBool()) {
+    //         auto focusPointList = this->recalculateFocusPoint();
+    //         for (int i = 0; i < focusPointList.count(); ++i) {
+    //             FocusItem* item = new FocusItem();
+    //             item->setPoint(focusPointList[i]);
+    //             item->setAdsorbItem(this);
+    //             item->setPos(this->mapToScene(focusPointList[i].x(), focusPointList[i].y()).toPoint());
+    //             item->setZValue(100);
+    //             scene()->addItem(item);
+    //             item->installSceneEventFilter(this);
+    //             item->update();
+    //             m_focusPointItemList.append(item);
+    //         }
+    //     } else {
+    //         for (int i = 0; i < m_focusPointItemList.count(); ++i) {
+    //             FocusItem* rectItem = m_focusPointItemList[i];
 
-                scene()->removeItem(rectItem);
+    //             scene()->removeItem(rectItem);
 
-                delete rectItem;
-                rectItem = nullptr;
-            }
-            m_focusPointItemList.clear();
+    //             delete rectItem;
+    //             rectItem = nullptr;
+    //         }
+    //         m_focusPointItemList.clear();
 
-            m_focusItem = nullptr;
-        }
-    }
+    //         m_focusItem = nullptr;
+    //     }
+    // }
 
     return QGraphicsItem::itemChange(change, value);
 }
@@ -512,6 +512,11 @@ void GraphicsItemBase::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
     } else {
         qDebug() << "GraphicsItemBase selectedAction not match";
     }
+}
+
+bool GraphicsItemBase::isMoving() {
+    m_scene = dynamic_cast<GraphicsScene*>(this->scene());
+    return m_scene->isMoving();
 }
 
 void GraphicsItemBase::updateTopLeftAndBottomRight() {

@@ -31,6 +31,9 @@ QPainterPath FocusItem::shape() const {
 }
 
 void FocusItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
+    if (m_adsorbItem && m_adsorbItem->isMoving()) {
+        return;
+    }
 
     QColor borderColor = Qt::gray;
     QColor fillColor = Qt::red;

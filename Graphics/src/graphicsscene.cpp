@@ -336,6 +336,7 @@ void GraphicsScene::keyReleaseEvent(QKeyEvent* event) {
 }
 
 void GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+    m_isPressed = true;
     qDebug() << "GraphicsScene::mousePressEvent";
     QPointF scenePos = event->scenePos();
     QGraphicsItem* item = this->itemAt(scenePos, QTransform());
@@ -363,6 +364,10 @@ void GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+    if (m_isPressed) {
+        m_isMoving = true;
+    }
+
     if (m_movingItem) {
         // qDebug() << m_movingItem->x();
     }
@@ -384,7 +389,13 @@ void GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
 void GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
     qDebug() << "GraphicsScene::mouseReleaseEvent";
+    m_isPressed = false;
+    m_isMoving = false;
     m_movingItem = nullptr;
+
+    for (auto item : this->selectedItems()) {
+        item->update();
+    }
 
     QGraphicsScene::mouseReleaseEvent(event);
 }
@@ -433,4 +444,12 @@ void GraphicsScene::dragMoveEvent(QGraphicsSceneDragDropEvent* event) {
 void GraphicsScene::dropEvent(QGraphicsSceneDragDropEvent* event) {
     event->acceptProposedAction();
     QGraphicsScene::dropEvent(event);
+}
+
+bool GraphicsScene::isMoving() const {
+    return m_isMoving;
+}
+
+void GraphicsScene::setMoving(bool newIsMoving) {
+    m_isMoving = newIsMoving;
 }
