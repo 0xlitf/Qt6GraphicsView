@@ -9,7 +9,6 @@
 #include <QKeyEvent>
 #include "focuspoint.h"
 #include "focusitem.h"
-#include "focuspoint.h"
 #include "graphics_global.h"
 
 class GRAPHICS_EXPORT GraphicsItemBase : public QGraphicsObject
