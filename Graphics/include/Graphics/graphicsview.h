@@ -5,6 +5,7 @@
 #include <QWheelEvent>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QElapsedTimer>
 #include "graphics_global.h"
 
 class ViewFrame;
@@ -14,13 +15,40 @@ class GRAPHICS_EXPORT GraphicsView : public QGraphicsView
     Q_OBJECT
 public:
     GraphicsView(ViewFrame* v);
-
+    QPixmap pix;
+    QPoint lasetPoint;
+    QPoint endPoint;
+    QPixmap tempPix;
+    bool isDrawing;
+    bool isDoubleClick;
 protected:
 #if QT_CONFIG(wheelevent)
     void wheelEvent(QWheelEvent* e) override;
 #endif
 
 protected:
+    void paintEvent(QPaintEvent* event) override {
+        QElapsedTimer t;
+        t.start();
+        // qDebug() << "this->viewport()" << this->viewport()->rect();
+        QGraphicsView::paintEvent(event);
+		QRectF viewRect = this->rect();
+        QPainter painter(viewport());
+        // painter.setPen(Qt::blue);
+        painter.setBrush(QColor(0, 0, 255, 63));
+        QFont f = painter.font();
+        f.setPixelSize(30);
+        painter.setFont(f);
+        painter.setPen(Qt::black);
+
+        painter.drawRect(QRect(10, 10, 200, 40));
+
+        int ms = t.elapsed();
+        if (ms > 0) {
+            painter.drawText(QRectF(20, 10, 200, 40), QString(QString::number(ms) + " ms, " + QString::number(1000 / ms) + " fps"));
+        }
+    }
+
     void enterEvent(QEnterEvent *event) override {
 #ifdef DEBUG_VIEW_EVENT
         qDebug() << "GraphicsView::enterEvent";
