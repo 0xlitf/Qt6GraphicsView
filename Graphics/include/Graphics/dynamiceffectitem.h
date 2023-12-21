@@ -35,7 +35,7 @@ public:
 protected:
     QTimer* m_timer = new QTimer();
 
-    int m_bps = 24;
+    int m_fps = 24;
 
     QSharedPointer<Eigen::Tensor<float, 3, Eigen::RowMajor>> m_frame;
 

@@ -92,7 +92,7 @@ QColor DynamicEffectItem::getColorAtPos(const QPointF& pos) {
 }
 
 void DynamicEffectItem::startTimer() {
-    m_timer->setInterval(1000 / m_bps); // m_bps
+    m_timer->setInterval(1000 / m_fps); // m_fps
     // m_timer->setSingleShot(true);
     QObject::connect(m_timer, &QTimer::timeout, [&]() {
 
